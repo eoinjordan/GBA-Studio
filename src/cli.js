@@ -12,6 +12,7 @@ const COMMANDS = new Set([
   "make:gba",
   "create-scene",
   "create-actor",
+  "set-start-scene",
 ]);
 const SCHEMA_PATH = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -63,6 +64,23 @@ function loadProject(projectPath) {
 
 function saveProject(projectPath, project) {
   fs.writeFileSync(projectPath, JSON.stringify(project, null, 2) + "\n", "utf8");
+}
+
+function parseIntegerFlag(value, name, fallback) {
+  if (value === undefined) {
+    return fallback;
+  }
+  if (!/^-?\d+$/.test(String(value))) {
+    fail(`${name} must be an integer.`);
+  }
+  return Number(value);
+}
+
+function validateOrFail(project) {
+  const errors = validateProject(project);
+  if (errors.length > 0) {
+    fail(`Project validation failed:\n- ${errors.join("\n- ")}`);
+  }
 }
 
 function inventoryProject(project) {
@@ -134,15 +152,27 @@ function createActor(project, sceneId, actorId, name, options = {}) {
   const newActor = {
     id: actorId,
     name,
-    x: Number(options.x ?? 112),
-    y: Number(options.y ?? 72),
-    width: Number(options.width ?? 16),
-    height: Number(options.height ?? 16),
+    x: parseIntegerFlag(options.x, "--x", 112),
+    y: parseIntegerFlag(options.y, "--y", 72),
+    width: parseIntegerFlag(options.width, "--width", 16),
+    height: parseIntegerFlag(options.height, "--height", 16),
     color: options.color || "#ffffff",
   };
 
   scene.actors.push(newActor);
   return newActor;
+}
+
+function setStartScene(project, sceneId) {
+  if (!sceneId) {
+    fail("Scene id is required.");
+  }
+  const scene = project.scenes.find((sceneItem) => sceneItem.id === sceneId);
+  if (!scene) {
+    fail(`Scene not found: ${sceneId}`);
+  }
+  project.startScene = sceneId;
+  return scene;
 }
 
 function usage(exitCode = 0) {
@@ -155,6 +185,7 @@ Usage:
   gba-studio make:gba <project.gbasproj> <out-rom.gba> [--skip-build]
   gba-studio create-scene <project.gbasproj> --id <id> --name <name>
   gba-studio create-actor <project.gbasproj> --scene <sceneId> --id <actorId> --name <name>
+  gba-studio set-start-scene <project.gbasproj> --scene <sceneId>
 
 Examples:
   gba-studio validate examples/blank/project.gbasproj
@@ -163,6 +194,7 @@ Examples:
   gba-studio make:gba examples/blank/project.gbasproj build/rom/blank.gba
   gba-studio create-scene examples/blank/project.gbasproj --id town --name Town
   gba-studio create-actor examples/blank/project.gbasproj --scene start --id player --name Player
+  gba-studio set-start-scene examples/blank/project.gbasproj --scene start
 
 Notes:
   make:gba requires devkitPro/devkitARM and a GBA support library such as libtonc.
@@ -501,16 +533,19 @@ function main() {
   }
 
   if (command === "create-scene") {
+    validateOrFail(project);
     const sceneId = getFlagValue(flags, "--id");
     const name = getFlagValue(flags, "--name");
-    backupProject(projectPath);
     const scene = createScene(project, sceneId, name);
+    validateOrFail(project);
+    backupProject(projectPath);
     saveProject(projectPath, project);
     outputResult(json ? { created: true, scene } : `Created scene ${sceneId} in ${projectPath}`, json);
     return;
   }
 
   if (command === "create-actor") {
+    validateOrFail(project);
     const sceneId = getFlagValue(flags, "--scene");
     const actorId = getFlagValue(flags, "--id");
     const name = getFlagValue(flags, "--name");
@@ -521,10 +556,22 @@ function main() {
       width: getFlagValue(flags, "--width"),
       height: getFlagValue(flags, "--height"),
     };
-    backupProject(projectPath);
     const actor = createActor(project, sceneId, actorId, name, actorOptions);
+    validateOrFail(project);
+    backupProject(projectPath);
     saveProject(projectPath, project);
     outputResult(json ? { created: true, actor } : `Created actor ${actorId} in scene ${sceneId}`, json);
+    return;
+  }
+
+  if (command === "set-start-scene") {
+    validateOrFail(project);
+    const sceneId = getFlagValue(flags, "--scene");
+    const scene = setStartScene(project, sceneId);
+    validateOrFail(project);
+    backupProject(projectPath);
+    saveProject(projectPath, project);
+    outputResult(json ? { updated: true, startScene: scene.id } : `Set start scene to ${scene.id}`, json);
     return;
   }
 

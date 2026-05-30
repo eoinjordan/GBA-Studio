@@ -4,13 +4,20 @@
   "description": "Minimal GBA Studio pipeline: validate .gbasproj projects, generate C source, and build .gba ROMs with devkitARM.",
   "type": "module",
   "bin": {
-    "gba-studio": "./src/cli.js"
+    "gba-studio": "./src/cli.js",
+    "gba-studio-mcp": "./src/mcp-server.js"
   },
   "scripts": {
     "validate": "node src/cli.js validate examples/blank/project.gbasproj",
     "inventory": "node src/cli.js inventory examples/blank/project.gbasproj",
     "export:c": "node src/cli.js export-c examples/blank/project.gbasproj build/generated/blank",
     "make:gba": "node src/cli.js make:gba examples/blank/project.gbasproj build/rom/blank.gba",
+    "mcp": "node src/mcp-server.js",
+    "fetch-deps": "npm --prefix gba-studio run fetch-deps",
+    "make:cli": "npm --prefix gba-studio run make:cli",
+    "build:gba": "npm --prefix gba-studio run build:gba --",
+    "test:emu": "npm --prefix gba-studio run test:emu --",
+    "validate:rom": "node scripts/validate-rom.js",
     "test": "node test/index.js"
   },
   "keywords": [

@@ -176,7 +176,27 @@ gba-studio export-c <project.gbasproj> <outDir>
 gba-studio make:gba <project.gbasproj> <out-rom.gba> [--skip-build]
 gba-studio create-scene <project.gbasproj> --id <id> --name <name>
 gba-studio create-actor <project.gbasproj> --scene <sceneId> --id <actorId> --name <name>
+gba-studio set-start-scene <project.gbasproj> --scene <sceneId>
 ```
+
+## MCP server
+
+This repo includes a small stdio MCP server that wraps the CLI with guarded tools for agent workflows.
+
+```bash
+npm run mcp
+```
+
+Available tools:
+
+- `find_gba_project`
+- `validate_gba_project`
+- `inventory_gba_project`
+- `create_scene`
+- `create_actor`
+- `set_start_scene`
+- `export_gba_source`
+- `build_gba_rom`
 
 ## Town demo
 

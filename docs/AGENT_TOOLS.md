@@ -32,6 +32,12 @@ Adds an actor object to a chosen scene.
 
 Updates `startScene` after verifying the scene exists.
 
+Implemented by:
+
+```bash
+node src/cli.js set-start-scene <project.gbasproj> --scene <sceneId>
+```
+
 ### build_gba_rom
 
 Runs:
@@ -55,3 +61,13 @@ node src/cli.js export-c <project.gbasproj> <out-dir>
 - Never edit generated C files as the source of truth.
 - Never overwrite an existing ROM unless the caller explicitly allows it.
 - Keep build output under `build/`.
+
+## Server
+
+Run the MCP stdio server with:
+
+```bash
+npm run mcp
+```
+
+The server wraps the CLI commands instead of calling compiler internals directly.

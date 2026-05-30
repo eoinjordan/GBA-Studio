@@ -1,84 +1,88 @@
-## GBA Studio — Code Review & Action Items
+## Current Status
 
-Summary
-- Tests: `npm test` now passes locally (171 suites, 2004 tests) after platform fixes.
-- Hygiene: added `gba-studio/.npmrc` and `tools/bootstrap.*` to help reproducible installs.
-- CLI: `npm run make:cli` builds the command-line bundle at `out/cli/gb-studio-cli`.
-- CI: preliminary GitHub Actions changes were added to install `devkitPro` on Ubuntu runners and run a headless ROM build; see `.github/workflows/ci.yml`.
+- Root wrapper scripts are in place:
+  - `npm run fetch-deps`
+  - `npm run make:cli`
+  - `npm run build:gba -- <project.gbsproj> <out.gba>`
+  - `npm run test:emu -- <out.gba>`
+  - `npm run validate:rom -- <out.gba>`
+- The standalone `.gbasproj` CLI is in place:
+  - `validate`
+  - `inventory`
+  - `export-c`
+  - `make:gba`
+  - `create-scene`
+  - `create-actor`
+  - `set-start-scene`
+- A stdio MCP server is in place at `src/mcp-server.js`.
+- `npm test` passes for the standalone CLI/MCP-oriented project.
+- `npm run make:cli` passes for the nested GB Studio fork.
+- `npm run build:gba -- test/data/projects/RunProject/RunProject.gbsproj out/RunProject.gba` now creates a non-empty proof ROM locally with devkitPro installed at `C:\devkitPro`.
+- `npm run validate:rom -- gba-studio\out\RunProject.gba` validates that the produced ROM exists and is non-empty.
 
-What I executed
-- Installed dependencies (npm fallback used where Corepack/Yarn activation required admin privileges).
-- Ran `npm run fetch-deps` to initialise submodules and helper downloads.
-- Ran and fixed failing tests, patched Windows path handling and plugin path comparisons.
-- Built the CLI and iterated on headless builds; the native link step is blocked locally by a platform-incompatible `devkit` binary.
+## Verified Locally
 
-Key findings
-- Corepack/Yarn on Windows: enabling corepack may require elevated permissions on some machines. `tools/bootstrap.*` helps but local admin intervention can be necessary.
-- Path normalization: repository-internal paths are now POSIX (fixed tests and cross-platform comparisons).
-- Engine metadata versions sometimes include suffixes (e.g. `4.2.0-gba`), now handled by base-version checks.
-- Toolchain: `buildTools` contains prebundled artifacts for various OS/arch, and CI now installs `devkitPro` on Ubuntu runners — Windows runner/toolchain steps remain to be added.
-
-Current status (high level)
-- Unit tests: PASS (local).
-- CLI build: OK (`npm run make:cli`).
-- Headless ROM build in CI: started (Ubuntu runners) — local Windows build blocked by incompatible prebundled devkit binary.
-
-Outstanding tasks (priority)
-1) CI: complete multi-platform devkit installation and emulator smoke-tests
-- Status: In-progress (CI for Ubuntu added). Add Windows and macOS devkit setup, add `binjgb` or `mGBA` smoke-tests, and attach produced `.gba` to releases.
-
-2) Local developer experience: document Yarn/Corepack and devkit setup
-- Status: Not started (docs). Add `docs/DEVKIT_SETUP.md` with platform steps and verification commands.
-
-3) `build:gba` and `test:emu` scripts
-- Status: Not started (code). Add scripts that wrap `make:cli` + `node out/cli/gb-studio-cli make:rom` and a smoke-run using an emulator.
-
-4) Caching and speed-ups for CI
-- Status: Not started. Add cache for `~/.devkitpro`, Yarn cache, and `node_modules`/Yarn cache to speed repeated runs.
-
-How to run the GUI locally (quick)
-1. Install dependencies (use Yarn if you prefer; npm works as a fallback):
+From the workspace root:
 
 ```powershell
-Set-Location 'c:\Users\Eoin\git\GBAStudio'
-Set-Location 'c:\Users\Eoin\git\GBAStudio\gba-studio'
-npm ci
+npm test
+npm run validate:rom -- gba-studio\out\RunProject.gba
 ```
 
-2. Start the Electron GUI:
+From `gba-studio` with devkitPro in the shell:
 
 ```powershell
-npm start
-```
-
-3. Open a sample project automatically (app accepts a project path as the last arg). From the repo root run:
-
-```powershell
-npm start -- "test/data/projects/RunProject/RunProject.gbsproj"
-```
-
-Notes: On Windows you may need to run `corepack enable` as admin to use the Yarn path in `package.json` or just use `npm ci` as above.
-
-How to run the CLI to export/build a ROM locally
-1. Build the CLI bundle:
-
-```powershell
+$env:DEVKITPRO = "C:\devkitPro"
+$env:DEVKITARM = "C:\devkitPro\devkitARM"
+$env:Path = "$env:DEVKITARM\bin;$env:Path"
 npm run make:cli
+npm run build:gba -- test/data/projects/RunProject/RunProject.gbsproj out/RunProject.gba
 ```
 
-2. Build a ROM (may fail locally without a compatible `devkitARM`):
+## Current Limitation
 
-```powershell
-# create output dir and run the headless builder
-Set-Location 'c:\Users\Eoin\git\GBAStudio\gba-studio'
-node out/cli/gb-studio-cli make:rom test/data/projects/RunProject/RunProject.gbsproj out/RunProject.gba -v
+The nested GB Studio fork currently produces a GBA proof ROM, not full GB Studio gameplay.
+
+The proof build intentionally skips GB Studio VM script assembly and emits a minimal GBA-compatible C proof scene. This avoids passing GB Studio / GBDK-style assembly into devkitARM.
+
+Examples of GB VM assembly that must not be sent to the ARM assembler:
+
+- `.module`
+- `.area`
+- `vm_push_const`
+- `vm_call_far`
+- `vm_idle`
+- `vm_stop`
+
+The compiler now warns:
+
+```text
+GBA proof build: GB Studio VM scripts are currently skipped.
 ```
 
-If the build fails with devkit errors on Windows, either install `devkitPro` locally (recommended) or rely on the CI runner (Ubuntu) which now installs `devkitPro`.
+## Next Milestone
 
-Next suggested actions (I can do these for you):
-- (A) Add emulator smoke-tests to CI (`binjgb` or `mGBA`) and attach `.gba` to the release — I can implement this now.
-- (B) Add Windows devkit installation steps to CI and caching for `~/.devkitpro` — I can implement this next.
-- (C) Add `docs/DEVKIT_SETUP.md` with per-OS install and verification steps — quick documentation task.
+Implement a real GBA script backend:
 
-Tell me which next action you want me to take (A, B, or C) and I will implement it and update `issues.md` accordingly.
+```text
+GB Studio events
+  -> intermediate script representation
+  -> GBA runtime calls in C or ARM assembly
+  -> devkitARM build
+```
+
+Initial backend support should cover:
+
+- idle
+- stop
+- call custom script
+- actor references
+- button checks, including L/R
+- scene transition placeholder
+
+## Remaining Tasks
+
+1. Add mGBA/binjgb to the local machine or CI and run `npm run test:emu -- out/RunProject.gba`.
+2. Expand the GBA proof runtime beyond the placeholder Mode 3 screen.
+3. Add tests proving GBA builds do not emit `.module`, `.area`, or `vm_*` assembly into files compiled by devkitARM.
+4. Decide whether `gba-studio-fixed` should be kept; it is currently a stale duplicate of the root standalone `.gbasproj` pipeline.

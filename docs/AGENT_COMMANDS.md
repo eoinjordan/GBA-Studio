@@ -29,6 +29,35 @@ This document describes the CLI commands available for agent-driven automation.
   - Uses default position and size values unless additional flags are added.
   - Backs up the project file to `<project>.bak` before modifying.
 
+- `gba-studio set-start-scene <project.gbasproj> --scene <sceneId>`
+  - Set the project start scene to an existing scene.
+  - Backs up the project file to `<project>.bak` before modifying.
+
+## MCP server
+
+Start the stdio MCP server with:
+
+```bash
+npm run mcp
+```
+
+or:
+
+```bash
+gba-studio-mcp
+```
+
+The server exposes guarded tools around the CLI:
+
+- `find_gba_project`
+- `validate_gba_project`
+- `inventory_gba_project`
+- `create_scene`
+- `create_actor`
+- `set_start_scene`
+- `export_gba_source`
+- `build_gba_rom`
+
 ## JSON output
 
 Any command supports `--json` to return machine-readable output. Example:

@@ -80,6 +80,31 @@ function main() {
   assert.strictEqual(actorResult.created, true);
   assert.strictEqual(actorResult.actor.id, "signpost");
 
+  const startSceneResult = expectJson([
+    "set-start-scene",
+    tempProject,
+    "--scene",
+    "town",
+    "--json",
+  ]);
+  assert.strictEqual(startSceneResult.updated, true);
+  assert.strictEqual(startSceneResult.startScene, "town");
+
+  const invalidActorResult = runCli([
+    "create-actor",
+    tempProject,
+    "--scene",
+    "town",
+    "--id",
+    "bad",
+    "--name",
+    "Bad",
+    "--x",
+    "not-a-number",
+  ]);
+  assert.notStrictEqual(invalidActorResult.status, 0);
+  assert(invalidActorResult.stderr.includes("--x must be an integer"));
+
   const validateTemp = expectJson(["validate", tempProject, "--json"]);
   assert.strictEqual(validateTemp.valid, true);
 
