@@ -12,6 +12,18 @@ This is not a patched GB Studio fork. GB Studio targets Game Boy and Game Boy Co
   -> .gba ROM
 ```
 
+## Maintenance model
+
+This project is being maintained as an independent GBA Studio workflow under Eoin Jordan's personal repos first. Upstream PRs can wait until the GBA editor, ROM backend, and workflow are stable enough to share.
+
+Current personal repo layout:
+
+- Wrapper, CLI, MCP, and release workflow: `eoinjordan/gba-rom-release-workflow`
+- Editor fork and GBA proof ROM path: `eoinjordan/gb-studio`, branch `gba-rom-release-workflow`
+- GB Studio MCP companion work: `eoinjordan/gb-studio-agent`
+
+Do not rely on the Blue Heron upstream remote for day-to-day maintenance. Keep GBA Studio changes on the personal branch, build and test there, then decide later whether any part should be proposed upstream.
+
 ## Repository layout
 
 ```text
