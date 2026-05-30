@@ -1,0 +1,225 @@
+# GBA Studio
+
+A clean starter source tree for a Game Boy Advance Studio workflow.
+
+This is not a patched GB Studio fork. GB Studio targets Game Boy and Game Boy Color projects. This repo defines a separate GBA-oriented flow:
+
+```text
+.gbasproj project file
+  -> validator
+  -> generated GBA C project
+  -> devkitARM/libtonc build
+  -> .gba ROM
+```
+
+## Repository layout
+
+```text
+.
+├── .github/workflows/
+│   ├── ci.yml
+│   └── release-gba.yml
+├── examples/
+│   └── blank/
+│       ├── assets/
+│       └── project.gbasproj
+├── schemas/
+│   └── gbasproj.schema.json
+├── scripts/
+│   ├── build-gba.sh
+│   └── validate-rom.sh
+├── src/
+│   └── cli.js
+├── package.json
+└── README.md
+```
+
+## Requirements
+
+For validation and source generation:
+
+- Node.js 20 or newer
+
+For actual `.gba` ROM building:
+
+- devkitPro/devkitARM
+- GBA development libraries, including libtonc
+- Optional: mGBA for local emulator testing
+
+## Install
+
+```bash
+npm install
+```
+
+## Validate the example project
+
+```bash
+npm run validate
+```
+
+Equivalent direct command:
+
+```bash
+node src/cli.js validate examples/blank/project.gbasproj
+```
+
+## Generate the GBA C project
+
+```bash
+npm run export:c
+```
+
+Equivalent direct command:
+
+```bash
+node src/cli.js export-c examples/blank/project.gbasproj build/generated/blank
+```
+
+This creates:
+
+```text
+build/generated/blank/
+├── Makefile
+├── README.md
+├── blank-gba-studio-demo.gbasproj
+├── audio/
+├── data/
+├── graphics/
+├── include/
+│   └── gba_studio_metadata.h
+└── source/
+    └── main.c
+```
+
+## Build a ROM
+
+With devkitPro/devkitARM installed:
+
+```bash
+npm run make:gba
+```
+
+Equivalent direct command:
+
+```bash
+node src/cli.js make:gba examples/blank/project.gbasproj build/rom/blank.gba
+```
+
+To generate source without invoking `make`:
+
+```bash
+node src/cli.js make:gba examples/blank/project.gbasproj build/rom/blank.gba --skip-build
+```
+
+## Project format
+
+The GBA Studio project format is `.gbasproj`.
+
+Minimal example:
+
+```json
+{
+  "schemaVersion": 1,
+  "name": "Blank GBA Studio Demo",
+  "slug": "blank-gba-studio-demo",
+  "target": "gba",
+  "rom": {
+    "title": "GBASTUDIO",
+    "gameCode": "GBAS",
+    "makerCode": "EJ"
+  },
+  "screen": {
+    "width": 240,
+    "height": 160
+  },
+  "startScene": "start",
+  "palette": {
+    "background": "#182030",
+    "text": "#ffffff"
+  },
+  "scenes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "backgroundColor": "#182030",
+      "message": "GBA Studio booted",
+      "actors": [
+        {
+          "id": "player",
+          "name": "Player",
+          "x": 112,
+          "y": 72,
+          "width": 16,
+          "height": 16,
+          "color": "#f8d060"
+        }
+      ],
+      "triggers": []
+    }
+  ],
+  "assets": {
+    "backgrounds": [],
+    "sprites": [],
+    "music": [],
+    "sfx": []
+  }
+}
+```
+
+## CLI commands
+
+```bash
+gba-studio validate <project.gbasproj>
+gba-studio inventory <project.gbasproj>
+gba-studio export-c <project.gbasproj> <outDir>
+gba-studio make:gba <project.gbasproj> <out-rom.gba> [--skip-build]
+gba-studio create-scene <project.gbasproj> --id <id> --name <name>
+gba-studio create-actor <project.gbasproj> --scene <sceneId> --id <actorId> --name <name>
+```
+
+## Town demo
+
+A second example project is available at `examples/town-demo/project.gbasproj`.
+
+Validate it with:
+
+```bash
+node src/cli.js validate examples/town-demo/project.gbasproj
+```
+
+Generate C source for the town demo with:
+
+```bash
+node src/cli.js export-c examples/town-demo/project.gbasproj build/generated/town-demo
+```
+
+## GitHub Actions
+
+### CI
+
+`.github/workflows/ci.yml` validates the example project and generates the C source tree. It does not require the GBA toolchain.
+
+### Release
+
+`.github/workflows/release-gba.yml` builds the `.gba` ROM inside a devkitARM container and publishes the ROM as a release asset when a tag is pushed.
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+## Intended next steps
+
+1. Add a real tile/sprite/background asset pipeline.
+2. Replace Mode 3 rectangle rendering with tiled backgrounds and object attribute memory sprites.
+3. Add scene transitions.
+4. Add button-driven movement.
+5. Add audio conversion.
+6. Add an MCP agent layer that calls this CLI through guarded tools.
+
+## Why this repo exists separately from GB Studio
+
+GB Studio and GBA Studio should not share a backend. Game Boy and Game Boy Advance development have different hardware targets, compilers, graphics models, audio constraints, and ROM formats.
+
+This repo provides the minimum viable GBA-specific spine that an editor or agent can call.

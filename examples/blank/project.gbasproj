@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "name": "Blank GBA Studio Demo",
+  "slug": "blank-gba-studio-demo",
+  "target": "gba",
+  "rom": {
+    "title": "GBASTUDIO",
+    "gameCode": "GBAS",
+    "makerCode": "EJ"
+  },
+  "screen": {
+    "width": 240,
+    "height": 160
+  },
+  "startScene": "start",
+  "palette": {
+    "background": "#182030",
+    "text": "#ffffff"
+  },
+  "scenes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "backgroundColor": "#182030",
+      "message": "GBA Studio booted",
+      "actors": [
+        {
+          "id": "player",
+          "name": "Player",
+          "x": 112,
+          "y": 72,
+          "width": 16,
+          "height": 16,
+          "color": "#f8d060"
+        }
+      ],
+      "triggers": []
+    }
+  ],
+  "assets": {
+    "backgrounds": [],
+    "sprites": [],
+    "music": [],
+    "sfx": []
+  }
+}
