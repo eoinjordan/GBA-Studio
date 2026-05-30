@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix gba-studio start",
+    "test": "npm --prefix gba-studio test",
+    "fetch-deps": "npm --prefix gba-studio run fetch-deps",
+    "make:cli": "npm --prefix gba-studio run make:cli",
+    "build:gba": "npm --prefix gba-studio run build:gba --",
+    "test:emu": "npm --prefix gba-studio run test:emu --"
+  }
+}
