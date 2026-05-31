@@ -1,8 +1,27 @@
 # GBA Studio
 
-A clean starter source tree for a Game Boy Advance Studio workflow.
+Based on GB Studio concepts and repository structure, this project deliberately diverges to support native Game Boy Advance development.
 
-This is not a patched GB Studio fork. GB Studio targets Game Boy and Game Boy Color projects. This repo defines a separate GBA-oriented flow:
+This repo reuses the `.gbasproj` workflow and CLI architecture, but it is not a simple GB Studio patch. GB Studio targets Game Boy and Game Boy Color. GBA Studio targets GBA hardware, with its own build backend, asset rules, and output format.
+
+## Why this repo exists separately from GB Studio
+
+GB Studio and GBA Studio should not share a backend. Game Boy and Game Boy Advance development have different hardware targets, compilers, graphics models, audio constraints, and ROM formats.
+
+This repo provides the minimum viable GBA-specific spine that an editor or agent can call. The divergence exists so we can build a clean GBA toolchain and release workflow without inheriting GB Studio-specific engine/compiler assumptions.
+
+| Area | GB Studio | GBA Studio |
+| --- | --- | --- |
+| Hardware target | Game Boy / Game Boy Color | Game Boy Advance |
+| Rendering model | GB tile modes, 160x144 display | GBA Mode 3/4, 240x160 display, sprites |
+| Output format | `.gb` | `.gba` |
+| Build toolchain | GB Studio backend, GBDK for GB | devkitARM / GBDK / libtonc for GBA |
+| Asset rules | 160x144 backgrounds, limited palettes | 240x160 backgrounds, richer color, larger assets |
+| Engine backend | GB Studio engine and editor logic | GBA-specific engine and build workflow |
+| Release flow | GB Studio editor releases | ROM artifacts and companion app installers |
+| Repo role | Main GB Studio project | GBA-specific fork/divergence for native GBA support |
+
+## Maintenance model
 
 ```text
 .gbasproj project file
@@ -241,6 +260,41 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
+## Release tags and build artifacts
+
+- Use semantic release tags with a `v` prefix, for example `v0.1.0` or `v1.0.0`.
+- The release workflow attaches the built `.gba` ROM to the GitHub Release for that tag.
+- Local build artifact outputs:
+  - ROM: `build/rom/blank.gba`
+  - Generated source tree: `build/generated/<project>/`
+  - Example generated project: `build/generated/blank/`
+- If you build editor/installer packages from the companion `gba-studio` app, those artifacts are written under `gba-studio/out/make`.
+
+## Screenshot preview
+
+If you add UI screenshots, store them under `docs/screenshots/` and reference them here.
+
+Suggested screenshot files:
+
+- `docs/screenshots/starter-screen.png` — starter scene / project boot screen
+- `docs/screenshots/build-output.png` — generated build artifacts and ROM output
+- `docs/screenshots/release-artifacts.png` — app package or ROM release artifacts
+
+Example markdown for an image:
+
+```md
+![GBA Studio starter screen](docs/screenshots/starter-screen.png)
+```
+
+## Starter screen / UI notes
+
+This repo is built around a minimal GBA proof-of-concept workflow:
+
+- `screen.width` is `240` and `screen.height` is `160`, matching GBA native resolution.
+- The starter scene is a simple boot screen with a message and a placeholder actor.
+- The `.gbasproj` project includes `target: "gba"`, ROM metadata, and GBA-specific build settings.
+- The current workflow is proof-of-concept for GBA assets, source generation, and ROM output.
+
 ## Intended next steps
 
 1. Add a real tile/sprite/background asset pipeline.
@@ -252,6 +306,6 @@ git push origin v0.1.0
 
 ## Why this repo exists separately from GB Studio
 
-GB Studio and GBA Studio should not share a backend. Game Boy and Game Boy Advance development have different hardware targets, compilers, graphics models, audio constraints, and ROM formats.
+See the introduction above for the core rationale: Game Boy and Game Boy Advance development have different hardware targets, compilers, graphics models, audio constraints, and ROM formats.
 
 This repo provides the minimum viable GBA-specific spine that an editor or agent can call.

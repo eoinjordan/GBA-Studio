@@ -1,4 +1,4 @@
-name: Release GBA ROM
+name: Release GBA ROM and app packages
 
 on:
   push:
@@ -9,16 +9,19 @@ on:
 jobs:
   build-rom:
     runs-on: ubuntu-latest
-    container:
-      image: devkitpro/devkitarm:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install dependencies
         run: npm ci
@@ -26,7 +29,21 @@ jobs:
       - name: Validate project
         run: npm run validate
 
+      - name: Install devkitPro GBA toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ca-certificates curl
+          curl -L https://github.com/devkitPro/pacman/releases/latest/download/devkitpro-pacman.deb -o /tmp/devkitpro-pacman.deb
+          sudo apt-get install -y /tmp/devkitpro-pacman.deb
+          sudo dkp-pacman -Sy --needed --noconfirm gba-dev
+          echo "DEVKITPRO=/opt/devkitpro" >> "$GITHUB_ENV"
+          echo "DEVKITARM=/opt/devkitpro/devkitARM" >> "$GITHUB_ENV"
+          test -x /opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc
+
       - name: Build ROM
+        env:
+          DEVKITPRO: ${{ env.DEVKITPRO }}
+          DEVKITARM: ${{ env.DEVKITARM }}
         run: npm run make:gba
 
       - name: Validate ROM
@@ -38,8 +55,101 @@ jobs:
           name: blank-gba-rom
           path: build/rom/blank.gba
 
-      - name: Publish GitHub Release
+      - name: Publish ROM to GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: build/rom/blank.gba
+
+  build-app-packages:
+    needs: build-rom
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        include:
+          - name: linux
+            os: ubuntu-latest
+            target: make:linux
+          - name: win64
+            os: ubuntu-latest
+            target: make:win
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: |
+          cd gba-studio
+          yarn install --immutable || npm ci
+
+      - name: Install Windows packaging tools
+        if: matrix.name == 'win64'
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y wine wine64 mono-devel
+
+      - name: Build app packages
+        run: |
+          cd gba-studio
+          if [ "${{ matrix.name }}" = "linux" ]; then
+            yarn fetch-deps -- --arch=linux-x64
+          else
+            yarn fetch-deps -- --arch=win32-x64
+          fi
+          yarn ${{ matrix.target }}
+          mkdir -p out/keep
+          if [ "${{ matrix.name }}" = "linux" ]; then
+            mv out/make/deb/x64/*.deb out/keep/gb-studio-${GITHUB_REF##*/}-linux_x86_64.deb 2>/dev/null || true
+            mv out/make/rpm/x64/*.rpm out/keep/gb-studio-${GITHUB_REF##*/}-linux_x86_64.rpm 2>/dev/null || true
+            mv out/make/AppImage/x64/*.AppImage out/keep/gb-studio-${GITHUB_REF##*/}-linux_x86_64.AppImage 2>/dev/null || true
+          else
+            mv out/make/zip/win32/x64/*.zip out/keep/gb-studio-${GITHUB_REF##*/}-windows_x86_64.zip 2>/dev/null || true
+            mv out/make/squirrel.windows/x64 out/keep/gb-studio-${GITHUB_REF##*/}-windows_x86_64-squirrel 2>/dev/null || true
+          fi
+
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-packages-${{ matrix.name }}
+          path: gba-studio/out/keep
+
+  publish-installers:
+    needs: build-app-packages
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Linux package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: app-packages-linux
+          path: release-artifacts
+
+      - name: Download Windows package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: app-packages-win64
+          path: release-artifacts
+
+      - name: Publish app packages to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/**
