@@ -1,5 +1,11 @@
 # GBA Studio
 
+UI and compiler
+
+<img width="271" height="123" alt="Screenshot 2026-05-30 202003" src="https://github.com/user-attachments/assets/37eeb0e8-3ba5-4202-9234-9ed5624842ad" />
+<img width="630" height="445" alt="Screenshot 2026-05-30 201827" src="https://github.com/user-attachments/assets/55e82ac3-305a-42a5-afaf-ccfc57a25bde" />
+
+
 A clean starter source tree for a Game Boy Advance Studio workflow.
 
 This is not a patched GB Studio fork. GB Studio targets Game Boy and Game Boy Color projects. This repo defines a separate GBA-oriented flow:
