@@ -1,8 +1,0 @@
-node_modules/
-build/
-dist/
-*.gba
-*.elf
-*.map
-test/tmp/
-.DS_Store
