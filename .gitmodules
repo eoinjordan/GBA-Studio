@@ -1,0 +1,3 @@
+[submodule "gba-studio"]
+	path = gba-studio
+	url = https://github.com/eoinjordan/gb-studio.git
