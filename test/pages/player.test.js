@@ -36,6 +36,7 @@ describe("GBA Studio browser player", () => {
     expect(target).toMatchObject({
       EJS_player: "#game",
       EJS_core: "gba",
+      EJS_controlScheme: "gba",
       EJS_gameUrl: "roms/demo.gba",
       EJS_startOnLoaded: true,
     });

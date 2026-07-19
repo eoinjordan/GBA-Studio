@@ -1417,11 +1417,19 @@ export const emitGBASpriteData = (
   const orderedMetaspriteIndexes = sprite.metaspritesOrder
     .slice(0, 255)
     .map((index) => (index >= 0 && index < metasprites.length ? index : 0));
-  const fallbackMetaspriteIndex = orderedMetaspriteIndexes[0] ?? 0;
+  const fallbackMetaspriteIndex =
+    orderedMetaspriteIndexes.find(
+      (index) => (metasprites[index]?.length ?? 0) > 0,
+    ) ?? Math.max(0, metasprites.findIndex((metasprite) => metasprite.length > 0));
   const fallbackMetasprite = metasprites[fallbackMetaspriteIndex] ?? [];
+  const emittedMetaspriteIndexes = orderedMetaspriteIndexes.map((index) =>
+    (metasprites[index]?.length ?? 0) > 0 ? index : fallbackMetaspriteIndex,
+  );
 
   const metaspriteBlocks = metasprites
     .map((metasprite, metaspriteIndex) => {
+      const unused =
+        metasprite.length === 0 ? " __attribute__((unused))" : "";
       const lines =
         metasprite.length > 0
           ? metasprite
@@ -1436,18 +1444,18 @@ export const emitGBASpriteData = (
       return `static const gba_metasprite_tile_t ${spriteSymbol}_metasprite_${metaspriteIndex}[${Math.max(
         1,
         metasprite.length,
-      )}] = {\n${lines}\n};`;
+      )}]${unused} = {\n${lines}\n};`;
     })
     .join("\n\n");
 
   const hasFrames = orderedMetaspriteIndexes.length > 0;
   const framePointers = hasFrames
-    ? `static const gba_metasprite_tile_t *const ${spriteSymbol}_frames[${orderedMetaspriteIndexes.length}] = {\n${orderedMetaspriteIndexes
+    ? `static const gba_metasprite_tile_t *const ${spriteSymbol}_frames[${orderedMetaspriteIndexes.length}] = {\n${emittedMetaspriteIndexes
         .map((index) => `  ${spriteSymbol}_metasprite_${index}`)
         .join(",\n")}\n};`
     : "";
   const frameLengths = hasFrames
-    ? `static const uint8_t ${spriteSymbol}_frame_lengths[${orderedMetaspriteIndexes.length}] = { ${orderedMetaspriteIndexes
+    ? `static const uint8_t ${spriteSymbol}_frame_lengths[${orderedMetaspriteIndexes.length}] = { ${emittedMetaspriteIndexes
         .map((index) => metasprites[index]?.length ?? 0)
         .join(", ")} };`
     : "";
