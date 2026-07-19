@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build-pages:
     name: Build browser playground
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,16 +39,19 @@ jobs:
       - name: Test browser player
         run: npm run test:pages
 
-      - name: Configure downloaded devkitARM
+      - name: Install devkitPro GBA toolchain
         run: |
-          DEVKITPRO_PATH="$GITHUB_WORKSPACE/buildTools/linux-x64"
-          DEVKITARM_GCC="$(find "$DEVKITPRO_PATH" -type f -path '*/bin/arm-none-eabi-gcc' -print -quit)"
-          test -n "$DEVKITARM_GCC"
-          DEVKITARM_PATH="$(dirname "$(dirname "$DEVKITARM_GCC")")"
-          echo "DEVKITPRO=$DEVKITPRO_PATH" >> "$GITHUB_ENV"
-          echo "DEVKITARM=$DEVKITARM_PATH" >> "$GITHUB_ENV"
-          echo "$DEVKITARM_PATH/bin" >> "$GITHUB_PATH"
-          "$DEVKITARM_PATH/bin/arm-none-eabi-gcc" --version
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ca-certificates apt-transport-https
+          echo 'deb [trusted=yes] https://apt.devkitpro.org stable main' \
+            | sudo tee /etc/apt/sources.list.d/devkitpro.list
+          sudo apt-get update
+          sudo apt-get install -y devkitpro-pacman
+          sudo dkp-pacman -Sy --needed --noconfirm gba-dev
+          echo "DEVKITPRO=/opt/devkitpro" >> "$GITHUB_ENV"
+          echo "DEVKITARM=/opt/devkitpro/devkitARM" >> "$GITHUB_ENV"
+          echo "/opt/devkitpro/devkitARM/bin" >> "$GITHUB_PATH"
+          /opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc --version
 
       - name: Build static site
         run: |
