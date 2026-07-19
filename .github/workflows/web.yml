@@ -24,6 +24,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Trust checked-out workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -41,8 +44,8 @@ jobs:
         run: |
           test "$DEVKITPRO" = "/opt/devkitpro"
           test "$DEVKITARM" = "/opt/devkitpro/devkitARM"
-          arm-none-eabi-gcc --version
-          command -v gbafix
+          "$DEVKITARM/bin/arm-none-eabi-gcc" --version
+          test -x "$DEVKITPRO/tools/bin/gbafix"
 
       - name: Build static site
         run: |
