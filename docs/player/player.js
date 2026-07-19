@@ -64,6 +64,7 @@
   function configureEmulator(target, url) {
     target.EJS_player = "#game";
     target.EJS_core = "gba";
+    target.EJS_controlScheme = "gba";
     target.EJS_gameUrl = url;
     target.EJS_pathtodata = EMULATOR_DATA_URL;
     target.EJS_color = "#8b5cf6";

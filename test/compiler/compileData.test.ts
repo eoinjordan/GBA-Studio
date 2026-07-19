@@ -53,6 +53,33 @@ test("should emit ordered GBA sprite frames and animation ranges", () => {
   expect(output).toContain(".anim_count    = 1");
 });
 
+test("should replace empty ordered GBA sprite frames with a visible fallback", () => {
+  const sprite = {
+    id: "sparse_animated_sprite",
+    tileset: { data: new Uint8Array(32) },
+    metasprites: [
+      [],
+      [{ x: 0, y: 0, tile: 0, props: 0 }],
+      [],
+    ],
+    metaspritesOrder: [0, 2, 1, 0],
+    animationOffsets: [{ start: 0, end: 3 }],
+  } as unknown as PrecompiledSprite;
+
+  const output = emitGBASpriteData(sprite, "scene_1_sprite_sparse");
+
+  expect(output).toContain(
+    "scene_1_sprite_sparse_frames[4] = {\n  scene_1_sprite_sparse_metasprite_1,\n  scene_1_sprite_sparse_metasprite_1,\n  scene_1_sprite_sparse_metasprite_1,\n  scene_1_sprite_sparse_metasprite_1",
+  );
+  expect(output).toContain(
+    "scene_1_sprite_sparse_frame_lengths[4] = { 1, 1, 1, 1 }",
+  );
+  expect(output).toContain(".metasprite_len = 1");
+  expect(output).toContain(
+    ".metasprite    = scene_1_sprite_sparse_metasprite_1",
+  );
+});
+
 test("should take into account state value when building projectiles", () => {
   const scene = projectileStateTest.scene as unknown as PrecompiledScene;
   const sprites = projectileStateTest.sprites as unknown as PrecompiledSprite[];
