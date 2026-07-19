@@ -1,48 +1,80 @@
-﻿{
-    "_resourceType":  "scene",
-    "id":  "5ce7e000-0000-4a00-8000-000000000002",
-    "_index":  0,
-    "type":  "TOPDOWN",
-    "name":  "Poachermon Field Office",
-    "symbol":  "scene_poachermon_field_office",
-    "x":  100,
-    "y":  100,
-    "width":  30,
-    "height":  20,
-    "backgroundId":  "b9a1c0de-0000-4a00-8000-000000000001",
-    "tilesetId":  "",
-    "colorModeOverride":  "none",
-    "paletteIds":  [
-
-                   ],
-    "spritePaletteIds":  [
-
-                         ],
-    "autoFadeSpeed":  1,
-    "script":  [
-                   {
-                       "args":  {
-                                    "text":  "POACHERMON!\\nGotta mildly inconvenience them all."
-                                },
-                       "command":  "EVENT_TEXT",
-                       "id":  "poachermon-intro-1"
-                   },
-                   {
-                       "args":  {
-                                    "text":  "Press A to file a complaint.\\nPress B to pretend this is legal."
-                                },
-                       "command":  "EVENT_TEXT",
-                       "id":  "poachermon-intro-2"
-                   }
-               ],
-    "playerHit1Script":  [
-
-                         ],
-    "playerHit2Script":  [
-
-                         ],
-    "playerHit3Script":  [
-
-                         ],
-    "collisions":  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+{
+  "_resourceType": "scene",
+  "id": "5ce7e000-0000-4a00-8000-000000000002",
+  "_index": 0,
+  "type": "TOPDOWN",
+  "name": "Field Office - Case 001",
+  "symbol": "scene_poachermon_field_office",
+  "x": 100,
+  "y": 100,
+  "width": 30,
+  "height": 20,
+  "backgroundId": "b9a1c0de-0000-4a00-8000-000000000001",
+  "tilesetId": "",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [],
+  "autoFadeSpeed": 1,
+  "script": [
+    {
+      "id": "poachermon-scene-group",
+      "command": "EVENT_GROUP",
+      "args": { "__label": "Case briefing lifecycle" },
+      "children": {
+        "true": [
+          {
+            "id": "poachermon-first-visit",
+            "command": "EVENT_IF_FALSE",
+            "args": { "variable": "0" },
+            "children": {
+              "true": [
+                {
+                  "id": "poachermon-title",
+                  "command": "EVENT_TEXT",
+                  "args": { "text": "POACHERMON!\nBEIGE CRIMES UNIT" }
+                },
+                {
+                  "id": "poachermon-call-briefing",
+                  "command": "EVENT_CALL_CUSTOM_EVENT",
+                  "args": { "customEventId": "d7ca5701-5d2d-4b81-8a2f-8815e163db01" }
+                }
+              ],
+              "false": [
+                {
+                  "id": "poachermon-reactivate-witness",
+                  "command": "EVENT_ACTOR_ACTIVATE",
+                  "args": { "actorId": "a02ea894-b111-4cd8-9125-4df27903a102" }
+                },
+                {
+                  "id": "poachermon-resume",
+                  "command": "EVENT_TEXT",
+                  "args": { "text": "CASE 001 RESUMED\nEvidence {1}/2  Caught {2}/2" }
+                }
+              ]
+            }
+          },
+          {
+            "id": "poachermon-briefing-active",
+            "command": "EVENT_IF",
+            "args": { "condition": { "type": "variable", "value": "0" } },
+            "children": {
+              "true": [
+                {
+                  "id": "poachermon-objective",
+                  "command": "EVENT_TEXT",
+                  "args": { "text": "Talk to Captain Rowan.\nA interacts. D-pad moves." }
+                }
+              ],
+              "false": []
+            }
+          }
+        ]
+      }
+    },
+    { "id": "poachermon-scene-end", "command": "EVENT_END", "args": {} }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "collisions": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000000000000000000000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001111111111111110001111111111111100000000000000000000000000001100000000000000000000000000001100000000000000000000000000001100000000000000000000000000001100000000000000000000000000001100000000000000000000000000001111111111111111111111111111111"
 }

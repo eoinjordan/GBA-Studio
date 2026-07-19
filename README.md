@@ -5,6 +5,8 @@
 
 GBA Studio is an experimental fork of GB Studio tailored for Game Boy Advance game development. Like the original, it provides a visual retro game editor for Mac, Linux, and Windows.
 
+**[Try the CI-built GBA Studio demos in your browser](https://eoinjordan.github.io/GBA-Studio/)** — no install or ROM upload required.
+
 ## Project Status
 
 <img width="673" height="480" alt="image" src="https://github.com/user-attachments/assets/3e5c7afd-c222-48e3-93ac-08c4681f2a43" />
@@ -32,13 +34,14 @@ This project is a prototype, but the editor UI is running and the GBA ROM build 
 | ROM boot path                  | Working     | The GBA engine boots through devkitARM startup and runs `engine_run()`.                                                  |
 | VM runtime                     | Prototype   | A native GBA bytecode loop supports end, wait, scene load, palette tone, text dispatch, variables, math, and branches.   |
 | Background rendering           | Prototype   | Mode 0 renders loaded scene dimensions, collision-marked tiles, generated palette tones, and visible scene transitions.  |
-| Actors                         | Stub        | Actor allocation/update functions exist, but sprite/OAM rendering and scene-driven actor loading are not complete.       |
-| Input/buttons                  | Partial     | GBA key polling supports A/B/Start/Select/D-pad/L/R; gameplay bindings still need VM/event integration.                  |
+| Actors                         | Partial     | Scene actors render through OAM with directional idle/moving animation, scripted position/direction/visibility/collision changes, and actor conditionals. |
+| Input/buttons                  | Working     | GBA key polling supports A/B/Start/Select/D-pad/L/R, player movement, interaction, and VM input branches.                |
 | Scenes/scripts                 | Prototype   | Compiled scene records, trigger scripts, actor interaction scripts, and constant variable events run on the GBA VM.      |
-| Sprites/projectiles            | Not started | GBA OAM sprite upload, animation, collisions, and projectile runtime need implementation.                                |
+| Sprites/projectiles            | Partial     | GBA sprite tiles, palettes, metasprites, and directional animations render through OAM; projectile runtime remains.       |
 | Audio                          | Not started | GBA APU/DirectSound music and sound effect runtime has not been ported.                                                  |
 | Save/load                      | Not started | SRAM/flash save support and GB Studio variable persistence are not implemented.                                          |
-| CI/release                     | Working     | GitHub Actions build CLI, sample GBA ROM, emulator smoke test, Windows installer, and release artifacts.                 |
+| Browser testing               | Working     | GitHub Pages publishes top-down/isometric ROMs from the current compiler and runs them client-side through EmulatorJS.   |
+| CI/release                     | Working     | GitHub Actions run unit/integration/contract tests, real ROM builds, emulator smoke checks, Pages, installers, and release artifacts. |
 
 ## Aims
 

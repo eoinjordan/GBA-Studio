@@ -1,5 +1,21 @@
 {
   "_resourceType": "variables",
-  "variables": [],
+  "variables": [
+    { "id": "0", "name": "Briefing accepted", "symbol": "var_briefing" },
+    { "id": "1", "name": "Evidence count", "symbol": "var_evidence" },
+    { "id": "2", "name": "Poachers caught", "symbol": "var_poachers_caught" },
+    { "id": "3", "name": "Creature rescued", "symbol": "var_creature_rescued" },
+    { "id": "4", "name": "Case closed", "symbol": "var_case_closed" },
+    { "id": "5", "name": "Patrol route", "symbol": "var_patrol_route" },
+    { "id": "6", "name": "Evidence remaining", "symbol": "var_evidence_remaining" },
+    { "id": "7", "name": "Witness clue", "symbol": "var_witness_clue" },
+    { "id": "8", "name": "Left snare tagged", "symbol": "var_left_snare" },
+    { "id": "9", "name": "Right snare tagged", "symbol": "var_right_snare" },
+    { "id": "10", "name": "Trail camera tagged", "symbol": "var_trail_camera" },
+    { "id": "11", "name": "Ash caught", "symbol": "var_ash_caught" },
+    { "id": "12", "name": "Moss caught", "symbol": "var_moss_caught" },
+    { "id": "13", "name": "Creature handled", "symbol": "var_creature_handled" },
+    { "id": "14", "name": "Field score", "symbol": "var_field_score" }
+  ],
   "constants": []
 }

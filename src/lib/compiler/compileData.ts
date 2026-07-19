@@ -1303,11 +1303,12 @@ import {
 
 const formatCByteArray = (values: number[] | Uint8Array, wrap = 16) =>
   Array.from(values)
-    .map((value, index) =>
-      `${index % wrap === 0 ? "\n  " : " "}0x${(value & 0xff)
-        .toString(16)
-        .toUpperCase()
-        .padStart(2, "0")}`,
+    .map(
+      (value, index) =>
+        `${index % wrap === 0 ? "\n  " : " "}0x${(value & 0xff)
+          .toString(16)
+          .toUpperCase()
+          .padStart(2, "0")}`,
     )
     .join(",");
 
@@ -1351,11 +1352,12 @@ const convertGbTilesetToGba4bpp = (
 
 const formatCWordArray = (values: number[], wrap = 8) =>
   values
-    .map((value, index) =>
-      `${index % wrap === 0 ? "\n  " : " "}0x${(value & 0xffff)
-        .toString(16)
-        .toUpperCase()
-        .padStart(4, "0")}`,
+    .map(
+      (value, index) =>
+        `${index % wrap === 0 ? "\n  " : " "}0x${(value & 0xffff)
+          .toString(16)
+          .toUpperCase()
+          .padStart(4, "0")}`,
     )
     .join(",");
 
@@ -1391,6 +1393,109 @@ const toGbaDirection = (direction?: string): number => {
     default:
       return 1;
   }
+};
+
+export const emitGBASpriteData = (
+  sprite: PrecompiledSprite,
+  spriteSymbol: string,
+  warnings: (message: string) => void = () => {},
+): string => {
+  const tileset = convertGbTilesetToGba4bpp(sprite.tileset.data);
+  const metasprites = sprite.metasprites.length > 0 ? sprite.metasprites : [[]];
+
+  if (sprite.metaspritesOrder.length > 255) {
+    warnings(
+      `GBA compiler: sprite "${sprite.id}" has ${sprite.metaspritesOrder.length} ordered frames; only the first 255 can be emitted`,
+    );
+  }
+  if (sprite.animationOffsets.length > 255) {
+    warnings(
+      `GBA compiler: sprite "${sprite.id}" has ${sprite.animationOffsets.length} animations; only the first 255 can be emitted`,
+    );
+  }
+
+  const orderedMetaspriteIndexes = sprite.metaspritesOrder
+    .slice(0, 255)
+    .map((index) => (index >= 0 && index < metasprites.length ? index : 0));
+  const fallbackMetaspriteIndex = orderedMetaspriteIndexes[0] ?? 0;
+  const fallbackMetasprite = metasprites[fallbackMetaspriteIndex] ?? [];
+
+  const metaspriteBlocks = metasprites
+    .map((metasprite, metaspriteIndex) => {
+      const lines =
+        metasprite.length > 0
+          ? metasprite
+              .map(
+                (tile) =>
+                  `  { ${tile.x}, ${tile.y}, ${tile.tile}, ${
+                    tile.props & 0x07
+                  }, ${(tile.props & 0x20) !== 0}, ${(tile.props & 0x40) !== 0} }`,
+              )
+              .join(",\n")
+          : "  { 0, 0, 0, 0, false, false }";
+      return `static const gba_metasprite_tile_t ${spriteSymbol}_metasprite_${metaspriteIndex}[${Math.max(
+        1,
+        metasprite.length,
+      )}] = {\n${lines}\n};`;
+    })
+    .join("\n\n");
+
+  const hasFrames = orderedMetaspriteIndexes.length > 0;
+  const framePointers = hasFrames
+    ? `static const gba_metasprite_tile_t *const ${spriteSymbol}_frames[${orderedMetaspriteIndexes.length}] = {\n${orderedMetaspriteIndexes
+        .map((index) => `  ${spriteSymbol}_metasprite_${index}`)
+        .join(",\n")}\n};`
+    : "";
+  const frameLengths = hasFrames
+    ? `static const uint8_t ${spriteSymbol}_frame_lengths[${orderedMetaspriteIndexes.length}] = { ${orderedMetaspriteIndexes
+        .map((index) => metasprites[index]?.length ?? 0)
+        .join(", ")} };`
+    : "";
+
+  const animationOffsets = hasFrames
+    ? sprite.animationOffsets.slice(0, 255).map((animation) => {
+        const lastFrame = orderedMetaspriteIndexes.length - 1;
+        const start = Math.max(0, Math.min(lastFrame, animation.start));
+        const end = Math.max(start, Math.min(lastFrame, animation.end));
+        return { start, end };
+      })
+    : [];
+  const animations =
+    animationOffsets.length > 0
+      ? `static const gba_sprite_anim_t ${spriteSymbol}_animations[${animationOffsets.length}] = {\n${animationOffsets
+          .map((animation) => `  { ${animation.start}, ${animation.end} }`)
+          .join(",\n")}\n};`
+      : "";
+
+  const tilesetArray = `static const uint8_t ${spriteSymbol}_tileset[${Math.max(
+    1,
+    tileset.length,
+  )}] = {${
+    tileset.length > 0 ? `${formatCByteArray(tileset)}\n` : "\n  0x00\n"
+  }};`;
+  const def = `static const gba_sprite_def_t ${spriteSymbol} = {
+  .tileset_len   = ${tileset.length},
+  .tileset       = ${spriteSymbol}_tileset,
+  .tile_count    = ${Math.ceil(tileset.length / 32)},
+  .metasprite_len = ${fallbackMetasprite.length},
+  .metasprite    = ${spriteSymbol}_metasprite_${fallbackMetaspriteIndex},
+  .frame_count   = ${orderedMetaspriteIndexes.length},
+  .frames        = ${hasFrames ? `${spriteSymbol}_frames` : "NULL"},
+  .frame_lengths = ${hasFrames ? `${spriteSymbol}_frame_lengths` : "NULL"},
+  .anim_count    = ${animationOffsets.length},
+  .animations    = ${animationOffsets.length > 0 ? `${spriteSymbol}_animations` : "NULL"},
+};`;
+
+  return [
+    metaspriteBlocks,
+    framePointers,
+    frameLengths,
+    animations,
+    tilesetArray,
+    def,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 };
 
 const collectUniqueSprites = (
@@ -1460,9 +1565,6 @@ const compileGBA = async (
   }
 
   progress("Compiling for GBA...");
-  warnings(
-    "GBA VM runtime is minimal: background, palette, player movement, and actor rendering are wired; full GB Studio script events are still pending.",
-  );
 
   const precompiled = await precompile(
     projectData,
@@ -1571,7 +1673,9 @@ const compileGBA = async (
         ? Uint8Array.from(background.tilemapAttr.data)
         : new Uint8Array();
       const bgPalette = toGbaPaletteData(
-        precompiled.usedPalettes[precompiled.scenePaletteIndexes[scene.id] || 0],
+        precompiled.usedPalettes[
+          precompiled.scenePaletteIndexes[scene.id] || 0
+        ],
       );
       const spritePalette = toGbaPaletteData(
         precompiled.usedPalettes[
@@ -1586,46 +1690,16 @@ const compileGBA = async (
       const spriteBlocks = localSprites
         .map((sprite, spriteIndex) => {
           const spriteSymbol = `${sceneSymbol}_sprite_${spriteIndex}`;
-          const tileset = convertGbTilesetToGba4bpp(sprite.tileset.data);
-          const metaspriteIndex = sprite.metaspritesOrder[0] ?? 0;
-          const metasprite =
-            sprite.metasprites[metaspriteIndex] ?? sprite.metasprites[0] ?? [];
-          const metaspriteLines =
-            metasprite.length > 0
-              ? metasprite
-                  .map(
-                    (tile) =>
-                      `  { ${tile.x}, ${tile.y}, ${tile.tile}, ${
-                        tile.props & 0x07
-                      }, ${(tile.props & 0x20) !== 0}, ${(tile.props & 0x40) !== 0} }`,
-                  )
-                  .join(",\n")
-              : "  { 0, 0, 0, 0, false, false }";
-          const metaspriteArray = `static const gba_metasprite_tile_t ${spriteSymbol}_metasprite[${Math.max(
-            1,
-            metasprite.length,
-          )}] = {\n${metaspriteLines}\n};`;
-          const tilesetArray = `static const uint8_t ${spriteSymbol}_tileset[${Math.max(
-            1,
-            tileset.length,
-          )}] = {${
-            tileset.length > 0 ? `${formatCByteArray(tileset)}\n` : "\n  0x00\n"
-          }};`;
-          const def = `static const gba_sprite_def_t ${spriteSymbol} = {
-  ${tileset.length},
-  ${spriteSymbol}_tileset,
-  ${Math.ceil(tileset.length / 32)},
-  ${metasprite.length},
-  ${spriteSymbol}_metasprite,
-};`;
-          return [metaspriteArray, tilesetArray, def].join("\n\n");
+          return emitGBASpriteData(sprite, spriteSymbol, warnings);
         })
         .join("\n\n");
 
       const spriteTableLines =
         localSprites.length > 0
           ? localSprites
-              .map((_, spriteIndex) => `  &${sceneSymbol}_sprite_${spriteIndex}`)
+              .map(
+                (_, spriteIndex) => `  &${sceneSymbol}_sprite_${spriteIndex}`,
+              )
               .join(",\n")
           : "  NULL";
       const spriteTable = `static const gba_sprite_def_t *const ${sceneSymbol}_sprites[${Math.max(
@@ -1645,7 +1719,32 @@ const compileGBA = async (
       const actorIndexById = Object.fromEntries(
         scene.actors.map((actor, actorIndex) => [actor.id, actorIndex + 1]),
       ) as Record<string, number>;
-      const sceneEventCtx = { ...gbaEventCtx, actorIndexById };
+      const sceneEventCtx = {
+        ...gbaEventCtx,
+        actorIndexById,
+        coordinateScale: scene.type === "ISOMETRIC" ? 1 : 8,
+      };
+
+      // Scene scripts are lifecycle scripts: the runtime schedules them once
+      // after loading the scene and spawning its player/actors.
+      const sceneScriptEvents = (rawScene?.script ??
+        scene.script ??
+        []) as GBAScriptEvent[];
+      const hasSceneStartScript =
+        sceneScriptEvents.length > 0 &&
+        !(
+          sceneScriptEvents.length === 1 &&
+          sceneScriptEvents[0].command === "EVENT_END"
+        );
+      const sceneStartScriptSymbol = hasSceneStartScript
+        ? `${sceneSymbol}_start_script`
+        : null;
+      const sceneStartScriptBlock = sceneStartScriptSymbol
+        ? emitGBAScriptC(
+            sceneStartScriptSymbol,
+            compileGBAScript(sceneScriptEvents, sceneEventCtx),
+          )
+        : "";
 
       // Compile trigger scripts and emit trigger array.
       const triggerScriptBlocks: string[] = [];
@@ -1702,12 +1801,8 @@ const compileGBA = async (
                 // Isometric actors store tile-grid coordinates directly;
                 // top-down actors use pixel position (tile * 8).
                 const isIso = scene.type === "ISOMETRIC";
-                const actorX = isIso
-                  ? actor.x || 0
-                  : (actor.x || 0) * 8;
-                const actorY = isIso
-                  ? actor.y || 0
-                  : (actor.y || 0) * 8;
+                const actorX = isIso ? actor.x || 0 : (actor.x || 0) * 8;
+                const actorY = isIso ? actor.y || 0 : (actor.y || 0) * 8;
                 return `  { ${actorX}, ${actorY}, ${spriteIndex}, ${toGbaDirection(
                   actor.direction,
                 )}, ${actor.moveSpeed || 1}, ${ensureNumber(
@@ -1744,7 +1839,7 @@ const compileGBA = async (
         spritePalette,
       )}\n};`;
       const playerSpriteIndex = scene.playerSprite
-        ? spriteIndexById[scene.playerSprite.id] ?? 0
+        ? (spriteIndexById[scene.playerSprite.id] ?? 0)
         : 0;
       const isIsoScene = scene.type === "ISOMETRIC";
       const sceneDef = isIsoScene
@@ -1769,28 +1864,30 @@ static const gba_iso_scene_def_t ${sceneSymbol} = {
     .sprite_count   = ${localSprites.length},
     .sprites        = ${sceneSymbol}_sprites,
     .triggers       = ${rawTriggers.length > 0 ? `${sceneSymbol}_triggers` : "NULL"},
+    .start_script   = ${sceneStartScriptSymbol ?? "NULL"},
   },
   .iso_tile_w = ${ISO_TILE_W},
   .iso_tile_h = ${ISO_TILE_H},
 };`
         : `static const gba_scene_def_t ${sceneSymbol} = {
-  ${scene.width},
-  ${scene.height},
-  ${sceneTypeIds[scene.type] ?? 0},
-  ${playerSpriteIndex},
-  ${scene.actors.length},
-  ${rawTriggers.length},
-  ${bgTileset.length},
-  ${sceneSymbol}_tileset,
-  ${sceneSymbol}_tilemap,
-  ${bgTilemapAttr.length > 0 ? `${sceneSymbol}_tilemap_attr` : "NULL"},
-  ${sceneSymbol}_bg_palette,
-  ${sceneSymbol}_sprite_palette,
-  ${sceneSymbol}_collisions,
-  ${scene.actors.length > 0 ? `${sceneSymbol}_actors` : "NULL"},
-  ${localSprites.length},
-  ${sceneSymbol}_sprites,
-  ${rawTriggers.length > 0 ? `${sceneSymbol}_triggers` : "NULL"},
+  .width          = ${scene.width},
+  .height         = ${scene.height},
+  .type           = ${sceneTypeIds[scene.type] ?? 0},
+  .player_sprite_index = ${playerSpriteIndex},
+  .actor_count    = ${scene.actors.length},
+  .trigger_count  = ${rawTriggers.length},
+  .tileset_len    = ${bgTileset.length},
+  .tileset        = ${sceneSymbol}_tileset,
+  .tilemap        = ${sceneSymbol}_tilemap,
+  .tilemap_attr   = ${bgTilemapAttr.length > 0 ? `${sceneSymbol}_tilemap_attr` : "NULL"},
+  .bg_palette     = ${sceneSymbol}_bg_palette,
+  .sprite_palette = ${sceneSymbol}_sprite_palette,
+  .collisions     = ${sceneSymbol}_collisions,
+  .actors         = ${scene.actors.length > 0 ? `${sceneSymbol}_actors` : "NULL"},
+  .sprite_count   = ${localSprites.length},
+  .sprites        = ${sceneSymbol}_sprites,
+  .triggers       = ${rawTriggers.length > 0 ? `${sceneSymbol}_triggers` : "NULL"},
+  .start_script   = ${sceneStartScriptSymbol ?? "NULL"},
 };`;
 
       sceneMap[scene.symbol] = {
@@ -1806,6 +1903,7 @@ static const gba_iso_scene_def_t ${sceneSymbol} = {
         bgPaletteArray,
         spritePaletteArray,
         collisionArray,
+        sceneStartScriptBlock,
         ...triggerScriptBlocks,
         ...actorScriptBlocks,
         actorArray,
@@ -1863,7 +1961,10 @@ const gba_game_data_t gba_game_data = {
   )},
   ${Math.max(
     0,
-    Math.min(255, Math.round(ensureNumber(projectData.settings.startAnimSpeed, 15))),
+    Math.min(
+      255,
+      Math.round(ensureNumber(projectData.settings.startAnimSpeed, 15)),
+    ),
   )},
   gba_scene_table,
   gba_bootstrap_script,
@@ -2638,4 +2739,3 @@ const compile = async (
 };
 
 export default compile;
-

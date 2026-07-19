@@ -1,71 +1,98 @@
-name: Coverage Report
+name: GBA Studio Pages
 
 on:
   push:
-    branches:
-      - develop
-
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
-jobs:
-  coverage:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
+permissions:
+  contents: read
 
+concurrency:
+  group: pages-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-pages:
+    name: Build browser playground
+    runs-on: ubuntu-24.04
+    container: devkitpro/devkitarm@sha256:15b79ce75822c289538d8153da5fa7aafe5e6adc32ad8a575a197beca0f0761b
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
+
+      - name: Trust checked-out workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "21.6.2"
+          node-version-file: .nvmrc
 
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Install Dependencies
-        run: |
-          yarn
+      - name: Install dependencies
+        run: yarn install --immutable || npm ci
 
-      - name: Create dist directory
-        run: |
-          mkdir ./dist
+      - name: Test browser player
+        run: npm run test:pages
 
-      - name: Generate Coverage
+      - name: Verify devkitPro GBA toolchain
         run: |
-          yarn coverage
+          test "$DEVKITPRO" = "/opt/devkitpro"
+          test "$DEVKITARM" = "/opt/devkitpro/devkitARM"
+          "$DEVKITARM/bin/arm-none-eabi-gcc" --version
+          test -x "$DEVKITPRO/tools/bin/gbafix"
 
-      - name: Move coverage into dist
+      - name: Build static site
         run: |
-          mv ./coverage/lcov-report ./dist/coverage
+          mkdir -p dist/player/roms
+          cp -R docs/. dist/
+          npm run make:cli
+          node out/cli/gb-studio-cli.js make:rom examples/starter-project/project.gbsproj dist/player/roms/gba-starter.gba
+          node out/cli/gb-studio-cli.js make:rom examples/isometric-adventure/project.gbsproj dist/player/roms/isometric-adventure.gba
+          node out/cli/gb-studio-cli.js make:rom examples/poachermon/project.gbsproj dist/player/roms/poachermon.gba
+
+      - name: Generate coverage report
+        run: |
+          npm run coverage
+          mv coverage/lcov-report dist/coverage
 
       - name: Generate Storybook
         run: |
-          yarn build-storybook
+          npm run build-storybook
+          mv storybook-static dist/storybook
 
-      - name: Move storybook into dist
-        run: |
-          mv ./storybook-static ./dist/storybook
+      - name: Validate Pages artifact and ROM headers
+        run: npm run validate:pages -- dist
 
-      - name: Upload Artifact
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gba-studio-pages
+          path: dist
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./dist"
+          path: dist
 
-  deploy-coverage:
+  deploy-pages:
+    name: Deploy GitHub Pages
+    if: github.event_name != 'pull_request'
+    needs: build-pages
     runs-on: ubuntu-latest
-    needs: coverage
-
     permissions:
       pages: write
       id-token: write
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

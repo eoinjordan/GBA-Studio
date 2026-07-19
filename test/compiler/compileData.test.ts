@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import compile, {
+  emitGBASpriteData,
   precompileBackgrounds,
   precompileScenes,
 } from "../../src/lib/compiler/compileData";
@@ -22,6 +23,35 @@ import {
 } from "../dummydata";
 import os from "os";
 import { ReferencedBackground } from "lib/compiler/precompile/determineUsedAssets";
+
+test("should emit ordered GBA sprite frames and animation ranges", () => {
+  const sprite = {
+    id: "animated_sprite",
+    tileset: { data: new Uint8Array(32) },
+    metasprites: [
+      [{ x: 0, y: 0, tile: 0, props: 0 }],
+      [
+        { x: 1, y: 2, tile: 1, props: 0x20 },
+        { x: 9, y: 2, tile: 2, props: 0x40 },
+      ],
+    ],
+    metaspritesOrder: [1, 0, 1],
+    animationOffsets: [{ start: 0, end: 2 }],
+  } as unknown as PrecompiledSprite;
+
+  const output = emitGBASpriteData(sprite, "scene_1_sprite_0");
+
+  expect(output).toContain("scene_1_sprite_0_metasprite_0[1]");
+  expect(output).toContain("scene_1_sprite_0_metasprite_1[2]");
+  expect(output).toContain(
+    "scene_1_sprite_0_frames[3] = {\n  scene_1_sprite_0_metasprite_1,\n  scene_1_sprite_0_metasprite_0,\n  scene_1_sprite_0_metasprite_1",
+  );
+  expect(output).toContain("scene_1_sprite_0_frame_lengths[3] = { 2, 1, 2 }");
+  expect(output).toContain("scene_1_sprite_0_animations[1]");
+  expect(output).toContain("{ 0, 2 }");
+  expect(output).toContain(".frame_count   = 3");
+  expect(output).toContain(".anim_count    = 1");
+});
 
 test("should take into account state value when building projectiles", () => {
   const scene = projectileStateTest.scene as unknown as PrecompiledScene;
@@ -517,6 +547,80 @@ test("should emit trigger tables for GBA scene data", async () => {
     "0x0F", // VM_OP_SHOW_TEXT
   );
   expect(compiled.files["gba_scene_data.c"]).toContain("scene_1_triggers");
+});
+
+test("should emit GBA scene-start scripts and link them from scene data", async () => {
+  const scriptEventHandlers = await getTestScriptHandlers();
+  const project = {
+    settings: {
+      startSceneId: "1",
+      startX: 5,
+      startY: 6,
+      defaultFontId: "font1",
+      defaultPlayerSprites: {},
+    },
+    scenes: [
+      {
+        id: "1",
+        name: "first_scene",
+        symbol: "scene_1",
+        type: "TOPDOWN",
+        backgroundId: "bg1",
+        tilesetId: "",
+        colorModeOverride: "none",
+        width: 20,
+        height: 18,
+        collisions: new Array(20 * 18).fill(0),
+        actors: [],
+        triggers: [],
+        script: [
+          {
+            command: EVENT_TEXT,
+            args: { text: "SCENE START TEST" },
+          },
+        ],
+      },
+    ],
+    backgrounds: [
+      {
+        id: "bg1",
+        name: "forest_clearing",
+        symbol: "bg_1",
+        width: 20,
+        height: 18,
+        imageWidth: 160,
+        imageHeight: 144,
+        filename: "forest_clearing.png",
+        tileColors: [],
+      },
+    ],
+    variables: { variables: [], constants: [] },
+    fonts: [
+      {
+        id: "font1",
+        name: "gbs-mono",
+        symbol: "font_1",
+        filename: "gbs-mono.png",
+      },
+    ],
+    engineFieldValues: { engineFieldValues: [] },
+  } as unknown as ProjectResources;
+
+  const compiled = await compile(project, {
+    projectRoot: `${__dirname}/_files`,
+    scriptEventHandlers,
+    engineSchema: { fields: [], sceneTypes: [], consts: {} },
+    tmpPath: os.tmpdir(),
+    debugEnabled: false,
+    progress: (_msg: string) => {},
+    warnings: (_msg: string) => {},
+    buildType: "gba",
+  });
+
+  const sceneData = compiled.files["gba_scene_data.c"];
+  expect(sceneData).toContain("static const uint8_t scene_1_start_script[");
+  expect(sceneData).toContain(".start_script   = scene_1_start_script");
+  expect(sceneData).toContain("0x0F"); // VM_OP_SHOW_TEXT
 });
 
 test("should emit GBA tilesets and tilemaps for scene backgrounds", async () => {

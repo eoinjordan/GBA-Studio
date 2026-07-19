@@ -1,0 +1,29 @@
+{
+  "_resourceType": "script",
+  "id": "d7ca5701-5d2d-4b81-8a2f-8815e163db01",
+  "name": "common/Case Briefing",
+  "symbol": "script_case_briefing",
+  "description": "Initialise Case 001 and demonstrate parameterless custom events.",
+  "variables": {},
+  "actors": {},
+  "script": [
+    { "id": "brief-set-briefing", "command": "EVENT_SET_VALUE", "args": { "variable": "0", "value": { "type": "true" } } },
+    { "id": "brief-set-evidence", "command": "EVENT_SET_VALUE", "args": { "variable": "1", "value": { "type": "number", "value": 0 } } },
+    { "id": "brief-set-caught", "command": "EVENT_SET_VALUE", "args": { "variable": "2", "value": { "type": "number", "value": 0 } } },
+    { "id": "brief-set-rescued", "command": "EVENT_SET_VALUE", "args": { "variable": "3", "value": { "type": "false" } } },
+    { "id": "brief-set-closed", "command": "EVENT_SET_VALUE", "args": { "variable": "4", "value": { "type": "false" } } },
+    { "id": "brief-random-route", "command": "EVENT_VARIABLE_MATH", "args": { "vectorX": "5", "operation": "set", "other": "rnd", "minValue": 1, "maxValue": 3 } },
+    { "id": "brief-evidence-remaining", "command": "EVENT_VARIABLE_MATH", "args": { "vectorX": "6", "operation": "set", "other": "val", "value": 2 } },
+    { "id": "brief-copy-score", "command": "EVENT_VARIABLE_MATH", "args": { "vectorX": "14", "operation": "set", "other": "var", "vectorY": "5" } },
+    { "id": "brief-add-score", "command": "EVENT_VARIABLE_MATH", "args": { "vectorX": "14", "operation": "add", "other": "var", "vectorY": "5" } },
+    { "id": "brief-sub-score", "command": "EVENT_VARIABLE_MATH", "args": { "vectorX": "14", "operation": "sub", "other": "val", "value": 1 } },
+    { "id": "brief-hide-witness", "command": "EVENT_ACTOR_DEACTIVATE", "args": { "actorId": "a02ea894-b111-4cd8-9125-4df27903a102" } },
+    { "id": "brief-position-captain", "command": "EVENT_ACTOR_SET_POSITION", "args": { "actorId": "bc140f2d-d829-480b-a837-1d6e3fdf0101", "x": { "type": "number", "value": 15 }, "y": { "type": "number", "value": 17 } } },
+    { "id": "brief-face-captain", "command": "EVENT_ACTOR_SET_DIRECTION", "args": { "actorId": "bc140f2d-d829-480b-a837-1d6e3fdf0101", "direction": { "type": "direction", "value": "down" } } },
+    { "id": "brief-captain-solid", "command": "EVENT_ACTOR_COLLISIONS_ENABLE", "args": { "actorId": "bc140f2d-d829-480b-a837-1d6e3fdf0101" } },
+    { "id": "brief-color", "command": "EVENT_IF_COLOR_SUPPORTED", "args": {}, "children": { "true": [ { "id": "brief-color-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 0 } } ], "false": [] } },
+    { "id": "brief-wait", "command": "EVENT_WAIT", "args": { "frames": 2 } },
+    { "id": "brief-text", "command": "EVENT_TEXT", "args": { "text": "CASE 001: SNARE AFFAIR\nPatrol route {5} assigned." } },
+    { "id": "brief-end", "command": "EVENT_END", "args": {} }
+  ]
+}

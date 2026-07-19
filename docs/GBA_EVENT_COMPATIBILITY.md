@@ -43,9 +43,13 @@ compatibility effort.
 | EVENT_IF_INPUT | ✅ | ✅ `VM_OP_IF_INPUT` | ✅ | ✅ | 16-bit key mask; branches on held buttons |
 | EVENT_ACTOR_SET_POSITION | ✅ | ✅ `VM_OP_ACTOR_SET_POS` | ✅ | ✅ | u8 coords (tile for iso, pixel for top-down) |
 | EVENT_ACTOR_MOVE_RELATIVE | ✅ | ✅ `VM_OP_ACTOR_MOVE_REL` | ✅ | ✅ | signed-byte deltas; instant (non-animated) move |
-| EVENT_ACTOR_SET_DIRECTION | 🟡 | ✅ `VM_OP_ACTOR_SET_DIR` | 🟡 | ✅ | Stored on actor; renderer doesn't use it yet |
+| EVENT_ACTOR_SET_DIRECTION | ✅ | ✅ `VM_OP_ACTOR_SET_DIR` | ✅ | ✅ | Selects the matching directional idle/moving animation |
 | EVENT_ACTOR_ACTIVATE | 🟡 | ✅ `VM_OP_ACTOR_SET_HIDDEN` | ✅ | ✅ | Mapped to show (hidden=0) |
 | EVENT_ACTOR_DEACTIVATE | 🟡 | ✅ `VM_OP_ACTOR_SET_HIDDEN` | ✅ | ✅ | Mapped to hide (hidden=1) |
+| EVENT_ACTOR_COLLISIONS_ENABLE | 🟡 | ✅ `VM_OP_ACTOR_SET_COLLISIONS` | 🟡 | ✅ | Enables scene-wall collision; actor-to-actor collision remains pending |
+| EVENT_ACTOR_COLLISIONS_DISABLE | 🟡 | ✅ `VM_OP_ACTOR_SET_COLLISIONS` | 🟡 | ✅ | Disables scene-wall collision for the actor |
+| EVENT_IF_ACTOR_AT_POSITION | ✅ | ✅ `VM_OP_IF_ACTOR_AT_POS` | ✅ | ✅ | Tile inputs compile to runtime coordinates for the current scene type |
+| EVENT_IF_ACTOR_RELATIVE_TO_ACTOR | ✅ | ✅ `VM_OP_IF_ACTOR_RELATIVE` | ✅ | ✅ | Branches for above/below/left/right comparisons |
 | EVENT_CALL_CUSTOM_EVENT | 🟡 | n/a | n/a | ✅ | Inlined at compile time; no parameter remapping yet |
 
 ## Missing events (skipped with warning)
@@ -69,13 +73,6 @@ by the phase that will address them.
 | EVENT_ACTOR_EMOTE | Show emote bubble above actor |
 | EVENT_PLATFORMER_STATE_SET | Platformer-specific; lower priority |
 
-### Phase 4 — conditionals
-
-| Event | Notes |
-|-------|-------|
-| EVENT_IF_ACTOR_AT_POSITION | Branch on actor at tile |
-| EVENT_IF_ACTOR_RELATIVE_TO_ACTOR | Branch on relative position of two actors |
-
 ### Phase 5 — save system
 
 | Event | Notes |
@@ -92,7 +89,7 @@ by the phase that will address them.
 
 ## Summary
 
-- **23** events compile today (13 fully ✅, 10 partial 🟡).
+- **27** events compile today (16 fully ✅, 11 partial 🟡).
 - **~10** distinct events are still skipped.
 - With input, variables, branching, text, scene changes, and actor
   position/visibility/direction now wired, a basic interactive game (move,
@@ -101,4 +98,4 @@ by the phase that will address them.
 - Remaining high-value gaps: **EVENT_CHOICE** (menus), **EVENT_ACTOR_MOVE_TO**
   (timed movement), **save** (Phase 5), and **audio** (Phase 6).
 
-_Last audited against the build log on 2026-06-09._
+_Last audited against the build log on 2026-07-19._

@@ -1,14 +1,14 @@
 import { readFileSync } from "fs";
-import { join } from "path";
+import { join, resolve } from "path";
 import {
   compileGBAScript,
   type GBAScriptEvent,
 } from "lib/compiler/compileGBAEvents";
 
-const vmHeader = readFileSync(
-  join(process.cwd(), "appData", "engine", "gbavm", "include", "vm.h"),
-  "utf8",
-);
+const vmHeaderPath = process.env.GBA_ENGINE_VM_HEADER
+  ? resolve(process.env.GBA_ENGINE_VM_HEADER)
+  : join(process.cwd(), "appData", "engine", "gbavm", "include", "vm.h");
+const vmHeader = readFileSync(vmHeaderPath, "utf8");
 
 const vmOpcode = (name: string): number => {
   const match = vmHeader.match(
@@ -75,6 +75,24 @@ test("GBA event compiler opcodes match bundled engine VM constants", () => {
       },
     },
     { command: "EVENT_TEXT", args: { text: "OK" } },
+    {
+      command: "EVENT_ACTOR_COLLISIONS_DISABLE",
+      args: { actorId: "player" },
+    },
+    {
+      command: "EVENT_IF_ACTOR_AT_POSITION",
+      args: { actorId: "player", x: 0, y: 0, true: [], false: [] },
+    },
+    {
+      command: "EVENT_IF_ACTOR_RELATIVE_TO_ACTOR",
+      args: {
+        actorId: "player",
+        otherActorId: "npc",
+        operation: "left",
+        true: [],
+        false: [],
+      },
+    },
   ];
 
   const bytecode = compileGBAScript(events, {
@@ -96,5 +114,8 @@ test("GBA event compiler opcodes match bundled engine VM constants", () => {
   expect(emittedOpcodes).toContain(vmOpcode("VM_OP_IF_VAR_EQ_CONST"));
   expect(emittedOpcodes).toContain(vmOpcode("VM_OP_SET_SCENE_TONE"));
   expect(emittedOpcodes).toContain(vmOpcode("VM_OP_SHOW_TEXT"));
+  expect(emittedOpcodes).toContain(vmOpcode("VM_OP_ACTOR_SET_COLLISIONS"));
+  expect(emittedOpcodes).toContain(vmOpcode("VM_OP_IF_ACTOR_AT_POS"));
+  expect(emittedOpcodes).toContain(vmOpcode("VM_OP_IF_ACTOR_RELATIVE"));
   expect(bytecode[bytecode.length - 1]).toBe(vmOpcode("VM_OP_END"));
 });

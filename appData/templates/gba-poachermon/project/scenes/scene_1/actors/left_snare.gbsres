@@ -1,0 +1,21 @@
+{
+  "_resourceType": "actor", "id": "4ecc8c0f-e50d-4692-a288-e7aceaa3a103", "_index": 2,
+  "symbol": "actor_left_snare", "prefabId": "", "name": "Illegal Snare - West",
+  "x": 4, "y": 17, "frame": 0, "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6", "paletteId": "", "direction": "down",
+  "moveSpeed": 1, "animSpeed": 15, "isPinned": false, "persistent": true,
+  "collisionGroup": "", "collisionExtraFlags": [], "prefabScriptOverrides": {},
+  "script": [
+    { "id": "left-new", "command": "EVENT_IF_FALSE", "args": { "variable": "8" }, "children": { "true": [
+      { "id": "left-position-check", "command": "EVENT_IF_ACTOR_AT_POSITION", "args": { "actorId": "$self$", "x": { "type": "number", "value": 4 }, "y": { "type": "number", "value": 17 } }, "children": { "true": [ { "id": "left-photo", "command": "EVENT_TEXT", "args": { "text": "Tagged illegal snare #A.\nFresh boot prints lead east." } } ], "false": [ { "id": "left-shifted", "command": "EVENT_TEXT", "args": { "text": "The snare was disturbed." } } ] } },
+      { "id": "left-set", "command": "EVENT_SET_VALUE", "args": { "variable": "8", "value": { "type": "true" } } },
+      { "id": "left-inc", "command": "EVENT_INC_VALUE", "args": { "variable": "1" } },
+      { "id": "left-dec", "command": "EVENT_DEC_VALUE", "args": { "variable": "6" } },
+      { "id": "left-collisions", "command": "EVENT_ACTOR_COLLISIONS_DISABLE", "args": { "actorId": "$self$" } },
+      { "id": "left-wait", "command": "EVENT_WAIT", "args": { "frames": 6 } },
+      { "id": "left-hide", "command": "EVENT_ACTOR_DEACTIVATE", "args": { "actorId": "$self$" } }
+    ], "false": [ { "id": "left-repeat", "command": "EVENT_TEXT", "args": { "text": "Evidence tag #A is already logged." } } ] } },
+    { "id": "left-end", "command": "EVENT_END", "args": {} }
+  ],
+  "startScript": [], "updateScript": [], "hit1Script": [], "hit2Script": [], "hit3Script": []
+}

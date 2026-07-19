@@ -1,8 +1,8 @@
-﻿{
-    "_resourceType":  "project",
-    "name":  "Poachermon: Beige Crimes Unit",
-    "author":  "GBA Studio",
-    "notes":  "Original CC0-style sample art generated for the GBA template. No third-party ROM assets bundled.",
-    "_version":  "4.2.0",
-    "_release":  "3"
+{
+  "_resourceType": "project",
+  "name": "Poachermon: Beige Crimes Unit",
+  "author": "GBA Studio",
+  "notes": "Playable Case 001 demo: collect evidence, report two poachers, rescue a trapped creature, and close the case. Original redistributable sample art; no third-party ROM assets.",
+  "_version": "4.2.0",
+  "_release": "4"
 }

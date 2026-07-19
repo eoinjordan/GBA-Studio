@@ -1,392 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GBA Studio — Play Demo</title>
-  <style>
-    :root {
-      --purple: #7c3aed;
-      --purple-light: #a78bfa;
-      --bg: #0f0f0f;
-      --surface: #1a1a2e;
-      --surface2: #16213e;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --border: #2d2d4e;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Run GBA Studio demo games or your own GBA ROM directly in the browser."
+    />
+    <title>GBA Studio Browser Player</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body class="player-page">
+    <header class="site-header">
+      <a class="brand" href="../">
+        <img src="gba-logo.png" alt="" />
+        <span>GBA Studio</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="../">Overview</a>
+        <a href="https://github.com/eoinjordan/GBA-Studio">Source</a>
+        <a href="https://github.com/eoinjordan/GBA-Studio/releases">Desktop app</a>
+      </nav>
+    </header>
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <main class="player-main">
+      <section class="player-intro" id="loader-ui">
+        <p class="eyebrow">No install required</p>
+        <h1>Test GBA Studio in your browser</h1>
+        <p class="lede">
+          Launch a game compiled by the current GBA Studio pipeline, or load
+          your own <code>.gba</code> file. ROMs stay on your device.
+        </p>
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+        <button class="drop-zone" id="drop-zone" type="button">
+          <span class="drop-icon" aria-hidden="true">+</span>
+          <strong>Choose a GBA ROM</strong>
+          <span>or drag and drop it here</span>
+        </button>
+        <input id="rom-input" type="file" accept=".gba,application/octet-stream" />
+        <p class="status" id="player-status" role="status" aria-live="polite"></p>
 
-    /* ── Header ── */
-    header {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Built by GitHub Actions</p>
+            <h2>Playable demos</h2>
+          </div>
+          <span class="build-badge">Compiler + engine smoke test</span>
+        </div>
+        <div class="demo-grid" id="demo-grid"></div>
+      </section>
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: inherit;
-    }
+      <section id="emulator-wrap" class="emulator-wrap" aria-label="GBA emulator">
+        <div class="emulator-toolbar">
+          <div>
+            <p class="eyebrow">Now playing</p>
+            <strong id="rom-name">GBA Studio demo</strong>
+          </div>
+          <button class="secondary-button" id="close-btn" type="button">Close</button>
+        </div>
+        <div id="game"></div>
+        <p class="controls">
+          Keyboard controls are shown in the emulator menu. A gamepad can be
+          connected before launch.
+        </p>
+      </section>
+    </main>
 
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-    }
+    <footer>
+      <span>Open-source GBA creation tools.</span>
+      <span>Emulation runs locally in your browser through EmulatorJS.</span>
+    </footer>
 
-    .logo-text {
-      font-size: 1.1rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--purple-light), #c4b5fd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .header-links {
-      display: flex;
-      gap: 16px;
-    }
-
-    .header-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-      transition: color 0.15s;
-    }
-
-    .header-links a:hover { color: var(--text); }
-
-    /* ── ROM loader ── */
-    main {
-      flex: 1;
-      width: 100%;
-      max-width: 900px;
-      padding: 32px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
-    }
-
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    h1 span { color: var(--purple-light); }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 0.9rem;
-      text-align: center;
-    }
-
-    /* ── Drop zone ── */
-    #drop-zone {
-      width: 100%;
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 32px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    #drop-zone:hover, #drop-zone.drag-over {
-      border-color: var(--purple);
-      background: rgba(124, 58, 237, 0.06);
-    }
-
-    #drop-zone svg { color: var(--purple-light); }
-    #drop-zone p { color: var(--muted); font-size: 0.875rem; }
-    #drop-zone strong { color: var(--text); }
-
-    #rom-input { display: none; }
-
-    .or-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-    .or-row::before, .or-row::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* ── Demo ROMs ── */
-    .demo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-      width: 100%;
-    }
-
-    .demo-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-      cursor: pointer;
-      transition: border-color 0.15s, transform 0.1s;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .demo-card:hover {
-      border-color: var(--purple);
-      transform: translateY(-2px);
-    }
-
-    .demo-card-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .demo-card-desc {
-      color: var(--muted);
-      font-size: 0.78rem;
-      line-height: 1.4;
-    }
-
-    .demo-card-tag {
-      display: inline-block;
-      background: rgba(124, 58, 237, 0.2);
-      color: var(--purple-light);
-      border-radius: 4px;
-      padding: 2px 7px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      align-self: flex-start;
-    }
-
-    /* ── Emulator container ── */
-    #emulator-wrap {
-      width: 100%;
-      display: none;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    #emulator-wrap.visible { display: flex; }
-
-    #emulator-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    #rom-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    #close-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      border-radius: 6px;
-      padding: 4px 12px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: border-color 0.15s, color 0.15s;
-    }
-
-    #close-btn:hover { border-color: var(--purple); color: var(--text); }
-
-    #game {
-      width: 100%;
-      aspect-ratio: 3/2;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #000;
-      border: 1px solid var(--border);
-    }
-
-    /* ── Footer ── */
-    footer {
-      width: 100%;
-      padding: 20px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.8rem;
-      border-top: 1px solid var(--border);
-    }
-
-    footer a { color: var(--purple-light); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-  </style>
-</head>
-<body>
-
-<header>
-  <a class="logo" href="https://github.com/eoinjordan/GBA-Studio">
-    <img class="logo-icon" src="../player/gba-logo.png" onerror="this.style.display='none'" alt="GBA Studio" />
-    <span class="logo-text">GBA Studio</span>
-  </a>
-  <nav class="header-links">
-    <a href="https://github.com/eoinjordan/GBA-Studio">GitHub</a>
-    <a href="https://github.com/eoinjordan/GBA-Studio/releases">Download</a>
-    <a href="https://github.com/eoinjordan/GBA-Studio/tree/develop/docs">Docs</a>
-  </nav>
-</header>
-
-<main>
-  <h1>Play your <span>GBA Studio</span> game</h1>
-  <p class="subtitle">Drop a <code>.gba</code> ROM built with GBA Studio, or try one of the demos below.</p>
-
-  <div id="loader-ui">
-    <div id="drop-zone" onclick="document.getElementById('rom-input').click()">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12V4M8 8l4-4 4 4"/>
-      </svg>
-      <p><strong>Click to choose a ROM</strong> or drag it here</p>
-      <p>.gba files only</p>
-      <input id="rom-input" type="file" accept=".gba" />
-    </div>
-
-    <div class="or-row">or try a demo</div>
-
-    <div class="demo-grid" id="demo-grid">
-      <!-- Populated by JS from DEMOS array -->
-    </div>
-  </div>
-
-  <div id="emulator-wrap">
-    <div id="emulator-header">
-      <span id="rom-name">Loading…</span>
-      <button id="close-btn" onclick="closeEmulator()">✕ Close</button>
-    </div>
-    <div id="game"></div>
-  </div>
-</main>
-
-<footer>
-  Made with <a href="https://github.com/eoinjordan/GBA-Studio">GBA Studio</a> —
-  an open-source GBA game maker forked from
-  <a href="https://www.gbstudio.dev">GB Studio</a>. ROMs run client-side; nothing is uploaded.
-</footer>
-
-<script>
-  // ── Demo ROM list ─────────────────────────────────────────────────────────
-  // Add entries here when you build and commit demo ROMs to docs/player/roms/
-  const DEMOS = [
-    // {
-    //   title: "Isometric Village",
-    //   desc: "Walk around the starter iso world from the GBA Studio template.",
-    //   tag: "Isometric",
-    //   url: "roms/iso-village.gba",
-    // },
-  ];
-
-  // ── Drag-and-drop ─────────────────────────────────────────────────────────
-  const dropZone = document.getElementById("drop-zone");
-  const romInput = document.getElementById("rom-input");
-
-  dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
-  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
-  dropZone.addEventListener("drop", e => {
-    e.preventDefault();
-    dropZone.classList.remove("drag-over");
-    const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith(".gba")) loadFileRom(file);
-  });
-
-  romInput.addEventListener("change", () => {
-    if (romInput.files[0]) loadFileRom(romInput.files[0]);
-  });
-
-  // ── Build demo grid ───────────────────────────────────────────────────────
-  const grid = document.getElementById("demo-grid");
-  if (DEMOS.length === 0) {
-    grid.innerHTML = `<p style="color:var(--muted);font-size:0.85rem;grid-column:1/-1">
-      No demo ROMs yet — build a game with GBA Studio and add the .gba here!
-    </p>`;
-  } else {
-    DEMOS.forEach(d => {
-      const card = document.createElement("div");
-      card.className = "demo-card";
-      card.innerHTML = `<span class="demo-card-tag">${d.tag}</span>
-        <div class="demo-card-title">${d.title}</div>
-        <div class="demo-card-desc">${d.desc}</div>`;
-      card.onclick = () => launchUrl(d.url, d.title);
-      grid.appendChild(card);
-    });
-  }
-
-  // ── ?rom= query param auto-launch ─────────────────────────────────────────
-  const params = new URLSearchParams(location.search);
-  if (params.has("rom")) {
-    const romUrl = decodeURIComponent(params.get("rom"));
-    const name = romUrl.split("/").pop() || "ROM";
-    launchUrl(romUrl, name);
-  }
-
-  // ── Launch helpers ────────────────────────────────────────────────────────
-  function loadFileRom(file) {
-    const url = URL.createObjectURL(file);
-    launchUrl(url, file.name.replace(/\.gba$/i, ""));
-  }
-
-  function launchUrl(url, name) {
-    document.getElementById("loader-ui").style.display = "none";
-    const wrap = document.getElementById("emulator-wrap");
-    wrap.classList.add("visible");
-    document.getElementById("rom-name").textContent = name;
-
-    // Clear any previous instance
-    const container = document.getElementById("game");
-    container.innerHTML = "";
-
-    // Configure EmulatorJS
-    window.EJS_player      = "#game";
-    window.EJS_core        = "gba";
-    window.EJS_gameUrl     = url;
-    window.EJS_color       = "#7c3aed";
-    window.EJS_startOnLoaded = true;
-    window.EJS_adUrl       = "";
-
-    const s = document.createElement("script");
-    s.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
-    document.body.appendChild(s);
-  }
-
-  function closeEmulator() {
-    document.getElementById("emulator-wrap").classList.remove("visible");
-    document.getElementById("loader-ui").style.display = "";
-    // Remove the script tag so it can be re-added fresh next launch
-    document.querySelectorAll('script[src*="emulatorjs"]').forEach(s => s.remove());
-  }
-</script>
-
-</body>
+    <noscript>This player requires JavaScript to run the emulator.</noscript>
+    <script src="player.js"></script>
+  </body>
 </html>

@@ -25,6 +25,9 @@ const VM_OP_ACTOR_SET_POS = 0x11;
 const VM_OP_ACTOR_MOVE_REL = 0x12;
 const VM_OP_ACTOR_SET_DIR = 0x13;
 const VM_OP_ACTOR_SET_HIDDEN = 0x14;
+const VM_OP_ACTOR_SET_COLLISIONS = 0x15;
+const VM_OP_IF_ACTOR_AT_POS = 0x16;
+const VM_OP_IF_ACTOR_RELATIVE = 0x17;
 
 const noopCtx = {
   sceneIndexById: {} as Record<string, number>,
@@ -511,9 +514,7 @@ describe("compileGBAScript", () => {
       {
         command: "EVENT_GROUP",
         children: {
-          true: [
-            { command: "EVENT_WAIT", args: { frames: 5 } },
-          ],
+          true: [{ command: "EVENT_WAIT", args: { frames: 5 } }],
         },
       },
     ];
@@ -612,6 +613,38 @@ describe("compileGBAScript", () => {
     expect(out).toEqual([VM_OP_ACTOR_MOVE_REL, 0, 0xff, 2, VM_OP_END]);
   });
 
+  it("actor coordinates convert tile units to top-down runtime pixels", () => {
+    const ctx = {
+      sceneIndexById: {},
+      coordinateScale: 8,
+      warnings: jest.fn(),
+    };
+    const out = compileGBAScript(
+      [
+        {
+          command: "EVENT_ACTOR_SET_POSITION",
+          args: { actorId: "player", x: 5, y: 7, units: "tiles" },
+        },
+        {
+          command: "EVENT_ACTOR_MOVE_RELATIVE",
+          args: { actorId: "player", x: -1, y: 2, units: "tiles" },
+        },
+      ],
+      ctx,
+    );
+    expect(out).toEqual([
+      VM_OP_ACTOR_SET_POS,
+      0,
+      40,
+      56,
+      VM_OP_ACTOR_MOVE_REL,
+      0,
+      0xf8,
+      16,
+      VM_OP_END,
+    ]);
+  });
+
   it("EVENT_ACTOR_SET_DIRECTION maps direction names (up=3)", () => {
     const events: GBAScriptEvent[] = [
       {
@@ -640,6 +673,83 @@ describe("compileGBAScript", () => {
       0,
       VM_OP_END,
     ]);
+  });
+
+  it("EVENT_ACTOR_COLLISIONS_ENABLE / DISABLE toggle runtime collisions", () => {
+    const out = compileGBAScript(
+      [
+        {
+          command: "EVENT_ACTOR_COLLISIONS_DISABLE",
+          args: { actorId: "player" },
+        },
+        {
+          command: "EVENT_ACTOR_COLLISIONS_ENABLE",
+          args: { actorId: "player" },
+        },
+      ],
+      noopCtx,
+    );
+    expect(out).toEqual([
+      VM_OP_ACTOR_SET_COLLISIONS,
+      0,
+      0,
+      VM_OP_ACTOR_SET_COLLISIONS,
+      0,
+      1,
+      VM_OP_END,
+    ]);
+  });
+
+  it("EVENT_IF_ACTOR_AT_POSITION emits a runtime branch with scaled coords", () => {
+    const ctx = {
+      sceneIndexById: {},
+      actorIndexById: { npc: 2 },
+      coordinateScale: 8,
+      warnings: jest.fn(),
+    };
+    const out = compileGBAScript(
+      [
+        {
+          command: "EVENT_IF_ACTOR_AT_POSITION",
+          args: {
+            actorId: "npc",
+            x: 3,
+            y: 4,
+            units: "tiles",
+            true: [
+              { command: "EVENT_SET_VALUE", args: { variable: "1", value: 7 } },
+            ],
+          },
+        },
+      ],
+      ctx,
+    );
+    expect(out.slice(0, 6)).toEqual([VM_OP_IF_ACTOR_AT_POS, 2, 24, 32, 3, 0]);
+    expect(out).toContain(VM_OP_SET_CONST);
+  });
+
+  it("EVENT_IF_ACTOR_RELATIVE_TO_ACTOR resolves both actors and direction", () => {
+    const ctx = {
+      sceneIndexById: {},
+      actorIndexById: { npc: 1 },
+      warnings: jest.fn(),
+    };
+    const out = compileGBAScript(
+      [
+        {
+          command: "EVENT_IF_ACTOR_RELATIVE_TO_ACTOR",
+          args: {
+            actorId: "player",
+            otherActorId: "npc",
+            operation: "up",
+            true: [],
+            false: [],
+          },
+        },
+      ],
+      ctx,
+    );
+    expect(out.slice(0, 6)).toEqual([VM_OP_IF_ACTOR_RELATIVE, 0, 1, 3, 3, 0]);
   });
 
   it("$self$ resolves to the enclosing actor index", () => {
@@ -689,11 +799,19 @@ describe("compileGBAScript", () => {
     };
     ctx.customEventsById["ce-loop"] = {
       script: [
-        { command: "EVENT_CALL_CUSTOM_EVENT", args: { customEventId: "ce-loop" } },
+        {
+          command: "EVENT_CALL_CUSTOM_EVENT",
+          args: { customEventId: "ce-loop" },
+        },
       ],
     };
     const out = compileGBAScript(
-      [{ command: "EVENT_CALL_CUSTOM_EVENT", args: { customEventId: "ce-loop" } }],
+      [
+        {
+          command: "EVENT_CALL_CUSTOM_EVENT",
+          args: { customEventId: "ce-loop" },
+        },
+      ],
       ctx,
     );
     expect(out).toEqual([VM_OP_END]);

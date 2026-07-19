@@ -13,11 +13,15 @@ permissions:
 
 jobs:
   test-and-rom:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    container: devkitpro/devkitarm@sha256:15b79ce75822c289538d8153da5fa7aafe5e6adc32ad8a575a197beca0f0761b
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Trust checked-out workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -29,9 +33,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --immutable || npm ci
-
-      - name: Fetch engine and tool dependencies
-        run: npm run fetch-deps
 
       - name: Run unit tests
         run: npm test
@@ -45,34 +46,20 @@ jobs:
       - name: Build CLI
         run: npm run make:cli
 
-      - name: Configure downloaded devkitARM
-        id: devkitpro
-        continue-on-error: true
+      - name: Verify devkitPro GBA toolchain
         run: |
-          DEVKITPRO_PATH="$GITHUB_WORKSPACE/buildTools/linux-x64"
-          find "$DEVKITPRO_PATH" -maxdepth 4 -type f -name '*gcc*' -o -type d -name '*devkit*'
-          DEVKITARM_GCC="$(find "$DEVKITPRO_PATH" -type f -path '*/bin/arm-none-eabi-gcc' -print -quit)"
-          test -n "$DEVKITARM_GCC"
-          DEVKITARM_PATH="$(dirname "$(dirname "$DEVKITARM_GCC")")"
-          echo "DEVKITPRO=$DEVKITPRO_PATH" >> "$GITHUB_ENV"
-          echo "DEVKITARM=$DEVKITARM_PATH" >> "$GITHUB_ENV"
-          echo "$DEVKITARM_PATH/bin" >> "$GITHUB_PATH"
-          "$DEVKITARM_PATH/bin/arm-none-eabi-gcc" --version
+          test "$DEVKITPRO" = "/opt/devkitpro"
+          test "$DEVKITARM" = "/opt/devkitpro/devkitARM"
+          "$DEVKITARM/bin/arm-none-eabi-gcc" --version
+          test -x "$DEVKITPRO/tools/bin/gbafix"
 
       - name: Build sample GBA ROM
-        if: steps.devkitpro.outcome == 'success'
-        continue-on-error: true
-        env:
-          DEVKITPRO: ${{ env.DEVKITPRO }}
-          DEVKITARM: ${{ env.DEVKITARM }}
-        run: npm run build:gba -- test/data/projects/RunProject/RunProject.gbsproj out/RunProject.gba
+        run: node out/cli/gb-studio-cli.js make:rom examples/starter-project/project.gbsproj out/GBAStarter.gba
+
+      - name: Build Poachermon end-to-end demo
+        run: node out/cli/gb-studio-cli.js make:rom examples/poachermon/project.gbsproj out/Poachermon.gba --verbose
 
       - name: Build engine ROM
-        if: steps.devkitpro.outcome == 'success'
-        continue-on-error: true
-        env:
-          DEVKITPRO: ${{ env.DEVKITPRO }}
-          DEVKITARM: ${{ env.DEVKITARM }}
         run: make -C appData/engine/gbavm
 
       - name: Export sample GBDK project
@@ -84,7 +71,8 @@ jobs:
           name: gba-studio-rom-smoke
           if-no-files-found: ignore
           path: |
-            out/RunProject.gba
+            out/GBAStarter.gba
+            out/Poachermon.gba
             appData/engine/gbavm/bin/game.gba
             out/ci/RunProject/**
 
@@ -204,7 +192,8 @@ jobs:
             out/make/zip/darwin/x64/*.zip
 
   attach-release-artifacts:
-    needs: [build-windows-installer, build-linux-installers, build-macos-installers]
+    needs:
+      [build-windows-installer, build-linux-installers, build-macos-installers]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
