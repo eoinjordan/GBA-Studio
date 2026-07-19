@@ -56,6 +56,9 @@ jobs:
       - name: Build sample GBA ROM
         run: node out/cli/gb-studio-cli.js make:rom examples/starter-project/project.gbsproj out/GBAStarter.gba
 
+      - name: Build Poachermon end-to-end demo
+        run: node out/cli/gb-studio-cli.js make:rom examples/poachermon/project.gbsproj out/Poachermon.gba --verbose
+
       - name: Build engine ROM
         run: make -C appData/engine/gbavm
 
@@ -69,6 +72,7 @@ jobs:
           if-no-files-found: ignore
           path: |
             out/GBAStarter.gba
+            out/Poachermon.gba
             appData/engine/gbavm/bin/game.gba
             out/ci/RunProject/**
 
@@ -188,7 +192,8 @@ jobs:
             out/make/zip/darwin/x64/*.zip
 
   attach-release-artifacts:
-    needs: [build-windows-installer, build-linux-installers, build-macos-installers]
+    needs:
+      [build-windows-installer, build-linux-installers, build-macos-installers]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:

@@ -24,7 +24,9 @@ describe("GBA Studio browser player", () => {
   });
 
   test("reads optional ROM query links", () => {
-    expect(player.romUrlFromSearch("?rom=roms%2Fdemo.gba")).toBe("roms/demo.gba");
+    expect(player.romUrlFromSearch("?rom=roms%2Fdemo.gba")).toBe(
+      "roms/demo.gba",
+    );
     expect(player.romUrlFromSearch("?other=1")).toBeNull();
   });
 
@@ -39,11 +41,12 @@ describe("GBA Studio browser player", () => {
     });
   });
 
-  test("publishes two CI-built feature demos", () => {
-    expect(player.DEMOS).toHaveLength(2);
+  test("publishes three CI-built feature demos", () => {
+    expect(player.DEMOS).toHaveLength(3);
     expect(player.DEMOS.map((demo) => demo.url)).toEqual([
       "roms/gba-starter.gba",
       "roms/isometric-adventure.gba",
+      "roms/poachermon.gba",
     ]);
   });
 });

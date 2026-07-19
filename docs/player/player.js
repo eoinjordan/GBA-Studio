@@ -27,6 +27,13 @@
       tag: "Isometric",
       url: "roms/isometric-adventure.gba",
     }),
+    Object.freeze({
+      title: "Poachermon: Case 001",
+      description:
+        "Collect evidence, report two poachers, rescue a trapped creature, and close a complete scripted case.",
+      tag: "Adventure",
+      url: "roms/poachermon.gba",
+    }),
   ]);
 
   let activeObjectUrl = null;
@@ -105,7 +112,10 @@
       script.src = `${EMULATOR_DATA_URL}loader.js`;
       script.dataset.gbaPlayerLoader = "true";
       script.onerror = function () {
-        setStatus("The emulator could not be loaded. Check your connection and try again.", true);
+        setStatus(
+          "The emulator could not be loaded. Check your connection and try again.",
+          true,
+        );
         close();
       };
       doc.body.appendChild(script);
@@ -182,7 +192,9 @@
     });
     if (closeButton) closeButton.addEventListener("click", close);
 
-    const queryRom = romUrlFromSearch(target.location && target.location.search);
+    const queryRom = romUrlFromSearch(
+      target.location && target.location.search,
+    );
     if (queryRom) launch(queryRom, romNameFromUrl(queryRom));
     return true;
   }

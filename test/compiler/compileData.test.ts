@@ -549,6 +549,80 @@ test("should emit trigger tables for GBA scene data", async () => {
   expect(compiled.files["gba_scene_data.c"]).toContain("scene_1_triggers");
 });
 
+test("should emit GBA scene-start scripts and link them from scene data", async () => {
+  const scriptEventHandlers = await getTestScriptHandlers();
+  const project = {
+    settings: {
+      startSceneId: "1",
+      startX: 5,
+      startY: 6,
+      defaultFontId: "font1",
+      defaultPlayerSprites: {},
+    },
+    scenes: [
+      {
+        id: "1",
+        name: "first_scene",
+        symbol: "scene_1",
+        type: "TOPDOWN",
+        backgroundId: "bg1",
+        tilesetId: "",
+        colorModeOverride: "none",
+        width: 20,
+        height: 18,
+        collisions: new Array(20 * 18).fill(0),
+        actors: [],
+        triggers: [],
+        script: [
+          {
+            command: EVENT_TEXT,
+            args: { text: "SCENE START TEST" },
+          },
+        ],
+      },
+    ],
+    backgrounds: [
+      {
+        id: "bg1",
+        name: "forest_clearing",
+        symbol: "bg_1",
+        width: 20,
+        height: 18,
+        imageWidth: 160,
+        imageHeight: 144,
+        filename: "forest_clearing.png",
+        tileColors: [],
+      },
+    ],
+    variables: { variables: [], constants: [] },
+    fonts: [
+      {
+        id: "font1",
+        name: "gbs-mono",
+        symbol: "font_1",
+        filename: "gbs-mono.png",
+      },
+    ],
+    engineFieldValues: { engineFieldValues: [] },
+  } as unknown as ProjectResources;
+
+  const compiled = await compile(project, {
+    projectRoot: `${__dirname}/_files`,
+    scriptEventHandlers,
+    engineSchema: { fields: [], sceneTypes: [], consts: {} },
+    tmpPath: os.tmpdir(),
+    debugEnabled: false,
+    progress: (_msg: string) => {},
+    warnings: (_msg: string) => {},
+    buildType: "gba",
+  });
+
+  const sceneData = compiled.files["gba_scene_data.c"];
+  expect(sceneData).toContain("static const uint8_t scene_1_start_script[");
+  expect(sceneData).toContain(".start_script   = scene_1_start_script");
+  expect(sceneData).toContain("0x0F"); // VM_OP_SHOW_TEXT
+});
+
 test("should emit GBA tilesets and tilemaps for scene backgrounds", async () => {
   const scriptEventHandlers = await getTestScriptHandlers();
   const project = {

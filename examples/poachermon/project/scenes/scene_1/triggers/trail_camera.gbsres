@@ -1,0 +1,23 @@
+{
+  "_resourceType": "trigger",
+  "id": "6a421770-b7e2-42f2-a826-e555436ca201",
+  "_index": 0,
+  "symbol": "trigger_trail_camera",
+  "prefabId": "",
+  "name": "Trail camera clue",
+  "x": 14,
+  "y": 14,
+  "width": 3,
+  "height": 1,
+  "prefabScriptOverrides": {},
+  "script": [
+    { "id": "camera-new", "command": "EVENT_IF_FALSE", "args": { "variable": "10" }, "children": { "true": [
+      { "id": "camera-text", "command": "EVENT_TEXT", "args": { "text": "TRAIL CAMERA: two figures, 02:14.\nTimestamp added as evidence." } },
+      { "id": "camera-set", "command": "EVENT_SET_VALUE", "args": { "variable": "10", "value": { "type": "true" } } },
+      { "id": "camera-inc", "command": "EVENT_INC_VALUE", "args": { "variable": "1" } },
+      { "id": "camera-score", "command": "EVENT_VARIABLE_MATH", "args": { "vectorX": "14", "operation": "add", "other": "val", "value": 2 } }
+    ], "false": [] } },
+    { "id": "camera-end", "command": "EVENT_END", "args": {} }
+  ],
+  "leaveScript": []
+}

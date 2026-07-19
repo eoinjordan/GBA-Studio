@@ -1,0 +1,41 @@
+{
+  "_resourceType": "actor",
+  "id": "bc140f2d-d829-480b-a837-1d6e3fdf0101",
+  "_index": 0,
+  "symbol": "actor_captain_rowan",
+  "prefabId": "",
+  "name": "Captain Rowan",
+  "x": 15,
+  "y": 17,
+  "frame": 0,
+  "animate": true,
+  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
+  "paletteId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    { "id": "captain-case-already-closed", "command": "EVENT_IF_TRUE", "args": { "variable": "4" }, "children": { "true": [ { "id": "captain-closed-text", "command": "EVENT_TEXT", "args": { "text": "Paperwork complete, Warden.\nThe reserve is safe." } } ], "false": [
+      { "id": "captain-release-witness", "command": "EVENT_ACTOR_ACTIVATE", "args": { "actorId": "a02ea894-b111-4cd8-9125-4df27903a102" } },
+      { "id": "captain-caught-check", "command": "EVENT_IF_VALUE", "args": { "variable": "2", "operator": ">=", "comparator": 2 }, "children": { "true": [
+        { "id": "captain-rescue-check", "command": "EVENT_IF_TRUE", "args": { "variable": "3" }, "children": { "true": [
+          { "id": "captain-success", "command": "EVENT_TEXT", "args": { "text": "Evidence {1}/2. Caught {2}/2.\nCreature safe. Case closed!" } },
+          { "id": "captain-set-closed", "command": "EVENT_SET_VALUE", "args": { "variable": "4", "value": { "type": "true" } } },
+          { "id": "captain-score", "command": "EVENT_VARIABLE_MATH", "args": { "vectorX": "14", "operation": "add", "other": "val", "value": 10 } },
+          { "id": "captain-show-creature", "command": "EVENT_ACTOR_ACTIVATE", "args": { "actorId": "8d14a725-3e43-4016-8a91-293f33a3a107" } },
+          { "id": "captain-position-creature", "command": "EVENT_ACTOR_SET_POSITION", "args": { "actorId": "8d14a725-3e43-4016-8a91-293f33a3a107", "x": { "type": "number", "value": 20 }, "y": { "type": "number", "value": 15 } } },
+          { "id": "captain-walk-creature", "command": "EVENT_ACTOR_MOVE_RELATIVE", "args": { "actorId": "8d14a725-3e43-4016-8a91-293f33a3a107", "x": { "type": "number", "value": 1 }, "y": { "type": "number", "value": 0 } } },
+          { "id": "captain-creature-solid", "command": "EVENT_ACTOR_COLLISIONS_ENABLE", "args": { "actorId": "8d14a725-3e43-4016-8a91-293f33a3a107" } },
+          { "id": "captain-finale", "command": "EVENT_SWITCH_SCENE", "args": { "sceneId": "5ce7e000-0000-4a00-8000-000000000099", "x": { "type": "number", "value": 15 }, "y": { "type": "number", "value": 18 }, "direction": "up", "fadeSpeed": "1" } }
+        ], "false": [ { "id": "captain-rescue-first", "command": "EVENT_TEXT", "args": { "text": "Both suspects are secured.\nFree the pink creature next." } } ] } }
+      ], "false": [ { "id": "captain-status", "command": "EVENT_TEXT", "args": { "text": "Tag 2 clues, catch 2 poachers,\nthen free the creature.\nEvidence {1}/2  Caught {2}/2" } } ] } }
+    ] } },
+    { "id": "captain-end", "command": "EVENT_END", "args": {} }
+  ],
+  "startScript": [], "updateScript": [], "hit1Script": [], "hit2Script": [], "hit3Script": []
+}

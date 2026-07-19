@@ -7,6 +7,7 @@ The current public demos are generated from:
 
 - `examples/starter-project/project.gbsproj`
 - `examples/isometric-adventure/project.gbsproj`
+- `examples/poachermon/project.gbsproj`
 
 To add a demo, update the build commands in `.github/workflows/web.yml` and the
 matching metadata in `docs/player/player.js`. `scripts/validate-pages.js`

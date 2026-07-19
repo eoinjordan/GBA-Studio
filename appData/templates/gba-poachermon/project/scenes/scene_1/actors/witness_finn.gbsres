@@ -1,0 +1,18 @@
+{
+  "_resourceType": "actor", "id": "a02ea894-b111-4cd8-9125-4df27903a102", "_index": 1,
+  "symbol": "actor_witness_finn", "prefabId": "", "name": "Witness Finn",
+  "x": 12, "y": 15, "frame": 0, "animate": true,
+  "spriteSheetId": "11b5452b-187c-43a3-afb1-a1f4f74ffda2", "paletteId": "", "direction": "right",
+  "moveSpeed": 1, "animSpeed": 15, "isPinned": false, "persistent": true,
+  "collisionGroup": "", "collisionExtraFlags": [], "prefabScriptOverrides": {},
+  "script": [
+    { "id": "witness-known", "command": "EVENT_IF_TRUE", "args": { "variable": "7" }, "children": { "true": [ { "id": "witness-repeat", "command": "EVENT_TEXT", "args": { "text": "Finn: Ash hides left. Moss hides right.\nThe pink creature is trapped." } } ], "false": [
+      { "id": "witness-input", "command": "EVENT_IF_INPUT", "args": { "input": ["b"] }, "children": { "true": [
+        { "id": "witness-secret", "command": "EVENT_TEXT", "args": { "text": "Finn: Quietly? Check both edges.\nI saw two illegal snares." } },
+        { "id": "witness-set", "command": "EVENT_SET_VALUE", "args": { "variable": "7", "value": { "type": "true" } } }
+      ], "false": [ { "id": "witness-prompt", "command": "EVENT_TEXT", "args": { "text": "Finn: Hold B while you talk\nif you want the quiet version." } } ] } }
+    ] } },
+    { "id": "witness-end", "command": "EVENT_END", "args": {} }
+  ],
+  "startScript": [], "updateScript": [], "hit1Script": [], "hit2Script": [], "hit3Script": []
+}

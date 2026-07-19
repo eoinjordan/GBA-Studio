@@ -1,0 +1,27 @@
+{
+  "_resourceType": "scene",
+  "id": "5ce7e000-0000-4a00-8000-000000000099",
+  "_index": 1,
+  "type": "TOPDOWN",
+  "name": "Case Closed",
+  "symbol": "scene_poachermon_case_closed",
+  "x": 520,
+  "y": 100,
+  "width": 30,
+  "height": 20,
+  "backgroundId": "b9a1c0de-0000-4a00-8000-000000000001",
+  "tilesetId": "",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [],
+  "autoFadeSpeed": 1,
+  "script": [
+    { "id": "closed-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 2 } },
+    { "id": "closed-check", "command": "EVENT_IF_TRUE", "args": { "variable": "4" }, "children": { "true": [ { "id": "closed-title", "command": "EVENT_TEXT", "args": { "text": "CASE CLOSED!\n2 poachers reported safely." } }, { "id": "closed-wait", "command": "EVENT_WAIT", "args": { "frames": 12 } }, { "id": "closed-score", "command": "EVENT_TEXT", "args": { "text": "Creature safe. Field score {14}.\nSTART reopens the patrol." } } ], "false": [ { "id": "closed-error", "command": "EVENT_TEXT", "args": { "text": "The paperwork escaped." } } ] } },
+    { "id": "closed-end", "command": "EVENT_END", "args": {} }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "collisions": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000000000000000000000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001100000000111111111111000000001111111111111110001111111111111100000000000000000000000000001100000000000000000000000000001100000000000000000000000000001100000000000000000000000000001100000000000000000000000000001100000000000000000000000000001111111111111111111111111111111"
+}
