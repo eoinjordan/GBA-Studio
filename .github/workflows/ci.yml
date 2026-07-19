@@ -54,7 +54,7 @@ jobs:
           test -x "$DEVKITPRO/tools/bin/gbafix"
 
       - name: Build sample GBA ROM
-        run: npm run build:gba -- test/data/projects/RunProject/RunProject.gbsproj out/RunProject.gba
+        run: node out/cli/gb-studio-cli.js make:rom examples/starter-project/project.gbsproj out/GBAStarter.gba
 
       - name: Build engine ROM
         run: make -C appData/engine/gbavm
@@ -68,7 +68,7 @@ jobs:
           name: gba-studio-rom-smoke
           if-no-files-found: ignore
           path: |
-            out/RunProject.gba
+            out/GBAStarter.gba
             appData/engine/gbavm/bin/game.gba
             out/ci/RunProject/**
 
