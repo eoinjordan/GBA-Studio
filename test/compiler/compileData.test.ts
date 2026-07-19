@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import compile, {
+  emitGBASpriteData,
   precompileBackgrounds,
   precompileScenes,
 } from "../../src/lib/compiler/compileData";
@@ -22,6 +23,35 @@ import {
 } from "../dummydata";
 import os from "os";
 import { ReferencedBackground } from "lib/compiler/precompile/determineUsedAssets";
+
+test("should emit ordered GBA sprite frames and animation ranges", () => {
+  const sprite = {
+    id: "animated_sprite",
+    tileset: { data: new Uint8Array(32) },
+    metasprites: [
+      [{ x: 0, y: 0, tile: 0, props: 0 }],
+      [
+        { x: 1, y: 2, tile: 1, props: 0x20 },
+        { x: 9, y: 2, tile: 2, props: 0x40 },
+      ],
+    ],
+    metaspritesOrder: [1, 0, 1],
+    animationOffsets: [{ start: 0, end: 2 }],
+  } as unknown as PrecompiledSprite;
+
+  const output = emitGBASpriteData(sprite, "scene_1_sprite_0");
+
+  expect(output).toContain("scene_1_sprite_0_metasprite_0[1]");
+  expect(output).toContain("scene_1_sprite_0_metasprite_1[2]");
+  expect(output).toContain(
+    "scene_1_sprite_0_frames[3] = {\n  scene_1_sprite_0_metasprite_1,\n  scene_1_sprite_0_metasprite_0,\n  scene_1_sprite_0_metasprite_1",
+  );
+  expect(output).toContain("scene_1_sprite_0_frame_lengths[3] = { 2, 1, 2 }");
+  expect(output).toContain("scene_1_sprite_0_animations[1]");
+  expect(output).toContain("{ 0, 2 }");
+  expect(output).toContain(".frame_count   = 3");
+  expect(output).toContain(".anim_count    = 1");
+});
 
 test("should take into account state value when building projectiles", () => {
   const scene = projectileStateTest.scene as unknown as PrecompiledScene;

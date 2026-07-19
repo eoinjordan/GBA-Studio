@@ -1393,6 +1393,109 @@ const toGbaDirection = (direction?: string): number => {
   }
 };
 
+export const emitGBASpriteData = (
+  sprite: PrecompiledSprite,
+  spriteSymbol: string,
+  warnings: (message: string) => void = () => {},
+): string => {
+  const tileset = convertGbTilesetToGba4bpp(sprite.tileset.data);
+  const metasprites = sprite.metasprites.length > 0 ? sprite.metasprites : [[]];
+
+  if (sprite.metaspritesOrder.length > 255) {
+    warnings(
+      `GBA compiler: sprite "${sprite.id}" has ${sprite.metaspritesOrder.length} ordered frames; only the first 255 can be emitted`,
+    );
+  }
+  if (sprite.animationOffsets.length > 255) {
+    warnings(
+      `GBA compiler: sprite "${sprite.id}" has ${sprite.animationOffsets.length} animations; only the first 255 can be emitted`,
+    );
+  }
+
+  const orderedMetaspriteIndexes = sprite.metaspritesOrder
+    .slice(0, 255)
+    .map((index) => (index >= 0 && index < metasprites.length ? index : 0));
+  const fallbackMetaspriteIndex = orderedMetaspriteIndexes[0] ?? 0;
+  const fallbackMetasprite = metasprites[fallbackMetaspriteIndex] ?? [];
+
+  const metaspriteBlocks = metasprites
+    .map((metasprite, metaspriteIndex) => {
+      const lines =
+        metasprite.length > 0
+          ? metasprite
+              .map(
+                (tile) =>
+                  `  { ${tile.x}, ${tile.y}, ${tile.tile}, ${
+                    tile.props & 0x07
+                  }, ${(tile.props & 0x20) !== 0}, ${(tile.props & 0x40) !== 0} }`,
+              )
+              .join(",\n")
+          : "  { 0, 0, 0, 0, false, false }";
+      return `static const gba_metasprite_tile_t ${spriteSymbol}_metasprite_${metaspriteIndex}[${Math.max(
+        1,
+        metasprite.length,
+      )}] = {\n${lines}\n};`;
+    })
+    .join("\n\n");
+
+  const hasFrames = orderedMetaspriteIndexes.length > 0;
+  const framePointers = hasFrames
+    ? `static const gba_metasprite_tile_t *const ${spriteSymbol}_frames[${orderedMetaspriteIndexes.length}] = {\n${orderedMetaspriteIndexes
+        .map((index) => `  ${spriteSymbol}_metasprite_${index}`)
+        .join(",\n")}\n};`
+    : "";
+  const frameLengths = hasFrames
+    ? `static const uint8_t ${spriteSymbol}_frame_lengths[${orderedMetaspriteIndexes.length}] = { ${orderedMetaspriteIndexes
+        .map((index) => metasprites[index]?.length ?? 0)
+        .join(", ")} };`
+    : "";
+
+  const animationOffsets = hasFrames
+    ? sprite.animationOffsets.slice(0, 255).map((animation) => {
+        const lastFrame = orderedMetaspriteIndexes.length - 1;
+        const start = Math.max(0, Math.min(lastFrame, animation.start));
+        const end = Math.max(start, Math.min(lastFrame, animation.end));
+        return { start, end };
+      })
+    : [];
+  const animations =
+    animationOffsets.length > 0
+      ? `static const gba_sprite_anim_t ${spriteSymbol}_animations[${animationOffsets.length}] = {\n${animationOffsets
+          .map((animation) => `  { ${animation.start}, ${animation.end} }`)
+          .join(",\n")}\n};`
+      : "";
+
+  const tilesetArray = `static const uint8_t ${spriteSymbol}_tileset[${Math.max(
+    1,
+    tileset.length,
+  )}] = {${
+    tileset.length > 0 ? `${formatCByteArray(tileset)}\n` : "\n  0x00\n"
+  }};`;
+  const def = `static const gba_sprite_def_t ${spriteSymbol} = {
+  .tileset_len   = ${tileset.length},
+  .tileset       = ${spriteSymbol}_tileset,
+  .tile_count    = ${Math.ceil(tileset.length / 32)},
+  .metasprite_len = ${fallbackMetasprite.length},
+  .metasprite    = ${spriteSymbol}_metasprite_${fallbackMetaspriteIndex},
+  .frame_count   = ${orderedMetaspriteIndexes.length},
+  .frames        = ${hasFrames ? `${spriteSymbol}_frames` : "NULL"},
+  .frame_lengths = ${hasFrames ? `${spriteSymbol}_frame_lengths` : "NULL"},
+  .anim_count    = ${animationOffsets.length},
+  .animations    = ${animationOffsets.length > 0 ? `${spriteSymbol}_animations` : "NULL"},
+};`;
+
+  return [
+    metaspriteBlocks,
+    framePointers,
+    frameLengths,
+    animations,
+    tilesetArray,
+    def,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+};
+
 const collectUniqueSprites = (
   scene: PrecompiledScene,
   usedSprites: PrecompiledSprite[],
@@ -1586,39 +1689,7 @@ const compileGBA = async (
       const spriteBlocks = localSprites
         .map((sprite, spriteIndex) => {
           const spriteSymbol = `${sceneSymbol}_sprite_${spriteIndex}`;
-          const tileset = convertGbTilesetToGba4bpp(sprite.tileset.data);
-          const metaspriteIndex = sprite.metaspritesOrder[0] ?? 0;
-          const metasprite =
-            sprite.metasprites[metaspriteIndex] ?? sprite.metasprites[0] ?? [];
-          const metaspriteLines =
-            metasprite.length > 0
-              ? metasprite
-                  .map(
-                    (tile) =>
-                      `  { ${tile.x}, ${tile.y}, ${tile.tile}, ${
-                        tile.props & 0x07
-                      }, ${(tile.props & 0x20) !== 0}, ${(tile.props & 0x40) !== 0} }`,
-                  )
-                  .join(",\n")
-              : "  { 0, 0, 0, 0, false, false }";
-          const metaspriteArray = `static const gba_metasprite_tile_t ${spriteSymbol}_metasprite[${Math.max(
-            1,
-            metasprite.length,
-          )}] = {\n${metaspriteLines}\n};`;
-          const tilesetArray = `static const uint8_t ${spriteSymbol}_tileset[${Math.max(
-            1,
-            tileset.length,
-          )}] = {${
-            tileset.length > 0 ? `${formatCByteArray(tileset)}\n` : "\n  0x00\n"
-          }};`;
-          const def = `static const gba_sprite_def_t ${spriteSymbol} = {
-  ${tileset.length},
-  ${spriteSymbol}_tileset,
-  ${Math.ceil(tileset.length / 32)},
-  ${metasprite.length},
-  ${spriteSymbol}_metasprite,
-};`;
-          return [metaspriteArray, tilesetArray, def].join("\n\n");
+          return emitGBASpriteData(sprite, spriteSymbol, warnings);
         })
         .join("\n\n");
 
@@ -2638,4 +2709,3 @@ const compile = async (
 };
 
 export default compile;
-
