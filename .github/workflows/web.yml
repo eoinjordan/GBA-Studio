@@ -39,6 +39,17 @@ jobs:
       - name: Test browser player
         run: npm run test:pages
 
+      - name: Configure downloaded devkitARM
+        run: |
+          DEVKITPRO_PATH="$GITHUB_WORKSPACE/buildTools/linux-x64"
+          DEVKITARM_GCC="$(find "$DEVKITPRO_PATH" -type f -path '*/bin/arm-none-eabi-gcc' -print -quit)"
+          test -n "$DEVKITARM_GCC"
+          DEVKITARM_PATH="$(dirname "$(dirname "$DEVKITARM_GCC")")"
+          echo "DEVKITPRO=$DEVKITPRO_PATH" >> "$GITHUB_ENV"
+          echo "DEVKITARM=$DEVKITARM_PATH" >> "$GITHUB_ENV"
+          echo "$DEVKITARM_PATH/bin" >> "$GITHUB_PATH"
+          "$DEVKITARM_PATH/bin/arm-none-eabi-gcc" --version
+
       - name: Build static site
         run: |
           mkdir -p dist/player/roms
