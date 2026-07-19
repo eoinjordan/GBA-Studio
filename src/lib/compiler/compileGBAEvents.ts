@@ -27,6 +27,9 @@ const VM_OP_ACTOR_SET_POS = 0x11;
 const VM_OP_ACTOR_MOVE_REL = 0x12;
 const VM_OP_ACTOR_SET_DIR = 0x13;
 const VM_OP_ACTOR_SET_HIDDEN = 0x14;
+const VM_OP_ACTOR_SET_COLLISIONS = 0x15;
+const VM_OP_IF_ACTOR_AT_POS = 0x16;
+const VM_OP_IF_ACTOR_RELATIVE = 0x17;
 
 // GBA key bit masks (mirror gba_system.h).
 const GBA_KEYS: Record<string, number> = {
@@ -68,6 +71,9 @@ export type GBACompileContext = {
   // Runtime index substituted for the "$self$" actor id (the actor whose
   // own script is being compiled). Undefined outside an actor script.
   selfActorIndex?: number;
+  // Tile-to-runtime-coordinate scale for the current scene. Isometric actor
+  // positions stay in tiles (1); other scene types use 8px tiles (8).
+  coordinateScale?: number;
   // Custom-event scripts by id, for inlining EVENT_CALL_CUSTOM_EVENT.
   customEventsById?: Record<string, { script?: GBAScriptEvent[] }>;
   // Recursion guard for nested custom-event calls.
@@ -180,6 +186,16 @@ function scriptValueToNumber(value: unknown): number {
     }
   }
   return 0;
+}
+
+function coordinateValue(
+  value: unknown,
+  units: unknown,
+  ctx: GBACompileContext,
+): number {
+  const scale =
+    String(units ?? "tiles") === "pixels" ? 1 : (ctx.coordinateScale ?? 1);
+  return scriptValueToNumber(value) * scale;
 }
 
 // Build a 16-bit GBA key mask from an EVENT_IF_INPUT `input` arg, which may be
@@ -298,6 +314,31 @@ function compileConditional(
 
   patchS16(out, jumpToFalseOffsetIndex, branchTrueBytes.length + 3);
   patchS16(out, jumpToEndOffsetIndex, branchFalseBytes.length);
+}
+
+function compileRuntimeConditional(
+  out: number[],
+  instruction: number[],
+  trueEvents: GBAScriptEvent[] | undefined,
+  falseEvents: GBAScriptEvent[] | undefined,
+  ctx: GBACompileContext,
+): void {
+  const trueBytes = compileNestedEvents(trueEvents, ctx);
+  const falseBytes = compileNestedEvents(falseEvents, ctx);
+
+  out.push(...instruction);
+  pushS16(out, 3);
+
+  const jumpToFalseOffsetIndex = out.length + 1;
+  pushJump(out, 0);
+  out.push(...trueBytes);
+
+  const jumpToEndOffsetIndex = out.length + 1;
+  pushJump(out, 0);
+  out.push(...falseBytes);
+
+  patchS16(out, jumpToFalseOffsetIndex, trueBytes.length + 3);
+  patchS16(out, jumpToEndOffsetIndex, falseBytes.length);
 }
 
 function conditionFromScriptValue(
@@ -551,8 +592,8 @@ function compileEvent(
       out.push(
         VM_OP_ACTOR_SET_POS,
         actor,
-        clampU8(scriptValueToNumber(args.x)),
-        clampU8(scriptValueToNumber(args.y)),
+        clampU8(coordinateValue(args.x, args.units, ctx)),
+        clampU8(coordinateValue(args.y, args.units, ctx)),
       );
       return true;
     }
@@ -562,8 +603,8 @@ function compileEvent(
       out.push(
         VM_OP_ACTOR_MOVE_REL,
         actor,
-        clampS8ToU8(scriptValueToNumber(args.x)),
-        clampS8ToU8(scriptValueToNumber(args.y)),
+        clampS8ToU8(coordinateValue(args.x, args.units, ctx)),
+        clampS8ToU8(coordinateValue(args.y, args.units, ctx)),
       );
       return true;
     }
@@ -581,6 +622,48 @@ function compileEvent(
 
     case "EVENT_ACTOR_DEACTIVATE": {
       out.push(VM_OP_ACTOR_SET_HIDDEN, resolveActorIndex(args.actorId, ctx), 1);
+      return true;
+    }
+
+    case "EVENT_ACTOR_COLLISIONS_ENABLE":
+    case "EVENT_ACTOR_COLLISIONS_DISABLE": {
+      out.push(
+        VM_OP_ACTOR_SET_COLLISIONS,
+        resolveActorIndex(args.actorId, ctx),
+        command === "EVENT_ACTOR_COLLISIONS_ENABLE" ? 1 : 0,
+      );
+      return true;
+    }
+
+    case "EVENT_IF_ACTOR_AT_POSITION": {
+      compileRuntimeConditional(
+        out,
+        [
+          VM_OP_IF_ACTOR_AT_POS,
+          resolveActorIndex(args.actorId, ctx),
+          clampU8(coordinateValue(args.x, args.units, ctx)),
+          clampU8(coordinateValue(args.y, args.units, ctx)),
+        ],
+        (args.true as GBAScriptEvent[] | undefined) ?? event.children?.true,
+        (args.false as GBAScriptEvent[] | undefined) ?? event.children?.false,
+        ctx,
+      );
+      return true;
+    }
+
+    case "EVENT_IF_ACTOR_RELATIVE_TO_ACTOR": {
+      compileRuntimeConditional(
+        out,
+        [
+          VM_OP_IF_ACTOR_RELATIVE,
+          resolveActorIndex(args.actorId, ctx),
+          resolveActorIndex(args.otherActorId, ctx),
+          directionValue(args.operation),
+        ],
+        (args.true as GBAScriptEvent[] | undefined) ?? event.children?.true,
+        (args.false as GBAScriptEvent[] | undefined) ?? event.children?.false,
+        ctx,
+      );
       return true;
     }
 

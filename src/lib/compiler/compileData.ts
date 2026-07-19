@@ -1716,7 +1716,11 @@ const compileGBA = async (
       const actorIndexById = Object.fromEntries(
         scene.actors.map((actor, actorIndex) => [actor.id, actorIndex + 1]),
       ) as Record<string, number>;
-      const sceneEventCtx = { ...gbaEventCtx, actorIndexById };
+      const sceneEventCtx = {
+        ...gbaEventCtx,
+        actorIndexById,
+        coordinateScale: scene.type === "ISOMETRIC" ? 1 : 8,
+      };
 
       // Compile trigger scripts and emit trigger array.
       const triggerScriptBlocks: string[] = [];

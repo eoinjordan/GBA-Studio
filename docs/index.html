@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Build and test Game Boy Advance games with the open-source GBA Studio toolchain."
+    />
+    <title>GBA Studio</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./">
+        <img src="player/gba-logo.png" alt="" />
+        <span>GBA Studio</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="player/">Browser player</a>
+        <a href="storybook/">UI preview</a>
+        <a href="coverage/">Test coverage</a>
+        <a href="https://github.com/eoinjordan/GBA-Studio">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Visual game creation for real GBA hardware</p>
+          <h1>Make the game.<br /><span>Test it anywhere.</span></h1>
+          <p class="lede">
+            GBA Studio pairs a visual desktop editor with a portable C engine.
+            This site publishes fresh demo ROMs from the same compiler and
+            engine commits validated in CI.
+          </p>
+          <div class="actions">
+            <a class="primary-button" href="player/">Play in browser</a>
+            <a class="secondary-button" href="https://github.com/eoinjordan/GBA-Studio/releases"
+              >Download Studio</a
+            >
+          </div>
+        </div>
+        <div class="console-card" aria-label="GBA Studio build pipeline">
+          <div class="console-screen">
+            <span class="pixel-sun"></span>
+            <span class="pixel-ground"></span>
+            <span class="pixel-actor"></span>
+          </div>
+          <div class="console-meta">
+            <span><i class="status-dot"></i> Browser-ready</span>
+            <span>240 × 160</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="feature-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">One tested pipeline</p>
+            <h2>From project data to playable ROM</h2>
+          </div>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <span class="feature-number">01</span>
+            <h3>Compile</h3>
+            <p>Scenes, tile art, actors, animations, collisions, triggers, and VM scripts become native GBA data.</p>
+          </article>
+          <article>
+            <span class="feature-number">02</span>
+            <h3>Validate</h3>
+            <p>Unit, integration, compiler-contract, ROM-header, and emulator smoke checks run automatically.</p>
+          </article>
+          <article>
+            <span class="feature-number">03</span>
+            <h3>Play</h3>
+            <p>Try the CI-built demos in a browser, or load a local ROM without uploading it anywhere.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>GBA Studio is open source.</span>
+      <a href="https://github.com/eoinjordan/GBA-Studio">Follow development on GitHub</a>
+    </footer>
+  </body>
+</html>
