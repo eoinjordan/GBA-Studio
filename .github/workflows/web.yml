@@ -34,9 +34,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable || npm ci
 
-      - name: Fetch engine and tool dependencies
-        run: npm run fetch-deps
-
       - name: Test browser player
         run: npm run test:pages
 
