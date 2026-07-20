@@ -11,7 +11,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
 
-  const EMULATOR_DATA_URL = "https://cdn.emulatorjs.org/stable/data/";
+  const EMULATOR_DATA_URL = "https://cdn.emulatorjs.org/4.2.3/data/";
   const DEMOS = Object.freeze([
     Object.freeze({
       title: "The Sunstone Relay",
@@ -72,7 +72,8 @@
     target.EJS_gameUrl = url;
     target.EJS_pathtodata = EMULATOR_DATA_URL;
     target.EJS_color = "#8b5cf6";
-    target.EJS_startOnLoaded = true;
+    target.EJS_startOnLoaded = false;
+    target.EJS_startButtonName = "Play GBA Studio Game";
     target.EJS_AdUrl = "";
     target.EJS_AdTimer = -1;
   }
@@ -81,6 +82,7 @@
     const params = new URLSearchParams();
     params.set("rom", url);
     params.set("name", name || romNameFromUrl(url));
+    params.set("player", "2");
     return `emulator.html?${params.toString()}`;
   }
 
@@ -94,8 +96,10 @@
     const routeTitle = doc.getElementById("route-title");
     const routeInstructions = doc.getElementById("route-instructions");
     const status = doc.getElementById("player-status");
+    const emulatorStatus = doc.getElementById("emulator-status");
     const demoGrid = doc.getElementById("demo-grid");
     const closeButton = doc.getElementById("close-btn");
+    let activeFrame = null;
 
     if (!dropZone || !romInput || !loaderUi || !emulatorWrap || !game) {
       return false;
@@ -112,6 +116,11 @@
       loaderUi.hidden = true;
       emulatorWrap.classList.add("visible");
       game.replaceChildren();
+      if (emulatorStatus) {
+        emulatorStatus.textContent =
+          "Loading the mGBA browser core. When it is ready, select Play GBA Studio Game inside the player.";
+        emulatorStatus.classList.remove("error");
+      }
       if (romName) romName.textContent = name || romNameFromUrl(url);
       if (routeTitle) {
         routeTitle.textContent = demo ? `${demo.title} route:` : "Loaded ROM:";
@@ -128,6 +137,7 @@
       frame.allow = "autoplay; fullscreen; gamepad";
       frame.setAttribute("allowfullscreen", "");
       frame.src = emulatorUrl(url, name);
+      activeFrame = frame;
       game.appendChild(frame);
     }
 
@@ -135,11 +145,35 @@
       emulatorWrap.classList.remove("visible");
       loaderUi.hidden = false;
       game.replaceChildren();
+      activeFrame = null;
       if (activeObjectUrl && target.URL && target.URL.revokeObjectURL) {
         target.URL.revokeObjectURL(activeObjectUrl);
       }
       activeObjectUrl = null;
       romInput.value = "";
+    }
+
+    if (target.addEventListener) {
+      target.addEventListener("message", function (event) {
+        if (
+          !activeFrame ||
+          event.source !== activeFrame.contentWindow ||
+          !event.data ||
+          event.data.source !== "gba-studio-emulator"
+        ) {
+          return;
+        }
+        if (emulatorStatus && event.data.type === "ready") {
+          emulatorStatus.textContent =
+            "Emulator ready. Select Play GBA Studio Game to start, then click the game whenever keyboard focus is needed.";
+        } else if (emulatorStatus && event.data.type === "started") {
+          emulatorStatus.textContent =
+            "Game running. Arrow keys move, X interacts, S is B, and Enter is START.";
+        } else if (emulatorStatus && event.data.type === "error") {
+          emulatorStatus.textContent = event.data.message;
+          emulatorStatus.classList.add("error");
+        }
+      });
     }
 
     async function loadFile(file) {
