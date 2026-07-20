@@ -22,7 +22,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "21.6.2"
+          node-version-file: .nvmrc
 
       - name: Enable Corepack
         run: corepack enable
@@ -71,7 +71,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "21.6.2"
+          node-version-file: .nvmrc
 
       - name: Enable Corepack
         run: corepack enable
@@ -91,6 +91,19 @@ jobs:
 
       - name: Install Dependencies
         run: yarn install --immutable || npm ci
+
+      - name: Prepare Windows signing certificate
+        if: (matrix.name == 'win32' || matrix.name == 'win64') && env.WINDOWS_CERTIFICATE_BASE64 != ''
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+        run: |
+          $certificatePath = Join-Path $env:RUNNER_TEMP "gba-studio-code-signing.pfx"
+          [IO.File]::WriteAllBytes(
+            $certificatePath,
+            [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64)
+          )
+          "WINDOWS_CERTIFICATE_FILE=$certificatePath" >> $env:GITHUB_ENV
 
       - name: Update credits
         if: ${{ vars.FETCH_CREDITS == 'true' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') }}
@@ -156,6 +169,8 @@ jobs:
 
       - name: Build Win32
         if: matrix.name == 'win32'
+        env:
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: |
           npm run fetch-deps -- --arch=win32-ia32
           npm run make:win32
@@ -166,6 +181,8 @@ jobs:
 
       - name: Build Win64
         if: matrix.name == 'win64'
+        env:
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: |
           npm run fetch-deps -- --arch=win32-x64
           npm run make:win
@@ -173,6 +190,23 @@ jobs:
           mkdir -p ./out/keep/gba-studio-${GITHUB_REF_NAME}-windows_x86_64-zip
           mv ./out/make/zip/win32/x64/*.zip ./out/keep/gba-studio-${GITHUB_REF_NAME}-windows_x86_64-zip/
           mv ./out/make/squirrel.windows/x64 ./out/keep/gba-studio-${GITHUB_REF_NAME}-windows_x86_64-squirrel
+
+      - name: Verify Windows signatures
+        if: (matrix.name == 'win32' || matrix.name == 'win64') && env.WINDOWS_CERTIFICATE_BASE64 != ''
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+        run: |
+          $files = Get-ChildItem -Path out/keep -Recurse -Filter "*.exe"
+          if ($files.Count -lt 1) {
+            throw "Expected a signed Windows installer executable."
+          }
+          foreach ($file in $files) {
+            $signature = Get-AuthenticodeSignature -LiteralPath $file.FullName
+            if ($signature.Status -ne "Valid") {
+              throw "Invalid Authenticode signature on $($file.FullName): $($signature.Status)"
+            }
+          }
 
       - uses: actions/upload-artifact@v4
         with:

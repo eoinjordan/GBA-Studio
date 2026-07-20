@@ -170,6 +170,54 @@ test("Should keep scene widths if backgrounds have NOT changed dimensions since 
   expect(newState.scenes.entities["scene1"]?.height).toBe(18);
 });
 
+test("Should preserve logical isometric dimensions when loading a padded background", () => {
+  const state: EntitiesState = {
+    ...initialState,
+  };
+
+  const loadData: CompressedProjectResources = {
+    ...dummyCompressedProjectResources,
+    scenes: [
+      {
+        ...dummyCompressedSceneResource,
+        id: "scene1",
+        backgroundId: "bg1",
+        type: "ISOMETRIC",
+        width: 8,
+        height: 7,
+      },
+    ],
+    backgrounds: [
+      {
+        ...dummyCompressedBackgroundResource,
+        id: "bg1",
+        width: 30,
+        height: 20,
+      },
+    ],
+  };
+
+  const action = projectActions.loadProject.fulfilled(
+    {
+      resources: loadData,
+      path: "project.gbsproj",
+      scriptEventDefs: {},
+      engineSchema: {
+        fields: [],
+        sceneTypes: [],
+        consts: {},
+      },
+      modifiedSpriteIds: [],
+      isMigrated: false,
+    },
+    "randomid",
+    "project.gbsproj",
+  );
+  const newState = reducer(state, action);
+  expect(newState.scenes.entities["scene1"]?.width).toBe(8);
+  expect(newState.scenes.entities["scene1"]?.height).toBe(7);
+});
+
 test("Should fix scene widths if background has changed while project is open", () => {
   const state: EntitiesState = {
     ...initialState,
@@ -533,6 +581,48 @@ test("Should update scene dimensions to match new background", () => {
   expect(newState.scenes.entities["scene1"]?.height).toEqual(28);
 });
 
+test("Should keep isometric bounds and collisions when changing background", () => {
+  const collisions = Array.from({ length: 56 }, (_, index) => index);
+  const state: EntitiesState = {
+    ...initialState,
+    scenes: {
+      entities: {
+        scene1: {
+          ...dummySceneNormalized,
+          id: "scene1",
+          type: "ISOMETRIC",
+          backgroundId: "bg1",
+          width: 8,
+          height: 7,
+          actors: [],
+          triggers: [],
+          collisions,
+        },
+      },
+      ids: ["scene1"],
+    },
+    backgrounds: {
+      entities: {
+        bg1: { ...dummyBackground, id: "bg1", width: 30, height: 20 },
+        bg2: { ...dummyBackground, id: "bg2", width: 40, height: 24 },
+      },
+      ids: ["bg1", "bg2"],
+    },
+  };
+
+  const newState = reducer(
+    state,
+    actions.editScene({
+      sceneId: "scene1",
+      changes: { backgroundId: "bg2" },
+    }),
+  );
+
+  expect(newState.scenes.entities["scene1"]?.width).toBe(8);
+  expect(newState.scenes.entities["scene1"]?.height).toBe(7);
+  expect(newState.scenes.entities["scene1"]?.collisions).toEqual(collisions);
+});
+
 test("Should discard collisions if switched to use different background of different width", () => {
   const state: EntitiesState = {
     ...initialState,
@@ -706,6 +796,65 @@ test("Should be able to paint collisions", () => {
 
   expect(newState.scenes.entities["scene1"]?.collisions.length).toBe(50);
   expect(newState.scenes.entities["scene1"]?.collisions).toEqual(expectedCols);
+});
+
+test("Should paint collisions within logical isometric bounds", () => {
+  const state: EntitiesState = {
+    ...initialState,
+    scenes: {
+      entities: {
+        scene1: {
+          ...dummySceneNormalized,
+          id: "scene1",
+          type: "ISOMETRIC",
+          backgroundId: "bg1",
+          width: 8,
+          height: 7,
+          collisions: [],
+          actors: [],
+          triggers: [],
+        },
+      },
+      ids: ["scene1"],
+    },
+    backgrounds: {
+      entities: {
+        bg1: { ...dummyBackground, id: "bg1", width: 30, height: 20 },
+      },
+      ids: ["bg1"],
+    },
+  };
+
+  const painted = reducer(
+    state,
+    actions.paintCollision({
+      sceneId: "scene1",
+      x: 7,
+      y: 6,
+      value: 2,
+      brush: "8px",
+      mask: 0x0F,
+      drawLine: false,
+      tileLookup: [],
+    }),
+  );
+  const outOfBounds = reducer(
+    painted,
+    actions.paintCollision({
+      sceneId: "scene1",
+      x: 8,
+      y: 6,
+      value: 3,
+      brush: "8px",
+      mask: 0x0F,
+      drawLine: false,
+      tileLookup: [],
+    }),
+  );
+
+  expect(outOfBounds.scenes.entities["scene1"]?.collisions).toHaveLength(56);
+  expect(outOfBounds.scenes.entities["scene1"]?.collisions[55]).toBe(2);
+  expect(outOfBounds.scenes.entities["scene1"]?.collisions).not.toContain(3);
 });
 
 test("Should be able to paint collision line", () => {

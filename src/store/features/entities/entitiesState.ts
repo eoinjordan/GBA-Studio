@@ -774,6 +774,11 @@ const loadTileset: CaseReducer<
 const fixAllScenesWithModifiedBackgrounds = (state: EntitiesState) => {
   const scenes = localSceneSelectAll(state);
   for (const scene of scenes) {
+    // Isometric dimensions are the logical diamond grid. A background can
+    // include padding, so its tile dimensions must not resize the world.
+    if (scene.type === "ISOMETRIC") {
+      continue;
+    }
     const background = localBackgroundSelectById(state, scene.backgroundId);
     if (
       !background ||
@@ -931,9 +936,12 @@ const editScene: CaseReducer<
   }
 
   if (patch.backgroundId) {
-    const otherScene = localSceneSelectAll(state).find((s) => {
-      return s.backgroundId === patch.backgroundId;
-    });
+    const isIsometric = (patch.type ?? scene.type) === "ISOMETRIC";
+    const otherScene = isIsometric
+      ? undefined
+      : localSceneSelectAll(state).find((s) => {
+          return s.backgroundId === patch.backgroundId;
+        });
 
     const actors = localActorSelectEntities(state);
     const triggers = localTriggerSelectEntities(state);
@@ -943,7 +951,13 @@ const editScene: CaseReducer<
     const background = state.backgrounds.entities[patch.backgroundId];
 
     if (background) {
-      if (otherScene) {
+      if (isIsometric) {
+        const collisionsSize = Math.ceil(scene.width * scene.height);
+        patch.collisions = scene.collisions.slice(0, collisionsSize);
+        while (patch.collisions.length < collisionsSize) {
+          patch.collisions.push(0);
+        }
+      } else if (otherScene) {
         patch.collisions = otherScene.collisions;
       } else if (
         oldBackground &&
@@ -960,14 +974,19 @@ const editScene: CaseReducer<
         }
       }
 
-      patch.width = background.width;
-      patch.height = background.height;
+      if (!isIsometric) {
+        patch.width = background.width;
+        patch.height = background.height;
+      }
+
+      const sceneWidth = isIsometric ? scene.width : background.width;
+      const sceneHeight = isIsometric ? scene.height : background.height;
 
       scene.actors.forEach((actorId) => {
         const actor = actors[actorId];
         if (actor) {
-          const x = Math.min(actor.x, background.width - 2);
-          const y = Math.min(actor.y, background.height - 1);
+          const x = Math.min(actor.x, sceneWidth - 2);
+          const y = Math.min(actor.y, sceneHeight - 1);
           if (actor.x !== x || actor.y !== y) {
             actorsAdapter.updateOne(state.actors, {
               id: actor.id,
@@ -980,10 +999,10 @@ const editScene: CaseReducer<
       scene.triggers.forEach((triggerId) => {
         const trigger = triggers[triggerId];
         if (trigger) {
-          const x = Math.min(trigger.x, background.width - 1);
-          const y = Math.min(trigger.y, background.height - 1);
-          const width = Math.min(trigger.width, background.width - x);
-          const height = Math.min(trigger.height, background.height - y);
+          const x = Math.min(trigger.x, sceneWidth - 1);
+          const y = Math.min(trigger.y, sceneHeight - 1);
+          const width = Math.min(trigger.width, sceneWidth - x);
+          const height = Math.min(trigger.height, sceneHeight - y);
           if (
             trigger.x !== x ||
             trigger.y !== y ||
@@ -3139,7 +3158,11 @@ const paintCollision: CaseReducer<
   const brush = action.payload.brush;
   const mask = action.payload.mask;
   const drawSize = brush === "16px" ? 2 : 1;
-  const collisionsSize = Math.ceil(background.width * background.height);
+  const collisionWidth =
+    scene.type === "ISOMETRIC" ? scene.width : background.width;
+  const collisionHeight =
+    scene.type === "ISOMETRIC" ? scene.height : background.height;
+  const collisionsSize = Math.ceil(collisionWidth * collisionHeight);
   const collisions = scene.collisions.slice(0, collisionsSize);
 
   // Fill collisions array if too small for image
@@ -3150,26 +3173,26 @@ const paintCollision: CaseReducer<
   }
 
   const getValue = (x: number, y: number) => {
-    const tileIndex = background.width * y + x;
+    const tileIndex = collisionWidth * y + x;
     return collisions[tileIndex];
   };
 
   const setValue = (x: number, y: number, value: number) => {
-    const tileIndex = background.width * y + x;
+    const tileIndex = collisionWidth * y + x;
     const originalValue = collisions[tileIndex] ?? 0;
     const newValue = (originalValue & ~mask) | (value & mask);
     collisions[tileIndex] = newValue;
   };
 
   const isInBounds = (x: number, y: number) => {
-    return x >= 0 && x < background.width && y >= 0 && y < background.height;
+    return x >= 0 && x < collisionWidth && y >= 0 && y < collisionHeight;
   };
 
   const equal = (a: number, b: number) => a === b;
 
   if (brush === "magic" && action.payload.tileLookup) {
     paintMagic(
-      background.width,
+      collisionWidth,
       action.payload.tileLookup,
       action.payload.x,
       action.payload.y,
@@ -3262,7 +3285,11 @@ const paintSlopeCollision: CaseReducer<
   const roundEndX = endX > startX ? Math.floor(endX) : Math.ceil(endX);
   const roundEndY = endY > startY ? Math.floor(endY) : Math.ceil(endY);
 
-  const collisionsSize = Math.ceil(background.width * background.height);
+  const collisionWidth =
+    scene.type === "ISOMETRIC" ? scene.width : background.width;
+  const collisionHeight =
+    scene.type === "ISOMETRIC" ? scene.height : background.height;
+  const collisionsSize = Math.ceil(collisionWidth * collisionHeight);
   const collisions = scene.collisions.slice(0, collisionsSize);
 
   // Fill collisions array if too small for image
@@ -3283,7 +3310,7 @@ const paintSlopeCollision: CaseReducer<
       return;
     }
 
-    const tileIndex = background.width * y + x;
+    const tileIndex = collisionWidth * y + x;
     let newValue = value;
 
     if (
@@ -3333,7 +3360,7 @@ const paintSlopeCollision: CaseReducer<
   };
 
   const isInBounds = (x: number, y: number) => {
-    return x >= 0 && x < background.width && y >= 0 && y < background.height;
+    return x >= 0 && x < collisionWidth && y >= 0 && y < collisionHeight;
   };
 
   paintLine(
