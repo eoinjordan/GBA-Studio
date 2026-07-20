@@ -68,7 +68,14 @@ function uniqueTiles(png) {
 
 for (const relativePath of [
   "docs/art-direction/poachermon-visual-target-v1.png",
+  "docs/art-direction/poachermon-visual-target-v2.png",
   "docs/art-direction/sunstone-relay-visual-target-v1.png",
+  "docs/art-direction/sunstone-relay-visual-target-v2.png",
+  "third_party/showcase-art/kenney-roguelike-rpg/LICENSE.txt",
+  "third_party/showcase-art/kenney-isometric-landscape/LICENSE.txt",
+  "third_party/showcase-art/kenney-foliage-pack/LICENSE.txt",
+  "third_party/showcase-art/opengameart/villager-cc0.png",
+  "third_party/showcase-art/opengameart/isometric-hero-cc0.png",
 ]) {
   if (!fs.existsSync(path.join(root, relativePath)))
     fail(`missing ${relativePath}`);

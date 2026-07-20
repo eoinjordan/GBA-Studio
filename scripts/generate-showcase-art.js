@@ -1257,6 +1257,11 @@ for (const scene of [
   ]);
 }
 
+// Replace the constrained procedural placeholders above with the curated CC0
+// production art. Keeping this final pass deterministic means CI, Pages, and
+// installer templates always receive byte-identical showcase assets.
+require("./lib/cc0-showcase-art").applyCc0ShowcaseArt();
+
 syncPortableTemplate("examples/poachermon", "appData/templates/gba-poachermon");
 syncPortableTemplate(
   "examples/isometric-adventure",
