@@ -19,7 +19,9 @@
       <nav aria-label="Primary navigation">
         <a href="../">Overview</a>
         <a href="https://github.com/eoinjordan/GBA-Studio">Source</a>
-        <a href="https://github.com/eoinjordan/GBA-Studio/releases">Desktop app</a>
+        <a href="https://github.com/eoinjordan/GBA-Studio/releases"
+          >Desktop app</a
+        >
       </nav>
     </header>
 
@@ -28,8 +30,10 @@
         <p class="eyebrow">No install required</p>
         <h1>Test GBA Studio in your browser</h1>
         <p class="lede">
-          Launch a game compiled by the current GBA Studio pipeline, or load
-          your own <code>.gba</code> file. ROMs stay on your device.
+          Launch a ROM compiled by the current GBA Studio CLI and engine, or
+          load your own <code>.gba</code> file. This page tests compiled games;
+          the editor and compiler remain desktop tools. Local ROMs stay on your
+          device.
         </p>
 
         <button class="drop-zone" id="drop-zone" type="button">
@@ -37,8 +41,17 @@
           <strong>Choose a GBA ROM</strong>
           <span>or drag and drop it here</span>
         </button>
-        <input id="rom-input" type="file" accept=".gba,application/octet-stream" />
-        <p class="status" id="player-status" role="status" aria-live="polite"></p>
+        <input
+          id="rom-input"
+          type="file"
+          accept=".gba,application/octet-stream"
+        />
+        <p
+          class="status"
+          id="player-status"
+          role="status"
+          aria-live="polite"
+        ></p>
 
         <div class="section-heading">
           <div>
@@ -50,13 +63,19 @@
         <div class="demo-grid" id="demo-grid"></div>
       </section>
 
-      <section id="emulator-wrap" class="emulator-wrap" aria-label="GBA emulator">
+      <section
+        id="emulator-wrap"
+        class="emulator-wrap"
+        aria-label="GBA emulator"
+      >
         <div class="emulator-toolbar">
           <div>
             <p class="eyebrow">Now playing</p>
             <strong id="rom-name">GBA Studio demo</strong>
           </div>
-          <button class="secondary-button" id="close-btn" type="button">Close</button>
+          <button class="secondary-button" id="close-btn" type="button">
+            Close
+          </button>
         </div>
         <div id="game"></div>
         <p class="controls">
@@ -65,9 +84,15 @@
           START. A gamepad also works.
         </p>
         <p class="controls">
-          <strong>Poachermon route:</strong> finish Rowan's briefing, tag the
-          west and east snares, confront Ash and Moss, free the pink creature,
-          then return to Rowan.
+          <strong id="route-title">Loaded ROM:</strong>
+          <span id="route-instructions">
+            Objectives depend on the loaded ROM.
+          </span>
+        </p>
+        <p class="controls">
+          EmulatorJS loads from a public CDN, so first launch needs an internet
+          connection. The demo ROMs are rebuilt and header-validated by GitHub
+          Actions whenever this Pages site deploys.
         </p>
       </section>
     </main>

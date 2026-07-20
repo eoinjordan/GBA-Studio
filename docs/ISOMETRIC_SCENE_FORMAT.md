@@ -1,147 +1,143 @@
-# GBA Studio — Isometric Scene Compiler Contract
+# GBA Studio - Isometric Scene Compiler Contract
 
-This document describes the exact C structures emitted by the GBA Studio
-compiler for scenes whose `type` is `"ISOMETRIC"`.  The gba-engine runtime
-must declare matching structures in `include/gba_scene.h`.
+This document describes the C data emitted for scenes whose project type is
+`"ISOMETRIC"`. The compiler and `gba-engine` declarations must stay in sync.
 
----
+## Scene type and structures
 
-## Scene mode identifier
-
-Scene type `ISOMETRIC` maps to integer `6` in the `sceneTypeIds` table
-(`src/lib/compiler/compileData.ts`).
-
----
-
-## C structures
-
-### `gba_iso_scene_def_t`
+`ISOMETRIC` maps to scene type id `6` (`SCENE_TYPE_ISOMETRIC`). The extended
+definition embeds the standard scene definition first, so a pointer can be
+safely treated as `gba_scene_def_t *`:
 
 ```c
+typedef struct gba_scene_def_t {
+  uint8_t width;              // logical collision-grid width
+  uint8_t height;             // logical collision-grid height
+  uint8_t type;
+  uint8_t player_sprite_index;
+  uint8_t actor_count;
+  uint8_t trigger_count;
+  uint16_t tileset_len;
+  const uint8_t *tileset;
+  const uint8_t *tilemap;
+  const uint8_t *tilemap_attr;
+  const uint16_t *bg_palette;
+  const uint16_t *sprite_palette;
+  const uint8_t *collisions;
+  const gba_actor_def_t *actors;
+  uint8_t sprite_count;
+  const gba_sprite_def_t *const *sprites;
+  const gba_trigger_def_t *triggers;
+  const uint8_t *start_script;
+  uint8_t background_width;   // compiled tilemap width, in 8px tiles
+  uint8_t background_height;  // compiled tilemap height, in 8px tiles
+} gba_scene_def_t;
+
 typedef struct gba_iso_scene_def_t {
-  gba_scene_def_t base;   // Inherits all top-down fields (see gba_scene.h)
-  uint8_t iso_tile_w;     // Projected tile width in screen pixels  (default 32)
-  uint8_t iso_tile_h;     // Projected tile height in screen pixels (default 16)
+  gba_scene_def_t base;
+  uint8_t iso_tile_w;         // default 32 screen pixels
+  uint8_t iso_tile_h;         // default 16 screen pixels
 } gba_iso_scene_def_t;
 ```
 
-The `base` field is a fully-populated `gba_scene_def_t` (see
-`appData/engine/gbavm/include/gba_scene.h`).  The runtime can safely cast
-a `gba_iso_scene_def_t *` to `gba_scene_def_t *` when the projection fields
-are not needed.
+Zero `background_width` or `background_height` preserves compatibility with
+older data by falling back to the corresponding logical dimension.
 
-### Emitted example
+## Emitted Sunstone Village shape
+
+The complete demo deliberately uses a logical grid that is smaller than its
+background:
 
 ```c
-/* Isometric scene: actors/triggers use tile-grid coordinates.
- * iso_tile_w=32 iso_tile_h=16 */
 static const gba_iso_scene_def_t scene_iso_village = {
   .base = {
-    .width          = 16,
-    .height         = 16,
-    .type           = 6,          /* SCENE_TYPE_ISOMETRIC */
-    .player_sprite_index = 0,
-    .actor_count    = 2,
-    .trigger_count  = 1,
-    .tileset_len    = 512,
-    .tileset        = scene_iso_village_tileset,
-    .tilemap        = scene_iso_village_tilemap,
-    .tilemap_attr   = NULL,
-    .bg_palette     = scene_iso_village_bg_palette,
-    .sprite_palette = scene_iso_village_sprite_palette,
-    .collisions     = scene_iso_village_collisions,
-    .actors         = scene_iso_village_actors,
-    .sprite_count   = 1,
-    .sprites        = scene_iso_village_sprites,
-    .triggers       = scene_iso_village_triggers,
+    .width = 8,
+    .height = 7,
+    .type = SCENE_TYPE_ISOMETRIC,
+    /* palettes, tiles, sprites, scripts, actors and triggers omitted */
+    .background_width = 30,
+    .background_height = 20,
   },
   .iso_tile_w = 32,
   .iso_tile_h = 16,
 };
 ```
 
----
+The 8x7 logical grid occupies 240x120 projected pixels. The 30x20 tile
+background occupies the full 240x160 GBA screen. Runtime tilemap indexing uses
+30 as its stride; movement and collision indexing use 8 as their stride.
+
+## Actor and sprite additions
+
+Isometric actors use the standard actor definition. Their `x` and `y` fields
+contain grid coordinates, and `iso_z` contains the signed height layer:
+
+```c
+typedef struct gba_actor_def_t {
+  uint16_t x;
+  uint16_t y;
+  uint8_t sprite_index;
+  uint8_t direction;          // down=0, left=1, right=2, up=3
+  uint8_t move_speed;
+  uint8_t anim_speed;
+  bool collision_enabled;
+  bool persistent;
+  bool pinned;
+  bool hidden;
+  const uint8_t *interact_script;
+  int8_t iso_z;
+} gba_actor_def_t;
+```
+
+`gba_sprite_def_t` includes `obj_8x16`, allowing the renderer to select the
+real GBA object shape and anchor the current metasprite frame correctly. The
+compiler also converts `iso_movement` editor slots into the runtime's
+down/right/up/left animation order.
 
 ## Coordinate model
 
-### Grid coordinates
+Actors and triggers are compiled in logical tile coordinates. Collision bytes
+are normalized to exactly `width * height` and indexed by `y * width + x`.
 
-Isometric scenes use a **tile-grid** coordinate system.
+Given a background canvas in pixels, the runtime projection is:
 
-| Field | Meaning |
-|---|---|
-| `x` | Column index, increases to the right on the ground plane |
-| `y` | Row index, increases away from the viewer (depth) |
-| `isoZ` | Height layer, 0 = ground; positive raises the entity upward |
+```text
+projected_width  = (width + height) * (iso_tile_w / 2)
+projected_height = (width + height) * (iso_tile_h / 2)
 
-Actor and trigger coordinates stored in `.gbsres` files are grid indices,
-**not** screen pixels.
+origin_x = max(0, (background_width * 8 - projected_width) / 2)
+         + height * (iso_tile_w / 2)
+origin_y = max(0, (background_height * 8 - projected_height) / 2)
 
-### Screen projection (editor preview)
-
-```
-screen_x = (tile_x - tile_y) * (iso_tile_w / 2)
-screen_y = (tile_x + tile_y) * (iso_tile_h / 2) - iso_z * iso_tile_h
+screen_x = origin_x + (x - y) * (iso_tile_w / 2)
+screen_y = origin_y + (x + y) * (iso_tile_h / 2) - iso_z * iso_tile_h
 ```
 
-A horizontal origin offset is applied so tile (0, 0) appears at the top-centre
-of the canvas:
+Actors are depth sorted by `x + y + iso_z`. Higher values are nearer the
+viewer and receive the front-most effective OAM order.
 
-```
-canvas_x = scene_width * iso_tile_w / 2 + screen_x
-canvas_y = screen_y
-```
+## Scripted scene transition ABI
 
-### Depth sorting (draw order)
+The VM retains `VM_OP_LOAD_SCENE` (`0x01`) with a single scene operand for
+legacy/bootstrap data. A compiled `EVENT_SWITCH_SCENE` emits:
 
-Entities are depth-sorted by `tile_x + tile_y + iso_z` in ascending order
-(lowest drawn first).  This matches the runtime's `iso_world_render()`.
-
----
-
-## Actor fields
-
-Actors in isometric scenes use the same `gba_actor_def_t` as top-down scenes.
-The `x` and `y` fields carry **grid coordinates** (not pixel coordinates).
-The optional `isoZ` editor field is stored in the project and compiled into
-the `z` field of any extended runtime struct; the base struct ignores it
-(defaults to 0).
-
----
-
-## Trigger fields
-
-Triggers use the same `gba_trigger_def_t`.  `x`, `y`, `w`, `h` are all
-**grid coordinates**.  The runtime is responsible for converting them to screen
-bounds using the projection above.
-
----
-
-## Collision map
-
-The collision map is a flat byte array of length `width × height`, indexed
-`[y * width + x]`.  Non-zero bytes mark a tile as impassable.
-
----
-
-## Runtime integration
-
-The runtime should check `scene->type == SCENE_TYPE_ISOMETRIC` and, if true,
-cast to `gba_iso_scene_def_t *` to access `iso_tile_w`/`iso_tile_h`.
-
-```c
-void load_iso_scene(const gba_scene_def_t *def) {
-  if (def->type == SCENE_TYPE_ISOMETRIC) {
-    const gba_iso_scene_def_t *iso = (const gba_iso_scene_def_t *)def;
-    iso_world_init(def, iso->iso_tile_w, iso->iso_tile_h);
-  }
-}
+```text
+VM_OP_LOAD_SCENE_AT (0x18), scene_index, x, y, direction
 ```
 
----
+All four operands are unsigned bytes. Direction uses down=0, left=1, right=2,
+up=3. Transition `x` and `y` values are tile coordinates for both isometric
+and non-isometric targets; the engine performs the non-isometric pixel
+conversion after loading the target scene.
 
-## Version history
+## Compatibility checklist
 
-| Version | Change |
-|---|---|
-| 4.3.1 | Initial isometric scene format |
+When the compiler or engine contract changes, validate that:
+
+- the compiler's generated definitions match `include/gba_scene.h` field
+  order and types;
+- logical and background dimensions are both emitted;
+- actor `iso_z` and sprite `obj_8x16` are emitted explicitly;
+- collision arrays contain exactly `width * height` bytes;
+- `EVENT_SWITCH_SCENE` supplies the positioned transition operands; and
+- unit, integration, ROM-build, and emulator smoke tests pass.
