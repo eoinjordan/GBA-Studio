@@ -2,26 +2,46 @@
   "_resourceType": "trigger",
   "id": "5ce7e000-0000-4a00-8000-000000000t02",
   "_index": 1,
-  "symbol": "trigger_scene_exit",
+  "symbol": "trigger_east_beacon",
   "prefabId": "",
-  "name": "Scene Exit",
-  "x": 0,
-  "y": 0,
-  "width": 2,
+  "name": "East Signal Beacon",
+  "x": 5,
+  "y": 2,
+  "width": 1,
   "height": 1,
   "prefabScriptOverrides": {},
   "script": [
     {
-      "id": "5ce7e000-0000-4a00-8000-000000000e03",
-      "command": "EVENT_SWITCH_SCENE",
-      "args": {
-        "sceneId": "5ce7e000-0000-4a00-8000-000000000iso",
-        "x": { "type": "number", "value": 5 },
-        "y": { "type": "number", "value": 5 },
-        "direction": "down",
-        "fadeSpeed": "2"
+      "id": "east-briefing-check",
+      "command": "EVENT_IF_FALSE",
+      "args": { "variable": "0" },
+      "children": {
+        "true": [
+          { "id": "east-locked", "command": "EVENT_TEXT", "args": { "text": "The east marker is silent.\nAsk Keeper Nia about it." } }
+        ],
+        "false": [
+          {
+            "id": "east-new-check",
+            "command": "EVENT_IF_FALSE",
+            "args": { "variable": "3" },
+            "children": {
+              "true": [
+                { "id": "east-restore", "command": "EVENT_TEXT", "args": { "text": "EAST BEACON RESTORED!\nThe lake answers with a flash." } },
+                { "id": "east-set", "command": "EVENT_SET_VALUE", "args": { "variable": "3", "value": { "type": "true" } } },
+                { "id": "east-count", "command": "EVENT_INC_VALUE", "args": { "variable": "1" } },
+                { "id": "east-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 1 } },
+                { "id": "east-wait", "command": "EVENT_WAIT", "args": { "frames": 8 } },
+                { "id": "east-reset-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 0 } }
+              ],
+              "false": [
+                { "id": "east-repeat", "command": "EVENT_TEXT", "args": { "text": "The east beacon is already lit." } }
+              ]
+            }
+          }
+        ]
       }
-    }
+    },
+    { "id": "east-end", "command": "EVENT_END", "args": {} }
   ],
   "leaveScript": []
 }

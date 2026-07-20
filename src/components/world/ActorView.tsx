@@ -1,15 +1,17 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
 import SpriteSheetCanvas from "./SpriteSheetCanvas";
-import { MIDDLE_MOUSE, TILE_SIZE, TOOL_COLLISIONS } from "consts";
+import { TILE_SIZE, TOOL_COLLISIONS } from "consts";
 import {
   isoToScreen,
   isoOriginX,
-  ISO_TILE_W,
-  ISO_TILE_H,
+  isoOriginY,
+  isoCanvasDimensions,
+  isoSpriteAnchorOffsetX,
 } from "shared/lib/entities/isoUtils";
 import {
   actorPrefabSelectors,
   actorSelectors,
+  backgroundSelectors,
   sceneSelectors,
   spriteSheetSelectors,
 } from "store/features/entities/entitiesState";
@@ -82,10 +84,12 @@ const ActorView = memo(
     const actor = useAppSelector((state) =>
       actorSelectors.selectById(state, id),
     );
-    const sceneWidth = useAppSelector((state) => {
-      if (!isIsometric) return 0;
-      return sceneSelectors.selectById(state, sceneId)?.width ?? 0;
-    });
+    const scene = useAppSelector((state) =>
+      sceneSelectors.selectById(state, sceneId),
+    );
+    const background = useAppSelector((state) =>
+      backgroundSelectors.selectById(state, scene?.backgroundId ?? ""),
+    );
     const prefab = useAppSelector((state) =>
       actorPrefabSelectors.selectById(state, actor?.prefabId ?? ""),
     );
@@ -127,7 +131,7 @@ const ActorView = memo(
 
     const onMouseDown = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (editable && e.nativeEvent.which !== MIDDLE_MOUSE) {
+        if (editable && e.nativeEvent.which === 1) {
           dispatch(editorActions.dragActorStart({ sceneId, actorId: id }));
           dispatch(editorActions.setTool({ tool: "select" }));
           window.addEventListener("mouseup", onMouseUp);
@@ -190,15 +194,33 @@ const ActorView = memo(
           style={
             isIsometric
               ? (() => {
+                  const mapWidth = scene?.width ?? 0;
+                  const mapHeight = scene?.height ?? 0;
+                  const canvas = isoCanvasDimensions(
+                    mapWidth,
+                    mapHeight,
+                    (background?.width ?? 0) * TILE_SIZE,
+                    (background?.height ?? 0) * TILE_SIZE,
+                  );
                   const { x, y } = isoToScreen(
                     actor.x,
                     actor.y,
                     actor.isoZ ?? 0,
                   );
+                  // SpriteSheetCanvas keeps the actor's foot point at either
+                  // the centre of a narrow sprite or 8px into wider sprites.
+                  const spriteAnchorX = isoSpriteAnchorOffsetX(
+                    sprite?.canvasWidth ?? 16,
+                  );
                   return {
-                    left: isoOriginX(sceneWidth) + x - ISO_TILE_W / 2,
-                    top: y,
-                    zIndex: actor.x + actor.y + (actor.isoZ ?? 0) + 1,
+                    left:
+                      isoOriginX(mapWidth, mapHeight, canvas.width) +
+                      x -
+                      spriteAnchorX,
+                    top: isoOriginY(mapWidth, mapHeight, canvas.height) + y,
+                    zIndex: selected
+                      ? 1000
+                      : actor.x + actor.y + (actor.isoZ ?? 0) + 1,
                   };
                 })()
               : {

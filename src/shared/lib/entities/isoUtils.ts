@@ -43,8 +43,8 @@ export function isoToScreen(
 }
 
 /**
- * Convert an editor screen pixel position back to the nearest isometric grid
- * tile. Inverse of isoToScreen (always on the ground plane, isoZ = 0).
+ * Convert an editor screen pixel position to the isometric grid tile that
+ * contains it (always on the ground plane, isoZ = 0).
  *
  * @param screenX - pixel x relative to the scene's isometric origin
  * @param screenY - pixel y relative to the scene's isometric origin
@@ -59,19 +59,100 @@ export function screenToIso(
   const sum = screenY / HH;
   const diff = screenX / HW;
   return {
-    tileX: Math.round((sum + diff) / 2),
-    tileY: Math.round((sum - diff) / 2),
+    tileX: Math.floor((sum + diff) / 2),
+    tileY: Math.floor((sum - diff) / 2),
+  };
+}
+
+export interface IsoTileAreaBounds {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Bounding box for a rectangular area of ground tiles, relative to the
+ * isometric origin. This is useful for editor cursors and hit targets.
+ */
+export function isoTileAreaBounds(
+  tileX: number,
+  tileY: number,
+  width = 1,
+  height = 1,
+): IsoTileAreaBounds {
+  const areaWidth = Math.max(1, width);
+  const areaHeight = Math.max(1, height);
+  const top = isoToScreen(tileX, tileY);
+
+  return {
+    left: top.x - areaHeight * HW,
+    top: top.y,
+    width: (areaWidth + areaHeight) * HW,
+    height: (areaWidth + areaHeight) * HH,
+  };
+}
+
+/** Horizontal offset that keeps an editor sprite's foot point on a tile. */
+export function isoSpriteAnchorOffsetX(spriteWidth: number): number {
+  return Math.min(Math.max(0, spriteWidth) / 2, ISO_TILE_W / 4);
+}
+
+/** Width in pixels occupied by a complete rectangular isometric grid. */
+export function isoProjectedWidth(mapWidth: number, mapHeight: number): number {
+  return (mapWidth + mapHeight) * HW;
+}
+
+/** Height in pixels occupied by a complete rectangular isometric grid. */
+export function isoProjectedHeight(
+  mapWidth: number,
+  mapHeight: number,
+): number {
+  return (mapWidth + mapHeight) * HH;
+}
+
+/**
+ * Pixel dimensions used to display an isometric scene. A compiled background
+ * can include scenery or letterboxing outside the logical diamond grid, so it
+ * must not be cropped to the collision-grid dimensions.
+ */
+export function isoCanvasDimensions(
+  mapWidth: number,
+  mapHeight: number,
+  backgroundWidth = 0,
+  backgroundHeight = 0,
+): { width: number; height: number } {
+  return {
+    width: Math.max(backgroundWidth, isoProjectedWidth(mapWidth, mapHeight)),
+    height: Math.max(backgroundHeight, isoProjectedHeight(mapWidth, mapHeight)),
   };
 }
 
 /**
- * Isometric origin offset within the scene canvas so that tile (0,0) appears
- * at the top-centre of the diamond grid rather than at the canvas origin.
- *
- * @param mapWidth  - scene width in tiles
+ * Horizontal projection origin for tile (0,0). The grid is centred within
+ * the scene canvas and uses the map height on its left-hand side; using the
+ * map width only works accidentally for square maps.
  */
-export function isoOriginX(mapWidth: number): number {
-  return (mapWidth * ISO_TILE_W) / 2;
+export function isoOriginX(
+  mapWidth: number,
+  mapHeight: number,
+  canvasWidth = isoProjectedWidth(mapWidth, mapHeight),
+): number {
+  return (
+    Math.floor((canvasWidth - isoProjectedWidth(mapWidth, mapHeight)) / 2) +
+    mapHeight * HW
+  );
+}
+
+/** Vertical projection origin, centred inside any background letterboxing. */
+export function isoOriginY(
+  mapWidth: number,
+  mapHeight: number,
+  canvasHeight = isoProjectedHeight(mapWidth, mapHeight),
+): number {
+  return Math.floor(
+    (canvasHeight - isoProjectedHeight(mapWidth, mapHeight)) / 2,
+  );
 }
 
 /**

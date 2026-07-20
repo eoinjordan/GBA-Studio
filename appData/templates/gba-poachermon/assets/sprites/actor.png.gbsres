@@ -177,6 +177,7 @@
   "filename": "actor.png",
   "width": 48,
   "height": 16,
+  "transparentColor": "000000",
   "checksum": "8646d62a30fe76f9e39e3dbdb23aab0182a33146",
   "numFrames": 3
 }

@@ -3,6 +3,7 @@ import compile, {
   emitGBASpriteData,
   precompileBackgrounds,
   precompileScenes,
+  toGbaDirection,
 } from "../../src/lib/compiler/compileData";
 import {
   compileSceneProjectiles,
@@ -37,6 +38,7 @@ test("should emit ordered GBA sprite frames and animation ranges", () => {
     ],
     metaspritesOrder: [1, 0, 1],
     animationOffsets: [{ start: 0, end: 2 }],
+    spriteMode: "8x16",
   } as unknown as PrecompiledSprite;
 
   const output = emitGBASpriteData(sprite, "scene_1_sprite_0");
@@ -51,6 +53,7 @@ test("should emit ordered GBA sprite frames and animation ranges", () => {
   expect(output).toContain("{ 0, 2 }");
   expect(output).toContain(".frame_count   = 3");
   expect(output).toContain(".anim_count    = 1");
+  expect(output).toContain(".obj_8x16      = true");
 });
 
 test("should replace empty ordered GBA sprite frames with a visible fallback", () => {
@@ -64,6 +67,7 @@ test("should replace empty ordered GBA sprite frames with a visible fallback", (
     ],
     metaspritesOrder: [0, 2, 1, 0],
     animationOffsets: [{ start: 0, end: 3 }],
+    spriteMode: "8x8",
   } as unknown as PrecompiledSprite;
 
   const output = emitGBASpriteData(sprite, "scene_1_sprite_sparse");
@@ -78,6 +82,15 @@ test("should replace empty ordered GBA sprite frames with a visible fallback", (
   expect(output).toContain(
     ".metasprite    = scene_1_sprite_sparse_metasprite_1",
   );
+  expect(output).toContain(".obj_8x16      = false");
+});
+
+test("should map project directions to the engine direction ABI", () => {
+  expect(toGbaDirection("down")).toBe(0);
+  expect(toGbaDirection("left")).toBe(1);
+  expect(toGbaDirection("right")).toBe(2);
+  expect(toGbaDirection("up")).toBe(3);
+  expect(toGbaDirection(undefined)).toBe(0);
 });
 
 test("should take into account state value when building projectiles", () => {
@@ -574,6 +587,9 @@ test("should emit trigger tables for GBA scene data", async () => {
     "0x0F", // VM_OP_SHOW_TEXT
   );
   expect(compiled.files["gba_scene_data.c"]).toContain("scene_1_triggers");
+  expect(compiled.files["gba_scene_data.c"]).toContain(
+    "static const uint8_t scene_1_collisions[360]",
+  );
 });
 
 test("should emit GBA scene-start scripts and link them from scene data", async () => {
@@ -736,6 +752,12 @@ test("should emit GBA tilesets and tilemaps for scene backgrounds", async () => 
   );
   expect(compiled.files["gba_scene_data.c"]).toContain("scene_1_tileset");
   expect(compiled.files["gba_scene_data.c"]).toContain("scene_1_tilemap");
+  expect(compiled.files["gba_scene_data.c"]).toContain(
+    ".background_width  = 20",
+  );
+  expect(compiled.files["gba_scene_data.c"]).toContain(
+    ".background_height = 18",
+  );
 });
 
 test("should precompile image data", async () => {

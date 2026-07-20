@@ -14,16 +14,11 @@
   const EMULATOR_DATA_URL = "https://cdn.emulatorjs.org/stable/data/";
   const DEMOS = Object.freeze([
     Object.freeze({
-      title: "Starter World",
+      title: "The Sunstone Relay",
       description:
-        "Walk through the compact starter scene and test native background, input, and collision handling.",
-      tag: "Top-down",
-      url: "roms/gba-starter.gba",
-    }),
-    Object.freeze({
-      title: "Isometric Adventure",
-      description:
-        "Test the isometric projection, depth ordering, NPC interaction, and scene triggers.",
+        "Complete a two-scene quest using isometric movement, collisions, triggers, interaction, depth ordering, variables, and scene transitions.",
+      instructions:
+        "Talk to Keeper Nia, walk onto the west and east signal markers, claim the green lake core with X, then return to Nia. Press Enter on the ending to replay.",
       tag: "Isometric",
       url: "roms/isometric-adventure.gba",
     }),
@@ -31,6 +26,8 @@
       title: "Poachermon: Case 001",
       description:
         "Collect evidence, report two poachers, rescue a trapped creature, and close a complete scripted case.",
+      instructions:
+        "Finish Rowan's briefing, tag the west and east snares, confront Ash and Moss, free the pink creature, then return to Rowan.",
       tag: "Adventure",
       url: "roms/poachermon.gba",
     }),
@@ -61,6 +58,13 @@
     return value && value.trim() ? value.trim() : null;
   }
 
+  function demoFromUrl(url) {
+    const cleanUrl = String(url || "").split(/[?#]/, 1)[0];
+    return DEMOS.find(function (demo) {
+      return demo.url === cleanUrl;
+    });
+  }
+
   function configureEmulator(target, url) {
     target.EJS_player = "#game";
     target.EJS_core = "gba";
@@ -73,6 +77,13 @@
     target.EJS_AdTimer = -1;
   }
 
+  function emulatorUrl(url, name) {
+    const params = new URLSearchParams();
+    params.set("rom", url);
+    params.set("name", name || romNameFromUrl(url));
+    return `emulator.html?${params.toString()}`;
+  }
+
   function init(doc, target) {
     const dropZone = doc.getElementById("drop-zone");
     const romInput = doc.getElementById("rom-input");
@@ -80,6 +91,8 @@
     const emulatorWrap = doc.getElementById("emulator-wrap");
     const game = doc.getElementById("game");
     const romName = doc.getElementById("rom-name");
+    const routeTitle = doc.getElementById("route-title");
+    const routeInstructions = doc.getElementById("route-instructions");
     const status = doc.getElementById("player-status");
     const demoGrid = doc.getElementById("demo-grid");
     const closeButton = doc.getElementById("close-btn");
@@ -94,39 +107,34 @@
       status.classList.toggle("error", Boolean(isError));
     }
 
-    function removeLoader() {
-      doc
-        .querySelectorAll("script[data-gba-player-loader]")
-        .forEach((node) => node.remove());
-    }
-
-    function launch(url, name) {
+    function launch(url, name, demo) {
       setStatus("", false);
       loaderUi.hidden = true;
       emulatorWrap.classList.add("visible");
       game.replaceChildren();
       if (romName) romName.textContent = name || romNameFromUrl(url);
+      if (routeTitle) {
+        routeTitle.textContent = demo ? `${demo.title} route:` : "Loaded ROM:";
+      }
+      if (routeInstructions) {
+        routeInstructions.textContent = demo
+          ? demo.instructions
+          : "Use the arrow keys to move, X for GBA A, S for GBA B, and Enter for START. Objectives depend on the loaded ROM.";
+      }
 
-      removeLoader();
-      configureEmulator(target, url);
-      const script = doc.createElement("script");
-      script.src = `${EMULATOR_DATA_URL}loader.js`;
-      script.dataset.gbaPlayerLoader = "true";
-      script.onerror = function () {
-        setStatus(
-          "The emulator could not be loaded. Check your connection and try again.",
-          true,
-        );
-        close();
-      };
-      doc.body.appendChild(script);
+      const frame = doc.createElement("iframe");
+      frame.className = "emulator-frame";
+      frame.title = `${name || romNameFromUrl(url)} GBA emulator`;
+      frame.allow = "autoplay; fullscreen; gamepad";
+      frame.setAttribute("allowfullscreen", "");
+      frame.src = emulatorUrl(url, name);
+      game.appendChild(frame);
     }
 
     function close() {
       emulatorWrap.classList.remove("visible");
       loaderUi.hidden = false;
       game.replaceChildren();
-      removeLoader();
       if (activeObjectUrl && target.URL && target.URL.revokeObjectURL) {
         target.URL.revokeObjectURL(activeObjectUrl);
       }
@@ -147,7 +155,7 @@
           return;
         }
         activeObjectUrl = target.URL.createObjectURL(file);
-        launch(activeObjectUrl, romNameFromUrl(file.name));
+        launch(activeObjectUrl, romNameFromUrl(file.name), null);
       } catch (_error) {
         setStatus("The ROM could not be read by this browser.", true);
       }
@@ -168,7 +176,7 @@
 
       card.append(tag, title, description);
       card.addEventListener("click", function () {
-        launch(demo.url, demo.title);
+        launch(demo.url, demo.title, demo);
       });
       demoGrid.appendChild(card);
     });
@@ -196,7 +204,14 @@
     const queryRom = romUrlFromSearch(
       target.location && target.location.search,
     );
-    if (queryRom) launch(queryRom, romNameFromUrl(queryRom));
+    if (queryRom) {
+      const queryDemo = demoFromUrl(queryRom);
+      launch(
+        queryRom,
+        queryDemo ? queryDemo.title : romNameFromUrl(queryRom),
+        queryDemo,
+      );
+    }
     return true;
   }
 
@@ -204,6 +219,8 @@
     DEMOS,
     EMULATOR_DATA_URL,
     configureEmulator,
+    demoFromUrl,
+    emulatorUrl,
     hasValidGbaHeader,
     init,
     isGbaFileName,

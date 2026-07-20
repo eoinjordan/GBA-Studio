@@ -1,0 +1,41 @@
+{
+  "_resourceType": "scene",
+  "id": "5ce7e000-0000-4a00-8000-000000000end",
+  "_index": 1,
+  "type": "ISOMETRIC",
+  "name": "Relay Restored",
+  "symbol": "scene_iso_relay_restored",
+  "x": 480,
+  "y": 100,
+  "width": 8,
+  "height": 7,
+  "backgroundId": "b9a1c0de-0000-4a00-8000-000000000001",
+  "tilesetId": "",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [],
+  "autoFadeSpeed": 1,
+  "script": [
+    { "id": "ending-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 2 } },
+    {
+      "id": "ending-complete-check",
+      "command": "EVENT_IF_TRUE",
+      "args": { "variable": "5" },
+      "children": {
+        "true": [
+          { "id": "ending-title", "command": "EVENT_TEXT", "args": { "text": "SUNSTONE RELAY RESTORED!\nBoth village paths now glow." } },
+          { "id": "ending-wait", "command": "EVENT_WAIT", "args": { "frames": 12 } },
+          { "id": "ending-replay", "command": "EVENT_TEXT", "args": { "text": "DEMO COMPLETE\nPress START to replay." } }
+        ],
+        "false": [
+          { "id": "ending-incomplete", "command": "EVENT_TEXT", "args": { "text": "The relay is still dark.\nPress START and finish the route." } }
+        ]
+      }
+    },
+    { "id": "ending-end", "command": "EVENT_END", "args": {} }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "collisions": "11111111100000011010001110100001110010011000000111111111"
+}

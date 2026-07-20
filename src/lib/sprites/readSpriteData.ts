@@ -12,6 +12,7 @@ import {
   spriteDataIndexFn,
 } from "shared/lib/sprites/spriteData";
 import {
+  ImageIndexFunction,
   IndexedImage,
   flipIndexedImageX,
   flipIndexedImageY,
@@ -59,6 +60,7 @@ export const optimiseTiles = async (
   spriteHeight: number,
   metasprites: MetaspriteTile[][],
   spriteMode: SpriteModeSetting,
+  indexFn: ImageIndexFunction = spriteDataIndexFn,
 ): Promise<{
   tiles: IndexedImage[];
   lookup: Record<string, OptimisedTile | undefined>;
@@ -69,10 +71,7 @@ export const optimiseTiles = async (
   const uniqTileData: IndexedImage[] = [];
   const tileIds: string[] = [];
   const optimisedLookup2: Record<string, OptimisedTile | undefined> = {};
-  const indexedImage = await readFileToIndexedImage(
-    filename,
-    spriteDataIndexFn,
-  );
+  const indexedImage = await readFileToIndexedImage(filename, indexFn);
 
   const baseWidth = 16;
   const originX = spriteWidth < baseWidth ? 0 : spriteWidth / 2 - baseWidth / 2;

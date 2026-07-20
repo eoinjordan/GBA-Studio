@@ -48,7 +48,7 @@ a { color: inherit; }
   text-decoration: none;
 }
 
-.brand img { width: 34px; height: 34px; border-radius: 9px; }
+.brand img { width: 38px; height: 38px; filter: drop-shadow(0 8px 15px rgba(124, 58, 237, 0.3)); }
 
 nav { display: flex; align-items: center; gap: 24px; }
 nav a { color: var(--muted); font-size: 0.88rem; text-decoration: none; }
@@ -137,6 +137,7 @@ h3 { margin-bottom: 10px; font-size: 1.15rem; }
 .emulator-wrap.visible { display: block; }
 .emulator-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 #game { width: 100%; aspect-ratio: 3 / 2; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #000; box-shadow: var(--shadow); }
+.emulator-frame { width: 100%; height: 100%; display: block; border: 0; background: #000; }
 .controls { margin: 12px 0 0; color: var(--muted); font-size: 0.8rem; }
 
 footer { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 24px 0 32px; display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); color: var(--muted); font-size: 0.8rem; }

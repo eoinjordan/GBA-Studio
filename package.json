@@ -5,7 +5,7 @@
   "bugs": {
     "url": "https://github.com/chrismaltby/gb-studio/issues"
   },
-  "version": "4.4.5",
+  "version": "4.4.6",
   "description": "Visual retro game maker for Game Boy Advance",
   "main": ".webpack/main",
   "scripts": {

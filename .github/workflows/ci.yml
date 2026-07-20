@@ -59,6 +59,9 @@ jobs:
       - name: Build Poachermon end-to-end demo
         run: node out/cli/gb-studio-cli.js make:rom examples/poachermon/project.gbsproj out/Poachermon.gba --verbose
 
+      - name: Build Sunstone Relay isometric end-to-end demo
+        run: node out/cli/gb-studio-cli.js make:rom examples/isometric-adventure/project.gbsproj out/SunstoneRelay.gba --verbose
+
       - name: Build engine ROM
         run: make -C appData/engine/gbavm
 
@@ -73,6 +76,7 @@ jobs:
           path: |
             out/GBAStarter.gba
             out/Poachermon.gba
+            out/SunstoneRelay.gba
             appData/engine/gbavm/bin/game.gba
             out/ci/RunProject/**
 
@@ -96,6 +100,9 @@ jobs:
 
       - name: Fetch engine and tool dependencies
         run: npm run fetch-deps
+
+      - name: Verify spaced GBA ROM paths on Windows
+        run: npx jest test/compiler/makeBuild.test.ts --runInBand
 
       - name: Build Windows installer
         run: npm run make:win

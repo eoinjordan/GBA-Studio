@@ -1,5 +1,8 @@
 const fs = require("fs");
 const path = require("path");
+const {
+  decompress8bitNumberString,
+} = require("shared/lib/resources/compression");
 
 const repoRoot = path.resolve(__dirname, "../..");
 const exampleRoot = path.join(repoRoot, "examples/poachermon");
@@ -55,6 +58,15 @@ function collectEvents(events, commands) {
   }
 }
 
+function decodeSceneCollisions(resource) {
+  return resource._resourceType === "scene"
+    ? {
+        ...resource,
+        collisions: decompress8bitNumberString(resource.collisions),
+      }
+    : resource;
+}
+
 function loadResources(root) {
   return filesUnder(root)
     .filter((filename) => filename.endsWith(".gbsres"))
@@ -65,6 +77,10 @@ function loadResources(root) {
           .readFileSync(path.join(root, filename), "utf8")
           .replace(/^\uFEFF/, ""),
       ),
+    }))
+    .map(({ filename, resource }) => ({
+      filename,
+      resource: decodeSceneCollisions(resource),
     }));
 }
 
@@ -220,7 +236,7 @@ function reachableTiles(scene, start) {
       y < 0 ||
       x >= scene.width ||
       y >= scene.height ||
-      scene.collisions[y * scene.width + x] !== "0"
+      scene.collisions[y * scene.width + x] !== 0
     ) {
       continue;
     }
@@ -273,6 +289,9 @@ describe("Poachermon end-to-end demo", () => {
     const triggers = resources.filter(
       ({ resource }) => resource._resourceType === "trigger",
     );
+    const sprites = resources.filter(
+      ({ resource }) => resource._resourceType === "sprite",
+    );
     const variables = resources.find(
       ({ resource }) => resource._resourceType === "variables",
     ).resource.variables;
@@ -280,6 +299,9 @@ describe("Poachermon end-to-end demo", () => {
     expect(scenes).toHaveLength(2);
     expect(actors.length).toBeGreaterThanOrEqual(7);
     expect(triggers.length).toBeGreaterThanOrEqual(1);
+    expect(
+      sprites.every(({ resource }) => resource.transparentColor === "000000"),
+    ).toBe(true);
     expect(variables.length).toBeGreaterThanOrEqual(15);
     expect([...commands].sort()).toEqual(requiredEvents.sort());
   });

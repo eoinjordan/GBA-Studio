@@ -1,33 +1,82 @@
 {
   "_resourceType": "actor",
   "id": "5ce7e000-0000-4a00-8000-000000000a02",
-  "_index": 1,
-  "symbol": "actor_npc_iso",
+  "_index": 0,
+  "symbol": "actor_keeper_nia",
   "prefabId": "",
-  "name": "NPC",
-  "x": 8,
-  "y": 4,
+  "name": "Keeper Nia",
+  "x": 5,
+  "y": 5,
   "isoZ": 0,
   "frame": 0,
   "animate": false,
   "spriteSheetId": "5ce7e000-0000-4a00-8000-0000000ihero",
   "paletteId": "",
-  "direction": "down",
+  "direction": "left",
   "moveSpeed": 1,
   "animSpeed": 15,
   "isPinned": false,
-  "persistent": false,
+  "persistent": true,
   "collisionGroup": "",
   "collisionExtraFlags": [],
   "prefabScriptOverrides": {},
   "script": [
     {
-      "id": "5ce7e000-0000-4a00-8000-000000000e01",
-      "command": "EVENT_TEXT",
-      "args": {
-        "text": "Welcome to the\nisometric world!"
+      "id": "nia-complete-check",
+      "command": "EVENT_IF_TRUE",
+      "args": { "variable": "5" },
+      "children": {
+        "true": [
+          { "id": "nia-already-complete", "command": "EVENT_TEXT", "args": { "text": "The relay shines again.\nThank you, pathfinder!" } }
+        ],
+        "false": [
+          {
+            "id": "nia-briefing-check",
+            "command": "EVENT_IF_FALSE",
+            "args": { "variable": "0" },
+            "children": {
+              "true": [
+                { "id": "nia-briefing", "command": "EVENT_TEXT", "args": { "text": "Our Sunstone Relay is dark.\nRestore its west and east beacons." } },
+                { "id": "nia-accept", "command": "EVENT_SET_VALUE", "args": { "variable": "0", "value": { "type": "true" } } },
+                { "id": "nia-directions", "command": "EVENT_TEXT", "args": { "text": "Follow both diamond paths,\nthen recover the lake core." } }
+              ],
+              "false": [
+                {
+                  "id": "nia-core-check",
+                  "command": "EVENT_IF_TRUE",
+                  "args": { "variable": "4" },
+                  "children": {
+                    "true": [
+                      { "id": "nia-success", "command": "EVENT_TEXT", "args": { "text": "The Sunstone Core is stable!\nVillage signal restored." } },
+                      { "id": "nia-set-complete", "command": "EVENT_SET_VALUE", "args": { "variable": "5", "value": { "type": "true" } } },
+                      { "id": "nia-finale-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 2 } },
+                      { "id": "nia-finale-wait", "command": "EVENT_WAIT", "args": { "frames": 12 } },
+                      { "id": "nia-finale", "command": "EVENT_SWITCH_SCENE", "args": { "sceneId": "5ce7e000-0000-4a00-8000-000000000end", "x": { "type": "number", "value": 4 }, "y": { "type": "number", "value": 5 }, "direction": "up", "fadeSpeed": "1" } }
+                    ],
+                    "false": [
+                      {
+                        "id": "nia-beacons-check",
+                        "command": "EVENT_IF_VALUE",
+                        "args": { "variable": "1", "operator": ">=", "comparator": 2 },
+                        "children": {
+                          "true": [
+                            { "id": "nia-core-ready", "command": "EVENT_TEXT", "args": { "text": "Both beacons answer!\nClaim the green lake core." } }
+                          ],
+                          "false": [
+                            { "id": "nia-status", "command": "EVENT_TEXT", "args": { "text": "Beacons restored: {1}/2.\nWalk to each signal marker." } }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
       }
-    }
+    },
+    { "id": "nia-end", "command": "EVENT_END", "args": {} }
   ],
   "startScript": [],
   "updateScript": [],
