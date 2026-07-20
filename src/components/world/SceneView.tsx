@@ -22,6 +22,7 @@ import {
 } from "consts";
 import SceneInfo from "./SceneInfo";
 import {
+  actorSelectors,
   sceneSelectors,
   backgroundSelectors,
   paletteSelectors,
@@ -43,12 +44,13 @@ import renderSceneContextMenu from "./renderSceneContextMenu";
 import SceneScrollBounds from "./SceneScrollBounds";
 import { SceneContext } from "components/script/SceneContext";
 import IsoGridOverlay from "./IsoGridOverlay";
-import { isoDepthKey } from "shared/lib/entities/isoUtils";
 import {
-  actorSelectors,
-  triggerSelectors,
-} from "store/features/entities/entitiesState";
-
+  isoCanvasDimensions,
+  isoDepthKey,
+  isoOriginX,
+  isoOriginY,
+  screenToIso,
+} from "shared/lib/entities/isoUtils";
 const TILE_SIZE = 8;
 
 const dmgPalettes = [
@@ -217,6 +219,22 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
   const background = useAppSelector((state) =>
     backgroundSelectors.selectById(state, scene?.backgroundId ?? ""),
   );
+  const isIsometric = scene?.type === "ISOMETRIC";
+  const backgroundPixelWidth = (background?.width ?? 0) * TILE_SIZE;
+  const backgroundPixelHeight = (background?.height ?? 0) * TILE_SIZE;
+  const sceneCanvas = scene
+    ? isIsometric
+      ? isoCanvasDimensions(
+          scene.width,
+          scene.height,
+          backgroundPixelWidth,
+          backgroundPixelHeight,
+        )
+      : {
+          width: scene.width * TILE_SIZE,
+          height: scene.height * TILE_SIZE,
+        }
+    : { width: 0, height: 0 };
   const tilesOverride = useAppSelector((state) =>
     background && background.monoOverrideId
       ? backgroundSelectors.selectById(state, background.monoOverrideId ?? "")
@@ -308,9 +326,9 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
     const viewBoundsHeight = (worldViewHeight + viewMargin * 2) / zoomRatio;
 
     return scene
-      ? scene.x + scene.width * 8 > viewBoundsX &&
+      ? scene.x + sceneCanvas.width > viewBoundsX &&
           scene.x < viewBoundsX + viewBoundsWidth &&
-          scene.y + scene.height * 8 + 50 > viewBoundsY &&
+          scene.y + sceneCanvas.height + 50 > viewBoundsY &&
           scene.y < viewBoundsY + viewBoundsHeight
       : false;
   });
@@ -330,9 +348,12 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
     const viewBoundsWidth =
       (worldViewWidth - sidebarWidth - navigatorWidth) / zoomRatio;
 
-    const offsetLabels = scene ? scene.width * 8 > viewBoundsWidth / 2 : 0;
+    const offsetLabels = scene ? sceneCanvas.width > viewBoundsWidth / 2 : 0;
     return offsetLabels && scene
-      ? Math.min(Math.max(0, viewBoundsX - scene.x), scene.width * 8 - 160)
+      ? Math.min(
+          Math.max(0, viewBoundsX - scene.x),
+          Math.max(0, sceneCanvas.width - 160),
+        )
       : 0;
   });
 
@@ -349,14 +370,14 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
     const viewBoundsX = worldScrollX / zoomRatio;
     const viewBoundsWidth =
       (worldViewWidth - sidebarWidth - navigatorWidth) / zoomRatio;
-    const offsetLabels = scene ? scene.width * 8 > viewBoundsWidth / 2 : 0;
+    const offsetLabels = scene ? sceneCanvas.width > viewBoundsWidth / 2 : 0;
     return offsetLabels && scene
       ? Math.min(
           Math.max(
             0,
-            scene.x + scene.width * 8 - (viewBoundsX + viewBoundsWidth),
+            scene.x + sceneCanvas.width - (viewBoundsX + viewBoundsWidth),
           ),
-          scene.width * 8 - 160,
+          Math.max(0, sceneCanvas.width - 160),
         )
       : 0;
   });
@@ -441,8 +462,6 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
     [gbcEnabled, getSpritePalette],
   );
 
-  const isIsometric = scene?.type === "ISOMETRIC";
-
   // For isometric scenes depth-sort actor IDs by (x + y + isoZ) so the
   // editor preview matches the engine's draw order.
   const allActors = useAppSelector((state) =>
@@ -455,9 +474,7 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
       const a = allActors[aId];
       const b = allActors[bId];
       if (!a || !b) return 0;
-      return (
-        isoDepthKey(a.x, a.y, a.isoZ) - isoDepthKey(b.x, b.y, b.isoZ)
-      );
+      return isoDepthKey(a.x, a.y, a.isoZ) - isoDepthKey(b.x, b.y, b.isoZ);
     });
   }, [scene, isIsometric, allActors]);
 
@@ -552,27 +569,58 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
         return;
       }
       const pos = getDOMElementCoords(e.currentTarget);
-      const x = e.pageX - pos.left;
-      const y = e.pageY - pos.top;
-      const tX = Math.floor(x / (8 * zoomRatio));
-      const tY = Math.floor(y / (8 * zoomRatio));
+      const screenX = (e.pageX - pos.left) / zoomRatio;
+      const screenY = (e.pageY - pos.top) / zoomRatio;
+      const useIsoGrid = isIsometric && tool !== TOOL_COLORS;
+      const isoPosition = useIsoGrid
+        ? screenToIso(
+            screenX - isoOriginX(scene.width, scene.height, sceneCanvas.width),
+            screenY - isoOriginY(scene.width, scene.height, sceneCanvas.height),
+          )
+        : undefined;
+      const tX = isoPosition?.tileX ?? Math.floor(screenX / TILE_SIZE);
+      const tY = isoPosition?.tileY ?? Math.floor(screenY / TILE_SIZE);
+      const boundsWidth =
+        isIsometric && tool === TOOL_COLORS
+          ? (background?.width ?? scene.width)
+          : scene.width;
+      const boundsHeight =
+        isIsometric && tool === TOOL_COLORS
+          ? (background?.height ?? scene.height)
+          : scene.height;
 
       if (
         tX !== dragState.current.lastTX ||
         tY !== dragState.current.lastTY ||
         !hovered
       ) {
-        if (tX >= 0 && tY >= 0 && tX < scene.width && tY < scene.height) {
+        if (tX >= 0 && tY >= 0 && tX < boundsWidth && tY < boundsHeight) {
           dispatch(editorActions.sceneHover({ sceneId: id, x: tX, y: tY }));
           dispatch(
             entitiesActions.moveSelectedEntity({ sceneId: id, x: tX, y: tY }),
           );
+        } else if (hovered) {
+          // Isometric scenes occupy a diamond inside a rectangular canvas.
+          // Clear the cursor while the pointer is in one of the empty corners.
+          dispatch(editorActions.sceneHover({ sceneId: "", x: tX, y: tY }));
         }
         dragState.current.lastTX = tX;
         dragState.current.lastTY = tY;
       }
     },
-    [dispatch, hovered, id, scene, zoomRatio],
+    [
+      background?.height,
+      background?.width,
+      dispatch,
+      hovered,
+      id,
+      isIsometric,
+      scene,
+      sceneCanvas.height,
+      sceneCanvas.width,
+      tool,
+      zoomRatio,
+    ],
   );
 
   const onMouseLeave = useCallback(() => {
@@ -677,8 +725,7 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
         <SceneName
           title={scene.notes}
           style={{
-            maxWidth:
-              scene.width * TILE_SIZE - (labelOffsetLeft + labelOffsetRight),
+            maxWidth: sceneCanvas.width - (labelOffsetLeft + labelOffsetRight),
           }}
         >
           <LabelSpan color={scene.labelColor}>{lastNamePart}</LabelSpan>
@@ -688,16 +735,16 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         style={{
-          width: scene.width * TILE_SIZE,
-          height: scene.height * TILE_SIZE,
+          width: sceneCanvas.width,
+          height: sceneCanvas.height,
         }}
       >
         {background && (
           <>
             {gbcEnabled && background.autoColor ? (
               <AutoColorizedImage
-                width={scene.width * TILE_SIZE}
-                height={scene.height * TILE_SIZE}
+                width={backgroundPixelWidth || sceneCanvas.width}
+                height={backgroundPixelHeight || sceneCanvas.height}
                 src={assetURL("backgrounds", background)}
                 tilesSrc={
                   tilesOverride
@@ -708,8 +755,8 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
               />
             ) : (
               <ColorizedImage
-                width={scene.width * TILE_SIZE}
-                height={scene.height * TILE_SIZE}
+                width={backgroundPixelWidth || sceneCanvas.width}
+                height={backgroundPixelHeight || sceneCanvas.height}
                 src={assetURL("backgrounds", background)}
                 tiles={tileColors}
                 palettes={palettes}
@@ -725,6 +772,9 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
               height={scene.height}
               collisions={scene.collisions}
               sceneTypeKey={scene.type}
+              isIsometric={isIsometric}
+              canvasWidth={sceneCanvas.width}
+              canvasHeight={sceneCanvas.height}
             />
             {selected && slopePreview && (
               <SceneSlopePreview
@@ -749,8 +799,8 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
         {background && showPriorityMap && (
           <SceneOverlay>
             <ScenePriorityMap
-              width={scene.width}
-              height={scene.height}
+              width={background?.width ?? scene.width}
+              height={background?.height ?? scene.height}
               tileColors={tileColors}
             />
           </SceneOverlay>
@@ -810,6 +860,8 @@ const SceneView = memo(({ id, index, editable }: SceneViewProps) => {
             <IsoGridOverlay
               mapWidth={scene.width}
               mapHeight={scene.height}
+              canvasWidth={sceneCanvas.width}
+              canvasHeight={sceneCanvas.height}
             />
           </SceneOverlay>
         )}

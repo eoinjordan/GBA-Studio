@@ -33,6 +33,14 @@ import { calculateSlope } from "shared/lib/helpers/slope";
 import styled, { css } from "styled-components";
 import { Tool } from "store/features/editor/editorState";
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import {
+  ISO_TILE_H,
+  ISO_TILE_W,
+  isoCanvasDimensions,
+  isoOriginX,
+  isoOriginY,
+  isoTileAreaBounds,
+} from "shared/lib/entities/isoUtils";
 
 interface SceneCursorProps {
   sceneId: string;
@@ -209,7 +217,7 @@ const SceneCursor = ({ sceneId, enabled, sceneFiltered }: SceneCursorProps) => {
 
   const hoverPalette =
     background && scene && Array.isArray(background.tileColors)
-      ? background.tileColors[x + y * scene.width] || 0
+      ? background.tileColors[x + y * background.width] || 0
       : 0;
 
   const hoverCollision =
@@ -1052,6 +1060,23 @@ const SceneCursor = ({ sceneId, enabled, sceneFiltered }: SceneCursorProps) => {
   if (!enabled) {
     return <div />;
   }
+  const useIsoGrid = scene?.type === "ISOMETRIC" && tool !== TOOL_COLORS;
+  const isoCanvas =
+    useIsoGrid && scene
+      ? isoCanvasDimensions(
+          scene.width,
+          scene.height,
+          (background?.width ?? 0) * 8,
+          (background?.height ?? 0) * 8,
+        )
+      : undefined;
+  const isIso16pxBrush =
+    useIsoGrid &&
+    (tool === TOOL_COLLISIONS || tool === TOOL_ERASER) &&
+    selectedBrush === BRUSH_16PX;
+  const isoBounds = useIsoGrid
+    ? isoTileAreaBounds(x, y, isIso16pxBrush ? 2 : 1, isIso16pxBrush ? 2 : 1)
+    : undefined;
   return (
     <Wrapper
       ref={cursorRef}
@@ -1067,8 +1092,23 @@ const SceneCursor = ({ sceneId, enabled, sceneFiltered }: SceneCursorProps) => {
       onMouseMove={onMouseMoveSlopeSelect}
       onMouseDown={onMouseDown}
       style={{
-        top: y * 8,
-        left: x * 8,
+        top:
+          scene && isoCanvas && isoBounds
+            ? isoOriginY(scene.width, scene.height, isoCanvas.height) +
+              isoBounds.top
+            : y * 8,
+        left:
+          scene && isoCanvas && isoBounds
+            ? isoOriginX(scene.width, scene.height, isoCanvas.width) +
+              isoBounds.left
+            : x * 8,
+        ...(useIsoGrid
+          ? {
+              width: isoBounds?.width ?? ISO_TILE_W,
+              height: isoBounds?.height ?? ISO_TILE_H,
+              clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)",
+            }
+          : {}),
       }}
     >
       {(tool === TOOL_ACTORS ||

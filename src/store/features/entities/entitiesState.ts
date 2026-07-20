@@ -98,6 +98,7 @@ import { Asset, AssetType } from "shared/lib/helpers/assets";
 import { assertUnreachable } from "shared/lib/scriptValue/format";
 import { addNewSongFile } from "store/features/trackerDocument/trackerDocumentState";
 import type { LoadProjectResult } from "lib/project/loadProjectData";
+import { isoCanvasDimensions } from "shared/lib/entities/isoUtils";
 import { decompressProjectResources } from "shared/lib/resources/compression";
 import { omit } from "shared/types";
 import { isEqual } from "lodash";
@@ -5173,10 +5174,20 @@ export const getLocalisedDMGPalette = () =>
   }) as Palette;
 
 export const getMaxSceneRight = createSelector(
-  [sceneSelectors.selectAll],
-  (scenes) =>
+  [sceneSelectors.selectAll, backgroundSelectors.selectEntities],
+  (scenes, backgrounds) =>
     scenes.reduce((memo, scene) => {
-      const sceneRight = scene.x + scene.width * 8;
+      const background = backgrounds[scene.backgroundId];
+      const width =
+        scene.type === "ISOMETRIC"
+          ? isoCanvasDimensions(
+              scene.width,
+              scene.height,
+              (background?.width ?? 0) * 8,
+              (background?.height ?? 0) * 8,
+            ).width
+          : scene.width * 8;
+      const sceneRight = scene.x + width;
       if (sceneRight > memo) {
         return sceneRight;
       }
@@ -5185,10 +5196,20 @@ export const getMaxSceneRight = createSelector(
 );
 
 export const getMaxSceneBottom = createSelector(
-  [sceneSelectors.selectAll],
-  (scenes) =>
+  [sceneSelectors.selectAll, backgroundSelectors.selectEntities],
+  (scenes, backgrounds) =>
     scenes.reduce((memo, scene) => {
-      const sceneBottom = scene.y + scene.height * 8;
+      const background = backgrounds[scene.backgroundId];
+      const height =
+        scene.type === "ISOMETRIC"
+          ? isoCanvasDimensions(
+              scene.width,
+              scene.height,
+              (background?.width ?? 0) * 8,
+              (background?.height ?? 0) * 8,
+            ).height
+          : scene.height * 8;
+      const sceneBottom = scene.y + height;
       if (sceneBottom > memo) {
         return sceneBottom;
       }
