@@ -24,8 +24,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 2,
+                  "paletteIndex": 2,
                   "objPalette": "OBP0",
                   "priority": false
                 },
@@ -37,8 +37,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 2,
+                  "paletteIndex": 2,
                   "objPalette": "OBP0",
                   "priority": false
                 }
@@ -69,8 +69,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 2,
+                  "paletteIndex": 2,
                   "objPalette": "OBP0",
                   "priority": false
                 },
@@ -82,8 +82,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 2,
+                  "paletteIndex": 2,
                   "objPalette": "OBP0",
                   "priority": false
                 }
@@ -105,8 +105,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 2,
+                  "paletteIndex": 2,
                   "objPalette": "OBP0",
                   "priority": false
                 },
@@ -118,8 +118,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 2,
+                  "paletteIndex": 2,
                   "objPalette": "OBP0",
                   "priority": false
                 }
@@ -166,7 +166,7 @@
       ]
     }
   ],
-  "numTiles": 5,
+  "numTiles": 6,
   "canvasWidth": 16,
   "canvasHeight": 16,
   "boundsX": 0,
@@ -178,6 +178,6 @@
   "width": 48,
   "height": 16,
   "transparentColor": "000000",
-  "checksum": "8646d62a30fe76f9e39e3dbdb23aab0182a33146",
+  "checksum": "",
   "numFrames": 3
 }

@@ -25,6 +25,7 @@
     "test:buttons": "jest test/events test/components --maxWorkers=2",
     "test:compile-options": "npm run make:cli && node out/cli/gb-studio-cli.js export -d examples/starter-project/project.gbsproj out/ci/starter-data && node out/cli/gb-studio-cli.js make:rom examples/starter-project/project.gbsproj out/ci/starter-cli.gba --verbose && node scripts/build-gba.js examples/starter-project/project.gbsproj out/ci/starter-build-gba.gba --quiet",
     "test:pages": "jest test/pages/player.test.js --runInBand",
+    "test:showcase-art": "node scripts/validate-showcase-art.js",
     "validate:pages": "node scripts/validate-pages.js",
     "test:suite": "npm run test && npm run test:buttons && npm run test:compile-options",
     "coverage": "jest --coverage --runInBand || true",

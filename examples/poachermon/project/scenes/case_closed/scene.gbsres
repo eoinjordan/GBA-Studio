@@ -13,12 +13,71 @@
   "tilesetId": "",
   "colorModeOverride": "none",
   "paletteIds": [],
-  "spritePaletteIds": [],
+  "spritePaletteIds": [
+    "7fee6b88-f893-493b-82e0-810d6e27a59b",
+    "35543855-752d-4195-836a-ca14bee206d3",
+    "e28289ef-a222-48fa-8c44-af79b5e54e40",
+    "5c769a01-83e5-4647-8254-5ba44907eec9",
+    "73bf49a8-808d-481b-8392-f9c053720845",
+    "9b00eabc-acc9-46e4-8aea-89f44f98e89f",
+    "01edf222-4cde-45ee-8946-98984e07fbe4",
+    "7fee6b88-f893-493b-82e0-810d6e27a59b"
+  ],
   "autoFadeSpeed": 1,
   "script": [
-    { "id": "closed-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 2 } },
-    { "id": "closed-check", "command": "EVENT_IF_TRUE", "args": { "variable": "4" }, "children": { "true": [ { "id": "closed-title", "command": "EVENT_TEXT", "args": { "text": "CASE CLOSED!\n2 poachers reported safely." } }, { "id": "closed-wait", "command": "EVENT_WAIT", "args": { "frames": 12 } }, { "id": "closed-score", "command": "EVENT_TEXT", "args": { "text": "Creature safe. Field score {14}.\nSTART reopens the patrol." } } ], "false": [ { "id": "closed-error", "command": "EVENT_TEXT", "args": { "text": "The paperwork escaped." } } ] } },
-    { "id": "closed-end", "command": "EVENT_END", "args": {} }
+    {
+      "id": "closed-tone",
+      "command": "EVENT_PALETTE_SET_BACKGROUND",
+      "args": {
+        "tone": 2
+      }
+    },
+    {
+      "id": "closed-check",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "4"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "closed-title",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "CASE CLOSED!\n2 poachers reported safely."
+            }
+          },
+          {
+            "id": "closed-wait",
+            "command": "EVENT_WAIT",
+            "args": {
+              "frames": 12
+            }
+          },
+          {
+            "id": "closed-score",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Creature safe. Field score {14}.\nSTART reopens the patrol."
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "closed-error",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "The paperwork escaped."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "closed-end",
+      "command": "EVENT_END",
+      "args": {}
+    }
   ],
   "playerHit1Script": [],
   "playerHit2Script": [],

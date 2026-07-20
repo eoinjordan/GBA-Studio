@@ -37,6 +37,9 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      - name: Validate showcase art budgets
+        run: npm run test:showcase-art
+
       - name: Run engine unit tests
         run: make -C appData/engine/gbavm test-unit HOST_CC=gcc
 

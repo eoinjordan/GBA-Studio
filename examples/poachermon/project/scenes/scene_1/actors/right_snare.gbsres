@@ -1,21 +1,106 @@
 {
-  "_resourceType": "actor", "id": "0f568a58-c67a-4c71-b992-4959d592a104", "_index": 3,
-  "symbol": "actor_right_snare", "prefabId": "", "name": "Illegal Snare - East",
-  "x": 25, "y": 17, "frame": 0, "animate": false,
-  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6", "paletteId": "", "direction": "down",
-  "moveSpeed": 1, "animSpeed": 15, "isPinned": false, "persistent": true,
-  "collisionGroup": "", "collisionExtraFlags": [], "prefabScriptOverrides": {},
+  "_resourceType": "actor",
+  "id": "0f568a58-c67a-4c71-b992-4959d592a104",
+  "_index": 3,
+  "symbol": "actor_right_snare",
+  "prefabId": "",
+  "name": "Illegal Snare - East",
+  "x": 25,
+  "y": 17,
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "paletteId": "9b00eabc-acc9-46e4-8aea-89f44f98e89f",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
   "script": [
-    { "id": "right-new", "command": "EVENT_IF_FALSE", "args": { "variable": "9" }, "children": { "true": [
-      { "id": "right-photo", "command": "EVENT_TEXT", "args": { "text": "Tagged illegal snare #B.\nBlue fur is caught in the wire." } },
-      { "id": "right-set", "command": "EVENT_SET_VALUE", "args": { "variable": "9", "value": { "type": "true" } } },
-      { "id": "right-inc", "command": "EVENT_INC_VALUE", "args": { "variable": "1" } },
-      { "id": "right-dec", "command": "EVENT_DEC_VALUE", "args": { "variable": "6" } },
-      { "id": "right-collisions", "command": "EVENT_ACTOR_COLLISIONS_DISABLE", "args": { "actorId": "$self$" } },
-      { "id": "right-wait", "command": "EVENT_WAIT", "args": { "frames": 6 } },
-      { "id": "right-hide", "command": "EVENT_ACTOR_DEACTIVATE", "args": { "actorId": "$self$" } }
-    ], "false": [ { "id": "right-repeat", "command": "EVENT_TEXT", "args": { "text": "Evidence tag #B is already logged." } } ] } },
-    { "id": "right-end", "command": "EVENT_END", "args": {} }
+    {
+      "id": "right-new",
+      "command": "EVENT_IF_FALSE",
+      "args": {
+        "variable": "9"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "right-photo",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Tagged illegal snare #B.\nBlue fur is caught in the wire."
+            }
+          },
+          {
+            "id": "right-set",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "9",
+              "value": {
+                "type": "true"
+              }
+            }
+          },
+          {
+            "id": "right-inc",
+            "command": "EVENT_INC_VALUE",
+            "args": {
+              "variable": "1"
+            }
+          },
+          {
+            "id": "right-dec",
+            "command": "EVENT_DEC_VALUE",
+            "args": {
+              "variable": "6"
+            }
+          },
+          {
+            "id": "right-collisions",
+            "command": "EVENT_ACTOR_COLLISIONS_DISABLE",
+            "args": {
+              "actorId": "$self$"
+            }
+          },
+          {
+            "id": "right-wait",
+            "command": "EVENT_WAIT",
+            "args": {
+              "frames": 6
+            }
+          },
+          {
+            "id": "right-hide",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "$self$"
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "right-repeat",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Evidence tag #B is already logged."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "right-end",
+      "command": "EVENT_END",
+      "args": {}
+    }
   ],
-  "startScript": [], "updateScript": [], "hit1Script": [], "hit2Script": [], "hit3Script": []
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
 }

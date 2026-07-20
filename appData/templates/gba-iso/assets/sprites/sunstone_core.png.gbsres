@@ -1,0 +1,128 @@
+{
+  "_resourceType": "sprite",
+  "id": "26580148-2fdd-48c8-8a2c-18d68731cd61",
+  "name": "Sunstone Core",
+  "symbol": "sprite_sunstone_core",
+  "states": [
+    {
+      "id": "fee6adc3-acaa-48ff-82ad-de6c318bcf3b",
+      "name": "",
+      "animationType": "fixed",
+      "flipLeft": false,
+      "animations": [
+        {
+          "id": "7fcd9f9b-6540-4c34-8847-f8125a5e0022",
+          "frames": [
+            {
+              "id": "5a69303f-4cbb-4a85-82e6-0db6a57b6990",
+              "tiles": [
+                {
+                  "id": "e67a3c01-2eed-4181-8f7e-e7445e62d5cf",
+                  "x": 0,
+                  "y": 0,
+                  "sliceX": 0,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 2,
+                  "paletteIndex": 2,
+                  "objPalette": "OBP0",
+                  "priority": false
+                },
+                {
+                  "id": "d17b37f6-7059-4845-8bb8-35ee7936a124",
+                  "x": 8,
+                  "y": 0,
+                  "sliceX": 8,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 2,
+                  "paletteIndex": 2,
+                  "objPalette": "OBP0",
+                  "priority": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "6f4218d3-b7e3-40fd-842d-bc07b68bd26c",
+          "frames": [
+            {
+              "id": "edb0af61-2922-40fc-8927-97c5d89af463",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "f73cda43-71c9-4750-88fc-2f0460328008",
+          "frames": [
+            {
+              "id": "0496511f-f450-4112-8e3f-8420c358b0b2",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "8af0ae78-2962-4a7a-8143-19e7d804c5c9",
+          "frames": [
+            {
+              "id": "b6556e5e-29a6-4fcd-8e88-76645ee74e63",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "d2ebac3f-22ed-455b-808d-dfe488d6e507",
+          "frames": [
+            {
+              "id": "7cbd32ce-7149-4e2f-892b-0ee644459436",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "eef086d5-c309-40c2-86b1-cbb4514c7d57",
+          "frames": [
+            {
+              "id": "0a9dedbc-b7ba-4955-8c23-01eac898e9e2",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "10941c63-51c1-4c6a-8aa5-3f72bb8b1565",
+          "frames": [
+            {
+              "id": "78396d4a-c1c4-44d8-8f1b-6f2fa965689c",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "3347a885-d31f-412a-841c-eb3c7d13a0c4",
+          "frames": [
+            {
+              "id": "626eeab9-7612-436a-82c1-9433d1afbc7f",
+              "tiles": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "numTiles": 2,
+  "canvasWidth": 16,
+  "canvasHeight": 16,
+  "boundsX": 0,
+  "boundsY": 0,
+  "boundsWidth": 16,
+  "boundsHeight": 16,
+  "animSpeed": 15,
+  "filename": "sunstone_core.png",
+  "width": 16,
+  "height": 16,
+  "checksum": "",
+  "numFrames": 1
+}

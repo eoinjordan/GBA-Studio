@@ -16,8 +16,32 @@
             {
               "id": "1a000000-0000-4a00-8000-0000000frNE",
               "tiles": [
-                { "id": "1a000000-0000-4a00-8000-00000tNE0", "x": 0, "y": 0, "sliceX": 48, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false },
-                { "id": "1a000000-0000-4a00-8000-00000tNE1", "x": 8, "y": 0, "sliceX": 56, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false }
+                {
+                  "id": "1a000000-0000-4a00-8000-00000tNE0",
+                  "x": 0,
+                  "y": 0,
+                  "sliceX": 48,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 0,
+                  "paletteIndex": 0,
+                  "objPalette": "OBP0",
+                  "priority": false
+                },
+                {
+                  "id": "1a000000-0000-4a00-8000-00000tNE1",
+                  "x": 8,
+                  "y": 0,
+                  "sliceX": 56,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 0,
+                  "paletteIndex": 0,
+                  "objPalette": "OBP0",
+                  "priority": false
+                }
               ]
             }
           ]
@@ -28,8 +52,32 @@
             {
               "id": "1a000000-0000-4a00-8000-0000000frSE",
               "tiles": [
-                { "id": "1a000000-0000-4a00-8000-00000tSE0", "x": 0, "y": 0, "sliceX": 0, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false },
-                { "id": "1a000000-0000-4a00-8000-00000tSE1", "x": 8, "y": 0, "sliceX": 8, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false }
+                {
+                  "id": "1a000000-0000-4a00-8000-00000tSE0",
+                  "x": 0,
+                  "y": 0,
+                  "sliceX": 0,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 0,
+                  "paletteIndex": 0,
+                  "objPalette": "OBP0",
+                  "priority": false
+                },
+                {
+                  "id": "1a000000-0000-4a00-8000-00000tSE1",
+                  "x": 8,
+                  "y": 0,
+                  "sliceX": 8,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 0,
+                  "paletteIndex": 0,
+                  "objPalette": "OBP0",
+                  "priority": false
+                }
               ]
             }
           ]
@@ -40,8 +88,32 @@
             {
               "id": "1a000000-0000-4a00-8000-0000000frSW",
               "tiles": [
-                { "id": "1a000000-0000-4a00-8000-00000tSW0", "x": 0, "y": 0, "sliceX": 16, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false },
-                { "id": "1a000000-0000-4a00-8000-00000tSW1", "x": 8, "y": 0, "sliceX": 24, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false }
+                {
+                  "id": "1a000000-0000-4a00-8000-00000tSW0",
+                  "x": 0,
+                  "y": 0,
+                  "sliceX": 16,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 0,
+                  "paletteIndex": 0,
+                  "objPalette": "OBP0",
+                  "priority": false
+                },
+                {
+                  "id": "1a000000-0000-4a00-8000-00000tSW1",
+                  "x": 8,
+                  "y": 0,
+                  "sliceX": 24,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 0,
+                  "paletteIndex": 0,
+                  "objPalette": "OBP0",
+                  "priority": false
+                }
               ]
             }
           ]
@@ -52,8 +124,32 @@
             {
               "id": "1a000000-0000-4a00-8000-0000000frNW",
               "tiles": [
-                { "id": "1a000000-0000-4a00-8000-00000tNW0", "x": 0, "y": 0, "sliceX": 32, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false },
-                { "id": "1a000000-0000-4a00-8000-00000tNW1", "x": 8, "y": 0, "sliceX": 40, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false }
+                {
+                  "id": "1a000000-0000-4a00-8000-00000tNW0",
+                  "x": 0,
+                  "y": 0,
+                  "sliceX": 32,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 0,
+                  "paletteIndex": 0,
+                  "objPalette": "OBP0",
+                  "priority": false
+                },
+                {
+                  "id": "1a000000-0000-4a00-8000-00000tNW1",
+                  "x": 8,
+                  "y": 0,
+                  "sliceX": 40,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 0,
+                  "paletteIndex": 0,
+                  "objPalette": "OBP0",
+                  "priority": false
+                }
               ]
             }
           ]
