@@ -340,7 +340,7 @@
       ]
     }
   ],
-  "numTiles": 10,
+  "numTiles": 12,
   "canvasWidth": 16,
   "canvasHeight": 16,
   "boundsX": 0,
@@ -352,6 +352,6 @@
   "width": 96,
   "height": 16,
   "transparentColor": "000000",
-  "checksum": "cd6c8ebac31ccd6a325b8a7e94a05d442ae6725e",
+  "checksum": "",
   "numFrames": 6
 }

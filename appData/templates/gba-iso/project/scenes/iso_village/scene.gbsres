@@ -3,7 +3,7 @@
   "id": "5ce7e000-0000-4a00-8000-000000000iso",
   "_index": 0,
   "type": "ISOMETRIC",
-  "name": "Sunstone Village",
+  "name": "Sunstone Relay - Dawn Circuit",
   "symbol": "scene_iso_village",
   "x": 100,
   "y": 100,
@@ -13,19 +13,105 @@
   "tilesetId": "",
   "colorModeOverride": "none",
   "paletteIds": [],
-  "spritePaletteIds": [],
+  "spritePaletteIds": [
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "1706ac37-5ef8-444e-8c63-95179471d952",
+    "e4aa83d0-8311-4ca3-8554-0d524a4cd527",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06"
+  ],
   "autoFadeSpeed": 1,
   "script": [
-    { "id": "iso-start-reset-briefing", "command": "EVENT_SET_VALUE", "args": { "variable": "0", "value": { "type": "false" } } },
-    { "id": "iso-start-reset-count", "command": "EVENT_SET_VALUE", "args": { "variable": "1", "value": { "type": "number", "value": 0 } } },
-    { "id": "iso-start-reset-west", "command": "EVENT_SET_VALUE", "args": { "variable": "2", "value": { "type": "false" } } },
-    { "id": "iso-start-reset-east", "command": "EVENT_SET_VALUE", "args": { "variable": "3", "value": { "type": "false" } } },
-    { "id": "iso-start-reset-core", "command": "EVENT_SET_VALUE", "args": { "variable": "4", "value": { "type": "false" } } },
-    { "id": "iso-start-reset-complete", "command": "EVENT_SET_VALUE", "args": { "variable": "5", "value": { "type": "false" } } },
-    { "id": "iso-start-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 0 } },
-    { "id": "iso-start-title", "command": "EVENT_TEXT", "args": { "text": "THE SUNSTONE RELAY\nMove on the diamond paths." } },
-    { "id": "iso-start-help", "command": "EVENT_TEXT", "args": { "text": "Talk to Keeper Nia with A." } },
-    { "id": "iso-start-end", "command": "EVENT_END", "args": {} }
+    {
+      "id": "iso-start-reset-briefing",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "0",
+        "value": {
+          "type": "false"
+        }
+      }
+    },
+    {
+      "id": "iso-start-reset-count",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "1",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "iso-start-reset-west",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "2",
+        "value": {
+          "type": "false"
+        }
+      }
+    },
+    {
+      "id": "iso-start-reset-east",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "3",
+        "value": {
+          "type": "false"
+        }
+      }
+    },
+    {
+      "id": "iso-start-reset-core",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "4",
+        "value": {
+          "type": "false"
+        }
+      }
+    },
+    {
+      "id": "iso-start-reset-complete",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "5",
+        "value": {
+          "type": "false"
+        }
+      }
+    },
+    {
+      "id": "iso-start-tone",
+      "command": "EVENT_PALETTE_SET_BACKGROUND",
+      "args": {
+        "tone": 0
+      }
+    },
+    {
+      "id": "iso-start-title",
+      "command": "EVENT_TEXT",
+      "args": {
+        "text": "THE SUNSTONE RELAY\nThree paths. One fading dawn."
+      }
+    },
+    {
+      "id": "iso-start-help",
+      "command": "EVENT_TEXT",
+      "args": {
+        "text": "Wake both beacons, claim the core.\nKeeper Nia will guide you."
+      }
+    },
+    {
+      "id": "iso-start-end",
+      "command": "EVENT_END",
+      "args": {}
+    }
   ],
   "playerHit1Script": [],
   "playerHit2Script": [],

@@ -33,7 +33,7 @@
   ],
   "defaultSpritePaletteId": "default-sprite",
   "defaultUIPaletteId": "default-ui",
-  "playerPaletteId": "",
+  "playerPaletteId": "12059cce-ee54-4980-8894-138f685a4d06",
   "defaultFontId": "4bd653f0-e08d-424e-9e5b-c1f3aaa21e47",
   "defaultCharacterEncoding": "",
   "defaultPlayerSprites": {
@@ -52,17 +52,41 @@
   "customColorsLight": "B0F088",
   "customColorsDark": "509878",
   "customColorsBlack": "202850",
-  "customControlsUp": ["ArrowUp", "w"],
-  "customControlsDown": ["ArrowDown", "s"],
-  "customControlsLeft": ["ArrowLeft", "a"],
-  "customControlsRight": ["ArrowRight", "d"],
-  "customControlsA": ["Alt", "z", "j"],
-  "customControlsB": ["Control", "k", "x"],
-  "customControlsStart": ["Enter"],
-  "customControlsSelect": ["Shift"],
+  "customControlsUp": [
+    "ArrowUp",
+    "w"
+  ],
+  "customControlsDown": [
+    "ArrowDown",
+    "s"
+  ],
+  "customControlsLeft": [
+    "ArrowLeft",
+    "a"
+  ],
+  "customControlsRight": [
+    "ArrowRight",
+    "d"
+  ],
+  "customControlsA": [
+    "Alt",
+    "z",
+    "j"
+  ],
+  "customControlsB": [
+    "Control",
+    "k",
+    "x"
+  ],
+  "customControlsStart": [
+    "Enter"
+  ],
+  "customControlsSelect": [
+    "Shift"
+  ],
   "colorMode": "color",
   "colorCorrection": "none",
-  "romFilename": "My Isometric Adventure",
+  "romFilename": "The Sunstone Relay",
   "generateDebugFilesEnabled": false,
   "compilerPreset": 3000,
   "scriptEventPresets": {},

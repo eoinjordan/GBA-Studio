@@ -24,8 +24,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 5,
+                  "paletteIndex": 5,
                   "objPalette": "OBP0",
                   "priority": false
                 },
@@ -37,8 +37,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 5,
+                  "paletteIndex": 5,
                   "objPalette": "OBP0",
                   "priority": false
                 }
@@ -124,6 +124,6 @@
   "width": 16,
   "height": 16,
   "transparentColor": "000000",
-  "checksum": "ed08d198cc3dd48f9bfba000769904ae41b36db8",
+  "checksum": "",
   "numFrames": 1
 }

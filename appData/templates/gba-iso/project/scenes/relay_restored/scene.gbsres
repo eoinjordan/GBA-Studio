@@ -13,26 +13,71 @@
   "tilesetId": "",
   "colorModeOverride": "none",
   "paletteIds": [],
-  "spritePaletteIds": [],
+  "spritePaletteIds": [
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "1706ac37-5ef8-444e-8c63-95179471d952",
+    "e4aa83d0-8311-4ca3-8554-0d524a4cd527",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06"
+  ],
   "autoFadeSpeed": 1,
   "script": [
-    { "id": "ending-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 2 } },
+    {
+      "id": "ending-tone",
+      "command": "EVENT_PALETTE_SET_BACKGROUND",
+      "args": {
+        "tone": 2
+      }
+    },
     {
       "id": "ending-complete-check",
       "command": "EVENT_IF_TRUE",
-      "args": { "variable": "5" },
+      "args": {
+        "variable": "5"
+      },
       "children": {
         "true": [
-          { "id": "ending-title", "command": "EVENT_TEXT", "args": { "text": "SUNSTONE RELAY RESTORED!\nBoth village paths now glow." } },
-          { "id": "ending-wait", "command": "EVENT_WAIT", "args": { "frames": 12 } },
-          { "id": "ending-replay", "command": "EVENT_TEXT", "args": { "text": "DEMO COMPLETE\nPress START to replay." } }
+          {
+            "id": "ending-title",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "SUNSTONE RELAY RESTORED!\nBoth village paths now glow."
+            }
+          },
+          {
+            "id": "ending-wait",
+            "command": "EVENT_WAIT",
+            "args": {
+              "frames": 12
+            }
+          },
+          {
+            "id": "ending-replay",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "DEMO COMPLETE\nPress START to replay."
+            }
+          }
         ],
         "false": [
-          { "id": "ending-incomplete", "command": "EVENT_TEXT", "args": { "text": "The relay is still dark.\nPress START and finish the route." } }
+          {
+            "id": "ending-incomplete",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "The relay is still dark.\nPress START and finish the route."
+            }
+          }
         ]
       }
     },
-    { "id": "ending-end", "command": "EVENT_END", "args": {} }
+    {
+      "id": "ending-end",
+      "command": "EVENT_END",
+      "args": {}
+    }
   ],
   "playerHit1Script": [],
   "playerHit2Script": [],

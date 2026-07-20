@@ -1,27 +1,171 @@
 {
-  "_resourceType": "actor", "id": "e1a51ccd-9bb8-4706-b528-43798edca106", "_index": 5,
-  "symbol": "actor_poacher_moss", "prefabId": "", "name": "Poacher Moss",
-  "x": 22, "y": 15, "frame": 0, "animate": true,
-  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd", "paletteId": "", "direction": "left",
-  "moveSpeed": 1, "animSpeed": 15, "isPinned": false, "persistent": true,
-  "collisionGroup": "", "collisionExtraFlags": [], "prefabScriptOverrides": {},
+  "_resourceType": "actor",
+  "id": "e1a51ccd-9bb8-4706-b528-43798edca106",
+  "_index": 5,
+  "symbol": "actor_poacher_moss",
+  "prefabId": "",
+  "name": "Poacher Moss",
+  "x": 22,
+  "y": 15,
+  "frame": 0,
+  "animate": true,
+  "spriteSheetId": "2a39d9a0-48f1-42b6-8845-3f15c4c21f4e",
+  "paletteId": "73bf49a8-808d-481b-8392-f9c053720845",
+  "direction": "left",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
   "script": [
-    { "id": "moss-not-caught", "command": "EVENT_IF_FALSE", "args": { "variable": "12" }, "children": { "true": [
-      { "id": "moss-evidence-check", "command": "EVENT_IF_VALUE", "args": { "variable": "1", "operator": ">=", "comparator": 2 }, "children": { "true": [
-        { "id": "moss-face", "command": "EVENT_ACTOR_SET_DIRECTION", "args": { "actorId": "$self$", "direction": { "type": "direction", "value": "up" } } },
-        { "id": "moss-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 3 } },
-        { "id": "moss-arrest", "command": "EVENT_TEXT", "args": { "text": "Moss: Fine. I will await the ranger.\nCAUGHT: POACHER MOSS" } },
-        { "id": "moss-set", "command": "EVENT_SET_VALUE", "args": { "variable": "12", "value": { "type": "true" } } },
-        { "id": "moss-inc", "command": "EVENT_INC_VALUE", "args": { "variable": "2" } },
-        { "id": "moss-score", "command": "EVENT_VARIABLE_MATH", "args": { "vectorX": "14", "operation": "add", "other": "val", "value": 2 } },
-        { "id": "moss-collisions", "command": "EVENT_ACTOR_COLLISIONS_DISABLE", "args": { "actorId": "$self$" } },
-        { "id": "moss-step", "command": "EVENT_ACTOR_MOVE_RELATIVE", "args": { "actorId": "$self$", "x": { "type": "number", "value": 1 }, "y": { "type": "number", "value": 0 } } },
-        { "id": "moss-wait", "command": "EVENT_WAIT", "args": { "frames": 8 } },
-        { "id": "moss-hide", "command": "EVENT_ACTOR_DEACTIVATE", "args": { "actorId": "$self$" } },
-        { "id": "moss-reset-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 0 } }
-      ], "false": [ { "id": "moss-no-proof", "command": "EVENT_TEXT", "args": { "text": "Moss: Come back with 2 real clues." } } ] } }
-    ], "false": [ { "id": "moss-repeat", "command": "EVENT_TEXT", "args": { "text": "Moss is already on the incident log." } } ] } },
-    { "id": "moss-end", "command": "EVENT_END", "args": {} }
+    {
+      "id": "moss-not-caught",
+      "command": "EVENT_IF_FALSE",
+      "args": {
+        "variable": "12"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "moss-evidence-check",
+            "command": "EVENT_IF_VALUE",
+            "args": {
+              "variable": "1",
+              "operator": ">=",
+              "comparator": 2
+            },
+            "children": {
+              "true": [
+                {
+                  "id": "moss-face",
+                  "command": "EVENT_ACTOR_SET_DIRECTION",
+                  "args": {
+                    "actorId": "$self$",
+                    "direction": {
+                      "type": "direction",
+                      "value": "up"
+                    }
+                  }
+                },
+                {
+                  "id": "moss-tone",
+                  "command": "EVENT_PALETTE_SET_BACKGROUND",
+                  "args": {
+                    "tone": 3
+                  }
+                },
+                {
+                  "id": "moss-arrest",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "Moss: Fine. I will await the ranger.\nCAUGHT: POACHER MOSS"
+                  }
+                },
+                {
+                  "id": "moss-set",
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "12",
+                    "value": {
+                      "type": "true"
+                    }
+                  }
+                },
+                {
+                  "id": "moss-inc",
+                  "command": "EVENT_INC_VALUE",
+                  "args": {
+                    "variable": "2"
+                  }
+                },
+                {
+                  "id": "moss-score",
+                  "command": "EVENT_VARIABLE_MATH",
+                  "args": {
+                    "vectorX": "14",
+                    "operation": "add",
+                    "other": "val",
+                    "value": 2
+                  }
+                },
+                {
+                  "id": "moss-collisions",
+                  "command": "EVENT_ACTOR_COLLISIONS_DISABLE",
+                  "args": {
+                    "actorId": "$self$"
+                  }
+                },
+                {
+                  "id": "moss-step",
+                  "command": "EVENT_ACTOR_MOVE_RELATIVE",
+                  "args": {
+                    "actorId": "$self$",
+                    "x": {
+                      "type": "number",
+                      "value": 1
+                    },
+                    "y": {
+                      "type": "number",
+                      "value": 0
+                    }
+                  }
+                },
+                {
+                  "id": "moss-wait",
+                  "command": "EVENT_WAIT",
+                  "args": {
+                    "frames": 8
+                  }
+                },
+                {
+                  "id": "moss-hide",
+                  "command": "EVENT_ACTOR_DEACTIVATE",
+                  "args": {
+                    "actorId": "$self$"
+                  }
+                },
+                {
+                  "id": "moss-reset-tone",
+                  "command": "EVENT_PALETTE_SET_BACKGROUND",
+                  "args": {
+                    "tone": 0
+                  }
+                }
+              ],
+              "false": [
+                {
+                  "id": "moss-no-proof",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "Moss: Come back with 2 real clues."
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "moss-repeat",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Moss is already on the incident log."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "moss-end",
+      "command": "EVENT_END",
+      "args": {}
+    }
   ],
-  "startScript": [], "updateScript": [], "hit1Script": [], "hit2Script": [], "hit3Script": []
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
 }
