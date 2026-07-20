@@ -52,7 +52,6 @@ jobs:
           mkdir -p dist/player/roms
           cp -R docs/. dist/
           npm run make:cli
-          node out/cli/gb-studio-cli.js make:rom examples/starter-project/project.gbsproj dist/player/roms/gba-starter.gba
           node out/cli/gb-studio-cli.js make:rom examples/isometric-adventure/project.gbsproj dist/player/roms/isometric-adventure.gba
           node out/cli/gb-studio-cli.js make:rom examples/poachermon/project.gbsproj dist/player/roms/poachermon.gba
 

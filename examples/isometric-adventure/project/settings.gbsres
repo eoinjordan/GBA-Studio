@@ -61,7 +61,7 @@
   "customControlsStart": ["Enter"],
   "customControlsSelect": ["Shift"],
   "colorMode": "color",
-  "colorCorrection": "default",
+  "colorCorrection": "none",
   "romFilename": "My Isometric Adventure",
   "generateDebugFilesEnabled": false,
   "compilerPreset": 3000,

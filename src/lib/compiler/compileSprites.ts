@@ -1,5 +1,9 @@
 import promiseLimit from "lib/helpers/promiseLimit";
-import { indexedImageTo2bppSpriteData } from "shared/lib/sprites/spriteData";
+import {
+  indexedImageTo2bppSpriteData,
+  spriteDataIndexFn,
+  spriteDataIndexFnWithTransparentColor,
+} from "shared/lib/sprites/spriteData";
 import {
   animationMapBySpriteType,
   toEngineOrder,
@@ -149,6 +153,9 @@ export const compileSprite = async (
     spriteSheet.canvasHeight,
     metasprites,
     spriteMode,
+    spriteSheet.transparentColor
+      ? spriteDataIndexFnWithTransparentColor(spriteSheet.transparentColor)
+      : spriteDataIndexFn,
   );
 
   const animationDefs: SpriteTileData[][][] = spriteSheet.states

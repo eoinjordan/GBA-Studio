@@ -123,6 +123,7 @@
   "filename": "static.png",
   "width": 16,
   "height": 16,
+  "transparentColor": "000000",
   "checksum": "ed08d198cc3dd48f9bfba000769904ae41b36db8",
   "numFrames": 1
 }

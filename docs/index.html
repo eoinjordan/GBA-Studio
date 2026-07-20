@@ -8,17 +8,20 @@
       content="Build and test Game Boy Advance games with the open-source GBA Studio toolchain."
     />
     <title>GBA Studio</title>
+    <link rel="icon" href="player/gba-studio-mark.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="./">
-        <img src="player/gba-logo.png" alt="" />
+        <img src="player/gba-studio-mark.svg" alt="" />
         <span>GBA Studio</span>
       </a>
       <nav aria-label="Primary navigation">
         <a href="player/">Browser player</a>
-        <a href="storybook/">UI preview</a>
+        <a href="storybook/?path=/story/gba-studio-preview--studio-workspace-preview"
+          >UI preview</a
+        >
         <a href="coverage/">Test coverage</a>
         <a href="https://github.com/eoinjordan/GBA-Studio">GitHub</a>
       </nav>
@@ -36,8 +39,10 @@
           </p>
           <div class="actions">
             <a class="primary-button" href="player/">Play in browser</a>
-            <a class="secondary-button" href="https://github.com/eoinjordan/GBA-Studio/releases"
-              >Download Studio</a
+            <a
+              class="secondary-button"
+              href="storybook/?path=/story/gba-studio-preview--studio-workspace-preview"
+              >Preview the editor</a
             >
           </div>
         </div>

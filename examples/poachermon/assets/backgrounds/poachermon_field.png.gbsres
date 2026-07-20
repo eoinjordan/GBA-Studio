@@ -9,5 +9,5 @@
     "height":  20,
     "imageWidth":  240,
     "imageHeight":  160,
-    "autoColor":  false
+    "autoColor":  true
 }

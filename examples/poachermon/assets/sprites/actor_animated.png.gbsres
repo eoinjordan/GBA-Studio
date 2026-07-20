@@ -351,6 +351,7 @@
   "filename": "actor_animated.png",
   "width": 96,
   "height": 16,
+  "transparentColor": "000000",
   "checksum": "cd6c8ebac31ccd6a325b8a7e94a05d442ae6725e",
   "numFrames": 6
 }

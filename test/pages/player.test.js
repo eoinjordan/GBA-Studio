@@ -54,6 +54,19 @@ describe("GBA Studio browser player", () => {
     });
   });
 
+  test("launches each game in a clean isolated emulator frame", () => {
+    expect(player.emulatorUrl("roms/My Game.gba", "My Game")).toBe(
+      "emulator.html?rom=roms%2FMy+Game.gba&name=My+Game",
+    );
+
+    const html = fs.readFileSync(
+      path.resolve(__dirname, "../../docs/player/emulator.html"),
+      "utf8",
+    );
+    expect(html).toContain('window.EJS_core = "gba"');
+    expect(html).toContain("stable/data/");
+  });
+
   test("keeps dynamic route targets in the published player markup", () => {
     const html = fs.readFileSync(
       path.resolve(__dirname, "../../docs/player/index.html"),
@@ -64,17 +77,27 @@ describe("GBA Studio browser player", () => {
     expect(html).toContain("the editor and compiler remain desktop tools");
   });
 
-  test("publishes three CI-built feature demos", () => {
-    expect(player.DEMOS).toHaveLength(3);
+  test("links the Pages UI preview to the interactive Studio workspace", () => {
+    const html = fs.readFileSync(
+      path.resolve(__dirname, "../../docs/index.html"),
+      "utf8",
+    );
+    expect(html).toContain(
+      "storybook/?path=/story/gba-studio-preview--studio-workspace-preview",
+    );
+    expect(html).toContain("player/gba-studio-mark.svg");
+  });
+
+  test("publishes only the two fully validated feature demos", () => {
+    expect(player.DEMOS).toHaveLength(2);
     expect(player.DEMOS.map((demo) => demo.url)).toEqual([
-      "roms/gba-starter.gba",
       "roms/isometric-adventure.gba",
       "roms/poachermon.gba",
     ]);
     expect(player.DEMOS.every((demo) => demo.instructions.length > 20)).toBe(
       true,
     );
-    expect(player.DEMOS[1]).toMatchObject({
+    expect(player.DEMOS[0]).toMatchObject({
       title: "The Sunstone Relay",
       instructions: expect.stringContaining("Keeper Nia"),
     });

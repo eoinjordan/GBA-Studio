@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { decompress8bitNumberString } from "shared/lib/resources/compression";
 
 const repoRoot = path.resolve(__dirname, "../..");
 const exampleRoot = path.join(repoRoot, "examples/isometric-adventure");
@@ -29,6 +30,15 @@ function filesUnder(root, directory = root) {
   });
 }
 
+function decodeSceneCollisions(resource) {
+  return resource._resourceType === "scene"
+    ? {
+        ...resource,
+        collisions: decompress8bitNumberString(resource.collisions),
+      }
+    : resource;
+}
+
 function loadResources(root) {
   return filesUnder(root)
     .filter((filename) => filename.endsWith(".gbsres"))
@@ -38,7 +48,8 @@ function loadResources(root) {
           .readFileSync(path.join(root, filename), "utf8")
           .replace(/^\uFEFF/, ""),
       ),
-    );
+    )
+    .map(decodeSceneCollisions);
 }
 
 function collectEvents(events, commands) {
@@ -135,7 +146,7 @@ function reachableTiles(scene, start) {
       y < 0 ||
       x >= scene.width ||
       y >= scene.height ||
-      scene.collisions[y * scene.width + x] !== "0"
+      scene.collisions[y * scene.width + x] !== 0
     ) {
       continue;
     }
@@ -236,17 +247,18 @@ describe("The Sunstone Relay isometric end-to-end demo", () => {
       settings.startX,
       settings.startY,
     ]);
-    const walkableCount = [...village.collisions].filter(
-      (cell) => cell === "0",
+    const walkableCount = village.collisions.filter(
+      (cell) => cell === 0,
     ).length;
 
     expect(village.width).toBe(8);
     expect(village.height).toBe(7);
     expect(settings.romFilename).toBe("My Isometric Adventure");
     expect(village.collisions).toHaveLength(village.width * village.height);
-    expect(village.collisions).toContain("0");
-    expect(village.collisions).toContain("1");
+    expect(village.collisions).toContain(0);
+    expect(village.collisions).toContain(1);
     expect((village.width + village.height) * 16).toBe(background.imageWidth);
+    expect(background.autoColor).toBe(true);
     expect(reachable.size).toBe(walkableCount);
 
     for (const trigger of triggers) {
@@ -257,7 +269,7 @@ describe("The Sunstone Relay isometric end-to-end demo", () => {
     }
 
     const core = actors.find((actor) => actor.symbol === "actor_sunstone_core");
-    expect(village.collisions[core.y * village.width + core.x]).toBe("1");
+    expect(village.collisions[core.y * village.width + core.x]).toBe(1);
   });
 
   test("executes the complete quest, its prerequisite branches, and the ending", () => {
