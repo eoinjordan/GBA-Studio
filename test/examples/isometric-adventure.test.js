@@ -242,6 +242,7 @@ describe("The Sunstone Relay isometric end-to-end demo", () => {
 
     expect(village.width).toBe(8);
     expect(village.height).toBe(7);
+    expect(settings.romFilename).toBe("My Isometric Adventure");
     expect(village.collisions).toHaveLength(village.width * village.height);
     expect(village.collisions).toContain("0");
     expect(village.collisions).toContain("1");

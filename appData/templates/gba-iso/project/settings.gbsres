@@ -62,6 +62,7 @@
   "customControlsSelect": ["Shift"],
   "colorMode": "color",
   "colorCorrection": "default",
+  "romFilename": "My Isometric Adventure",
   "generateDebugFilesEnabled": false,
   "compilerPreset": 3000,
   "scriptEventPresets": {},
