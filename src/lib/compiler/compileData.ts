@@ -1,9 +1,14 @@
 import { keyBy } from "lodash";
 import { uniq } from "lodash";
-const SparkMD5 = require("spark-md5");
+import SparkMD5 from "spark-md5";
 import { eventHasArg } from "lib/helpers/eventSystem";
 import compileImages from "./compileImages";
 import compileEntityEvents from "./compileEntityEvents";
+import {
+  compileGBAScript,
+  emitGBAScriptC,
+  type GBAScriptEvent,
+} from "./compileGBAEvents";
 import {
   projectTemplatesRoot,
   MAX_ACTORS,
@@ -1295,12 +1300,6 @@ const precompile = async (
 
 // #endregion
 
-import {
-  compileGBAScript,
-  emitGBAScriptC,
-  type GBAScriptEvent,
-} from "./compileGBAEvents";
-
 const formatCByteArray = (values: number[] | Uint8Array, wrap = 16) =>
   Array.from(values)
     .map(
@@ -1380,18 +1379,18 @@ const toGbaPaletteData = (palette?: PrecompiledPalette): number[] => {
   return output;
 };
 
-const toGbaDirection = (direction?: string): number => {
+export const toGbaDirection = (direction?: string): number => {
   switch (direction) {
-    case "up":
-      return 0;
     case "down":
-      return 1;
+      return 0;
     case "left":
-      return 2;
+      return 1;
     case "right":
+      return 2;
+    case "up":
       return 3;
     default:
-      return 1;
+      return 0;
   }
 };
 
@@ -1492,6 +1491,7 @@ export const emitGBASpriteData = (
   .frame_lengths = ${hasFrames ? `${spriteSymbol}_frame_lengths` : "NULL"},
   .anim_count    = ${animationOffsets.length},
   .animations    = ${animationOffsets.length > 0 ? `${spriteSymbol}_animations` : "NULL"},
+  .obj_8x16      = ${sprite.spriteMode === "8x16" ? "true" : "false"},
 };`;
 
   return [
@@ -1534,7 +1534,6 @@ const compileGBA = async (
     scriptEventHandlers,
     engineSchema,
     tmpPath = "/tmp",
-    debugEnabled = false,
     progress = (_msg: string) => {},
     warnings = (_msg: string) => {},
   }: {
@@ -1715,14 +1714,16 @@ const compileGBA = async (
         localSprites.length,
       )}] = {\n${spriteTableLines}\n};`;
 
-      const collisionArray = `static const uint8_t ${sceneSymbol}_collisions[${Math.max(
-        1,
-        scene.collisions.length,
-      )}] = {${
-        scene.collisions.length > 0
-          ? `${formatCByteArray(scene.collisions)}\n`
-          : "\n  0x00\n"
-      }};`;
+      // The runtime indexes the collision grid by logical scene dimensions.
+      // Always emit exactly that many bytes so an empty or short project map
+      // cannot turn a valid movement check into an out-of-bounds ROM read.
+      const collisionData = Array.from(
+        { length: Math.max(1, scene.width * scene.height) },
+        (_, collisionIndex) => scene.collisions[collisionIndex] ?? 0,
+      );
+      const collisionArray = `static const uint8_t ${sceneSymbol}_collisions[${collisionData.length}] = {${formatCByteArray(
+        collisionData,
+      )}\n};`;
       // Runtime actor indices: 0 is the player, scene actors follow in order.
       const actorIndexById = Object.fromEntries(
         scene.actors.map((actor, actorIndex) => [actor.id, actorIndex + 1]),
@@ -1811,14 +1812,20 @@ const compileGBA = async (
                 const isIso = scene.type === "ISOMETRIC";
                 const actorX = isIso ? actor.x || 0 : (actor.x || 0) * 8;
                 const actorY = isIso ? actor.y || 0 : (actor.y || 0) * 8;
-                return `  { ${actorX}, ${actorY}, ${spriteIndex}, ${toGbaDirection(
-                  actor.direction,
-                )}, ${actor.moveSpeed || 1}, ${ensureNumber(
-                  actor.animSpeed,
-                  15,
-                )}, ${actor.isPinned ? "false" : "true"}, ${
-                  actor.persistent ? "true" : "false"
-                }, ${actor.isPinned ? "true" : "false"}, false, ${scriptSym ?? "NULL"} }`;
+                return `  {
+    .x = ${actorX}, .y = ${actorY}, .sprite_index = ${spriteIndex},
+    .direction = ${toGbaDirection(actor.direction)},
+    .move_speed = ${actor.moveSpeed || 1}, .anim_speed = ${ensureNumber(actor.animSpeed, 15)},
+    .collision_enabled = ${actor.isPinned ? "false" : "true"},
+    .persistent = ${actor.persistent ? "true" : "false"},
+    .pinned = ${actor.isPinned ? "true" : "false"}, .hidden = false,
+    .interact_script = ${scriptSym ?? "NULL"},
+    .iso_z = ${
+      isIso
+        ? Math.max(-128, Math.min(127, Math.round(ensureNumber(actor.isoZ, 0))))
+        : 0
+    }
+  }`;
               })
               .join(",\n")}\n};`
           : "";
@@ -1873,6 +1880,8 @@ static const gba_iso_scene_def_t ${sceneSymbol} = {
     .sprites        = ${sceneSymbol}_sprites,
     .triggers       = ${rawTriggers.length > 0 ? `${sceneSymbol}_triggers` : "NULL"},
     .start_script   = ${sceneStartScriptSymbol ?? "NULL"},
+    .background_width  = ${Math.max(0, Math.min(255, background.width))},
+    .background_height = ${Math.max(0, Math.min(255, background.height))},
   },
   .iso_tile_w = ${ISO_TILE_W},
   .iso_tile_h = ${ISO_TILE_H},
@@ -1896,6 +1905,8 @@ static const gba_iso_scene_def_t ${sceneSymbol} = {
   .sprites        = ${sceneSymbol}_sprites,
   .triggers       = ${rawTriggers.length > 0 ? `${sceneSymbol}_triggers` : "NULL"},
   .start_script   = ${sceneStartScriptSymbol ?? "NULL"},
+  .background_width  = ${Math.max(0, Math.min(255, background.width))},
+  .background_height = ${Math.max(0, Math.min(255, background.height))},
 };`;
 
       sceneMap[scene.symbol] = {

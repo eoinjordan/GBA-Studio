@@ -11,6 +11,18 @@
       "flipLeft": false,
       "animations": [
         {
+          "id": "1a000000-0000-4a00-8000-0000000anNE",
+          "frames": [
+            {
+              "id": "1a000000-0000-4a00-8000-0000000frNE",
+              "tiles": [
+                { "id": "1a000000-0000-4a00-8000-00000tNE0", "x": 0, "y": 0, "sliceX": 48, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false },
+                { "id": "1a000000-0000-4a00-8000-00000tNE1", "x": 8, "y": 0, "sliceX": 56, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false }
+              ]
+            }
+          ]
+        },
+        {
           "id": "1a000000-0000-4a00-8000-0000000anSE",
           "frames": [
             {
@@ -42,18 +54,6 @@
               "tiles": [
                 { "id": "1a000000-0000-4a00-8000-00000tNW0", "x": 0, "y": 0, "sliceX": 32, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false },
                 { "id": "1a000000-0000-4a00-8000-00000tNW1", "x": 8, "y": 0, "sliceX": 40, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "1a000000-0000-4a00-8000-0000000anNE",
-          "frames": [
-            {
-              "id": "1a000000-0000-4a00-8000-0000000frNE",
-              "tiles": [
-                { "id": "1a000000-0000-4a00-8000-00000tNE0", "x": 0, "y": 0, "sliceX": 48, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false },
-                { "id": "1a000000-0000-4a00-8000-00000tNE1", "x": 8, "y": 0, "sliceX": 56, "sliceY": 0, "flipX": false, "flipY": false, "palette": 0, "paletteIndex": 0, "objPalette": "OBP0", "priority": false }
               ]
             }
           ]

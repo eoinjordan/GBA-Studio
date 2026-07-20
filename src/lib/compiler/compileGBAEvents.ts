@@ -7,7 +7,6 @@
 // here and vice-versa.
 
 const VM_OP_END = 0x00;
-const VM_OP_LOAD_SCENE = 0x01;
 const VM_OP_SET_SCENE_TONE = 0x02;
 const VM_OP_WAIT = 0x03;
 const VM_OP_SET_CONST = 0x04;
@@ -30,6 +29,7 @@ const VM_OP_ACTOR_SET_HIDDEN = 0x14;
 const VM_OP_ACTOR_SET_COLLISIONS = 0x15;
 const VM_OP_IF_ACTOR_AT_POS = 0x16;
 const VM_OP_IF_ACTOR_RELATIVE = 0x17;
+const VM_OP_LOAD_SCENE_AT = 0x18;
 
 // GBA key bit masks (mirror gba_system.h).
 const GBA_KEYS: Record<string, number> = {
@@ -429,7 +429,13 @@ function compileEvent(
         );
         return false;
       }
-      out.push(VM_OP_LOAD_SCENE, clampU8(sceneIndex));
+      out.push(
+        VM_OP_LOAD_SCENE_AT,
+        clampU8(sceneIndex),
+        clampU8(scriptValueToNumber(args.x)),
+        clampU8(scriptValueToNumber(args.y)),
+        directionValue(args.direction),
+      );
       return true;
     }
 

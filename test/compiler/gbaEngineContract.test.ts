@@ -101,7 +101,7 @@ test("GBA event compiler opcodes match bundled engine VM constants", () => {
   });
 
   const emittedOpcodes = new Set(bytecode);
-  expect(emittedOpcodes).toContain(vmOpcode("VM_OP_LOAD_SCENE"));
+  expect(emittedOpcodes).toContain(vmOpcode("VM_OP_LOAD_SCENE_AT"));
   expect(emittedOpcodes).toContain(vmOpcode("VM_OP_WAIT"));
   expect(emittedOpcodes).toContain(vmOpcode("VM_OP_SET_CONST"));
   expect(emittedOpcodes).toContain(vmOpcode("VM_OP_COPY_VAR"));

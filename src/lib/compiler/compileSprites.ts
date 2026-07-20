@@ -3,6 +3,7 @@ import { indexedImageTo2bppSpriteData } from "shared/lib/sprites/spriteData";
 import {
   animationMapBySpriteType,
   toEngineOrder,
+  toIsometricEngineOrder,
 } from "shared/lib/sprites/helpers";
 import type {
   ObjPalette,
@@ -151,72 +152,73 @@ export const compileSprite = async (
   );
 
   const animationDefs: SpriteTileData[][][] = spriteSheet.states
-    .map((state) =>
-      toEngineOrder(
-        animationMapBySpriteType(
-          state.animations,
-          state.animationType,
-          state.flipLeft,
-          (animation, flip) => {
-            if (!animation) {
-              return [];
-            }
-            return animation.frames.map((frame) => {
-              let currentX = 0;
-              let currentY = spriteMode === "8x16" ? 0 : -8;
-              return [...frame.tiles]
-                .reverse()
-                .map((tile) => {
-                  const optimisedTile = lookup[tile.id];
-                  if (!optimisedTile) {
-                    return null;
-                  }
-                  const { tileIndex, inVRAM2 } = tileAllocationStrategy(
-                    optimisedTile.tile,
-                    tiles.length,
-                    spriteSheet,
-                  );
-                  if (flip) {
-                    const data: SpriteTileData = {
-                      tile: tileIndex,
-                      x: 8 - tile.x - currentX,
-                      y: -tile.y - currentY,
-                      props: makeProps(
-                        tile.objPalette,
-                        tile.paletteIndex,
-                        !optimisedTile.flipX,
-                        optimisedTile.flipY,
-                        tile.priority,
-                        inVRAM2,
-                      ),
-                    };
-                    currentX = 8 - tile.x;
-                    currentY = -tile.y;
-                    return data;
-                  }
+    .map((state) => {
+      const animations = animationMapBySpriteType(
+        state.animations,
+        state.animationType,
+        state.flipLeft,
+        (animation, flip) => {
+          if (!animation) {
+            return [];
+          }
+          return animation.frames.map((frame) => {
+            let currentX = 0;
+            let currentY = spriteMode === "8x16" ? 0 : -8;
+            return [...frame.tiles]
+              .reverse()
+              .map((tile) => {
+                const optimisedTile = lookup[tile.id];
+                if (!optimisedTile) {
+                  return null;
+                }
+                const { tileIndex, inVRAM2 } = tileAllocationStrategy(
+                  optimisedTile.tile,
+                  tiles.length,
+                  spriteSheet,
+                );
+                if (flip) {
                   const data: SpriteTileData = {
                     tile: tileIndex,
-                    x: tile.x - currentX,
+                    x: 8 - tile.x - currentX,
                     y: -tile.y - currentY,
                     props: makeProps(
                       tile.objPalette,
                       tile.paletteIndex,
-                      optimisedTile.flipX,
+                      !optimisedTile.flipX,
                       optimisedTile.flipY,
                       tile.priority,
                       inVRAM2,
                     ),
                   };
-                  currentX = tile.x;
+                  currentX = 8 - tile.x;
                   currentY = -tile.y;
                   return data;
-                })
-                .filter((tile) => tile) as SpriteTileData[];
-            });
-          },
-        ),
-      ),
-    )
+                }
+                const data: SpriteTileData = {
+                  tile: tileIndex,
+                  x: tile.x - currentX,
+                  y: -tile.y - currentY,
+                  props: makeProps(
+                    tile.objPalette,
+                    tile.paletteIndex,
+                    optimisedTile.flipX,
+                    optimisedTile.flipY,
+                    tile.priority,
+                    inVRAM2,
+                  ),
+                };
+                currentX = tile.x;
+                currentY = -tile.y;
+                return data;
+              })
+              .filter((tile) => tile) as SpriteTileData[];
+          });
+        },
+      );
+      return state.animationType === "iso_movement"
+        ? toIsometricEngineOrder(animations)
+        : toEngineOrder(animations);
+    })
     .flat();
 
   // const uniqFrames: SpriteTileData[][] = [];
@@ -259,6 +261,9 @@ export const compileSprite = async (
 
   const precompiled: PrecompiledSpriteSheetData = {
     ...spriteSheet,
+    // Preserve the resolved mode so downstream GBA emitters can select the
+    // correct OAM object shape even when the sprite inherited project defaults.
+    spriteMode,
     vramData,
     tiles,
     metasprites: uniqFrames,
