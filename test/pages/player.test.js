@@ -50,13 +50,14 @@ describe("GBA Studio browser player", () => {
       EJS_core: "gba",
       EJS_controlScheme: "gba",
       EJS_gameUrl: "roms/demo.gba",
-      EJS_startOnLoaded: true,
+      EJS_startOnLoaded: false,
+      EJS_startButtonName: "Play GBA Studio Game",
     });
   });
 
   test("launches each game in a clean isolated emulator frame", () => {
     expect(player.emulatorUrl("roms/My Game.gba", "My Game")).toBe(
-      "emulator.html?rom=roms%2FMy+Game.gba&name=My+Game",
+      "emulator.html?rom=roms%2FMy+Game.gba&name=My+Game&player=2",
     );
 
     const html = fs.readFileSync(
@@ -64,7 +65,11 @@ describe("GBA Studio browser player", () => {
       "utf8",
     );
     expect(html).toContain('window.EJS_core = "gba"');
-    expect(html).toContain("stable/data/");
+    expect(html).toContain("4.2.3/data/");
+    expect(html).toContain("window.EJS_startOnLoaded = false");
+    expect(html).toContain("window.EJS_onGameStart = function ()");
+    expect(html).toContain("Play GBA Studio Game");
+    expect(html).toContain('bootStatus.addEventListener("click"');
   });
 
   test("keeps dynamic route targets in the published player markup", () => {
@@ -74,6 +79,7 @@ describe("GBA Studio browser player", () => {
     );
     expect(html).toContain('id="route-title"');
     expect(html).toContain('id="route-instructions"');
+    expect(html).toContain('id="emulator-status"');
     expect(html).toContain("the editor and compiler remain desktop tools");
   });
 

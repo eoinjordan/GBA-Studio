@@ -7,6 +7,7 @@
     <style>
       html,
       body,
+      #shell,
       #game {
         width: 100%;
         height: 100%;
@@ -19,7 +20,44 @@
         display: grid;
         place-items: stretch;
         color: #f5f3ff;
-        font: 14px system-ui, sans-serif;
+        font:
+          14px system-ui,
+          sans-serif;
+      }
+
+      #shell {
+        position: relative;
+      }
+
+      .boot-status {
+        position: absolute;
+        z-index: 20;
+        top: 14px;
+        left: 50%;
+        max-width: calc(100% - 32px);
+        padding: 8px 12px;
+        transform: translateX(-50%);
+        border: 1px solid rgba(196, 181, 253, 0.45);
+        border-radius: 999px;
+        background: rgba(10, 11, 18, 0.9);
+        color: #ede9fe;
+        font-size: 12px;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .boot-status:disabled {
+        cursor: wait;
+      }
+
+      .boot-status.ready {
+        border-color: rgba(217, 249, 157, 0.55);
+        color: #d9f99d;
+      }
+
+      .boot-status.error {
+        border-color: rgba(255, 180, 180, 0.65);
+        color: #ffb4b4;
       }
 
       .error {
@@ -31,15 +69,32 @@
     </style>
   </head>
   <body>
-    <div id="game"></div>
+    <div id="shell">
+      <div id="game"></div>
+      <button class="boot-status" id="boot-status" type="button" disabled>
+        Loading emulator controls…
+      </button>
+    </div>
     <script>
       (function () {
         const params = new URLSearchParams(window.location.search);
         const rom = params.get("rom");
         const name = params.get("name") || "GBA Studio game";
+        const bootStatus = document.getElementById("boot-status");
+        const report = function (type, message) {
+          window.parent.postMessage(
+            { source: "gba-studio-emulator", type: type, message: message },
+            window.location.origin,
+          );
+        };
+        const showError = function (message) {
+          bootStatus.textContent = message;
+          bootStatus.disabled = true;
+          bootStatus.classList.add("error");
+          report("error", message);
+        };
         if (!rom) {
-          document.getElementById("game").innerHTML =
-            '<p class="error">No GBA ROM was selected.</p>';
+          showError("No GBA ROM was selected.");
           return;
         }
 
@@ -48,17 +103,49 @@
         window.EJS_controlScheme = "gba";
         window.EJS_gameUrl = rom;
         window.EJS_gameName = name;
-        window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+        window.EJS_pathtodata = "https://cdn.emulatorjs.org/4.2.3/data/";
         window.EJS_color = "#8b5cf6";
-        window.EJS_startOnLoaded = true;
+        // EmulatorJS documents that startOnLoaded can freeze until the user
+        // interacts with the page. Keep the explicit Play button so direct
+        // links and demo-card launches work reliably in every browser.
+        window.EJS_startOnLoaded = false;
+        window.EJS_startButtonName = "Play GBA Studio Game";
+        window.EJS_backgroundColor = "#0f172a";
         window.EJS_AdUrl = "";
         window.EJS_AdTimer = -1;
+        window.EJS_ready = function () {
+          bootStatus.textContent = "Play GBA Studio Game";
+          bootStatus.disabled = false;
+          bootStatus.classList.add("ready");
+          report("ready", bootStatus.textContent);
+        };
+        window.EJS_onGameStart = function () {
+          bootStatus.hidden = true;
+          report("started", "Game running");
+        };
+
+        bootStatus.addEventListener("click", function () {
+          const startButton = document.querySelector(".ejs_start_button");
+          if (startButton) {
+            bootStatus.disabled = true;
+            bootStatus.textContent = "Starting game…";
+            startButton.click();
+          }
+        });
+
+        window.setTimeout(function () {
+          if (!bootStatus.hidden && !bootStatus.classList.contains("ready")) {
+            bootStatus.textContent =
+              "Still downloading the mGBA core… check your connection if this continues.";
+          }
+        }, 15000);
 
         const loader = document.createElement("script");
         loader.src = window.EJS_pathtodata + "loader.js";
         loader.onerror = function () {
-          document.getElementById("game").innerHTML =
-            '<p class="error">The emulator could not be loaded. Check your connection and try again.</p>';
+          showError(
+            "The emulator could not be loaded. Check your connection and try again.",
+          );
         };
         document.body.appendChild(loader);
       })();
