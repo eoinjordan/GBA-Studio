@@ -137,8 +137,12 @@ describe("GBA build process invocation", () => {
       expect(options.shell).toBe(false);
     }
 
+    const gbafixExecutable =
+      process.platform === "win32" ? "gbafix.exe" : "gbafix";
     const gbafixCall = spawnMock.mock.calls.find(([command]) =>
-      command.replace(/\\/g, "/").endsWith("/tools/bin/gbafix.exe"),
+      command
+        .replace(/\\/g, "/")
+        .endsWith(`/tools/bin/${gbafixExecutable}`),
     );
     expect(gbafixCall?.[1]).toEqual(["build/rom/My Isometric Game.gba"]);
   });

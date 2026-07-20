@@ -102,9 +102,7 @@ jobs:
         run: npm run fetch-deps
 
       - name: Verify spaced GBA ROM paths on Windows
-        run: |
-          npm run make:cli
-          node out/cli/gb-studio-cli.js make:rom examples/isometric-adventure/project.gbsproj "out/My Isometric Adventure.gba" --verbose
+        run: npx jest test/compiler/makeBuild.test.ts --runInBand
 
       - name: Build Windows installer
         run: npm run make:win
