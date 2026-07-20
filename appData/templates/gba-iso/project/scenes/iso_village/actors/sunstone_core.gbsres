@@ -1,0 +1,62 @@
+{
+  "_resourceType": "actor",
+  "id": "5ce7e000-0000-4a00-8000-000000000a03",
+  "_index": 1,
+  "symbol": "actor_sunstone_core",
+  "prefabId": "",
+  "name": "Sunstone Core",
+  "x": 2,
+  "y": 2,
+  "isoZ": 0,
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "paletteId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "core-claimed-check",
+      "command": "EVENT_IF_FALSE",
+      "args": { "variable": "4" },
+      "children": {
+        "true": [
+          {
+            "id": "core-beacons-check",
+            "command": "EVENT_IF_VALUE",
+            "args": { "variable": "1", "operator": ">=", "comparator": 2 },
+            "children": {
+              "true": [
+                { "id": "core-awake", "command": "EVENT_TEXT", "args": { "text": "The lake releases its core.\nSUNSTONE RECOVERED!" } },
+                { "id": "core-set", "command": "EVENT_SET_VALUE", "args": { "variable": "4", "value": { "type": "true" } } },
+                { "id": "core-face", "command": "EVENT_ACTOR_SET_DIRECTION", "args": { "actorId": "$self$", "direction": { "type": "direction", "value": "up" } } },
+                { "id": "core-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 1 } },
+                { "id": "core-wait", "command": "EVENT_WAIT", "args": { "frames": 10 } },
+                { "id": "core-hide", "command": "EVENT_ACTOR_DEACTIVATE", "args": { "actorId": "$self$" } },
+                { "id": "core-reset-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 0 } }
+              ],
+              "false": [
+                { "id": "core-dormant", "command": "EVENT_TEXT", "args": { "text": "The lake core is dormant.\nRestore both beacons first." } }
+              ]
+            }
+          }
+        ],
+        "false": [
+          { "id": "core-empty", "command": "EVENT_TEXT", "args": { "text": "Only calm water remains." } }
+        ]
+      }
+    },
+    { "id": "core-end", "command": "EVENT_END", "args": {} }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}
