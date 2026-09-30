@@ -5,6 +5,9 @@
 
 GBA Studio is an experimental fork of GB Studio tailored for Game Boy Advance game development. Like the original, it provides a visual retro game editor for Mac, Linux, and Windows.
 
+[Build Studio games for the Tang Nano 20K LCD](docs/tangnano20k.md): export
+the same project to the native GBA-engine runtime, then load it over USB.
+
 **[Try the CI-built GBA Studio demos in your browser](https://eoinjordan.github.io/GBA-Studio/)** — no install or ROM upload required.
 
 ## Project Status
@@ -14,7 +17,9 @@ GBA Studio is an experimental fork of GB Studio tailored for Game Boy Advance ga
 
 <img width="647" height="451" alt="image" src="https://github.com/user-attachments/assets/f88dc5e2-879c-4e38-8c0b-18bd9fbda729" />
 
-This project is a prototype, but the editor UI is running and the GBA ROM build path is wired up. The immediate goal is to make the inherited GB Studio authoring workflow produce reproducible `.gba` ROM builds locally and in CI. The editor can launch, sample projects can be built to `.gba`, and Electron packaging scripts are available for installers, though full GB Studio feature parity and complete GBA hardware support are not finished yet.
+The editor opens projects and builds sample `.gba` ROMs locally and in CI.
+Electron packaging scripts produce desktop installers. GBA support remains
+incomplete; the table below lists the current limits.
 
 [Join the GBA STUDIO Discord to share any issues or feedback thanks!](https://discord.gg/3B3SZmdpw)
 

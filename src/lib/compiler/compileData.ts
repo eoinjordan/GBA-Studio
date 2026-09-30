@@ -1297,6 +1297,7 @@ const precompile = async (
 
 import {
   compileGBAScript,
+  GBA_DIRECTIONS,
   emitGBAScriptC,
   type GBAScriptEvent,
 } from "./compileGBAEvents";
@@ -1381,18 +1382,7 @@ const toGbaPaletteData = (palette?: PrecompiledPalette): number[] => {
 };
 
 const toGbaDirection = (direction?: string): number => {
-  switch (direction) {
-    case "up":
-      return 0;
-    case "down":
-      return 1;
-    case "left":
-      return 2;
-    case "right":
-      return 3;
-    default:
-      return 1;
-  }
+  return GBA_DIRECTIONS[direction ?? "down"] ?? GBA_DIRECTIONS.down;
 };
 
 export const emitGBASpriteData = (
@@ -1484,6 +1474,7 @@ export const emitGBASpriteData = (
   .frame_lengths = ${hasFrames ? `${spriteSymbol}_frame_lengths` : "NULL"},
   .anim_count    = ${animationOffsets.length},
   .animations    = ${animationOffsets.length > 0 ? `${spriteSymbol}_animations` : "NULL"},
+  .obj_8x16      = ${sprite.spriteMode !== "8x8"},
 };`;
 
   return [
@@ -1805,7 +1796,7 @@ const compileGBA = async (
                 const actorY = isIso ? actor.y || 0 : (actor.y || 0) * 8;
                 return `  { ${actorX}, ${actorY}, ${spriteIndex}, ${toGbaDirection(
                   actor.direction,
-                )}, ${actor.moveSpeed || 1}, ${ensureNumber(
+                )}, ${Math.max(1, Math.min(255, Math.round(actor.moveSpeed || 1)))}, ${ensureNumber(
                   actor.animSpeed,
                   15,
                 )}, ${actor.isPinned ? "false" : "true"}, ${

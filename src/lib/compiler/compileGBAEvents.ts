@@ -46,7 +46,7 @@ const GBA_KEYS: Record<string, number> = {
 };
 
 // GB Studio direction_e order: 0=down, 1=left, 2=right, 3=up.
-const GBA_DIRECTIONS: Record<string, number> = {
+export const GBA_DIRECTIONS: Record<string, number> = {
   down: 0,
   left: 1,
   right: 2,

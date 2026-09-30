@@ -259,6 +259,7 @@ export const compileSprite = async (
 
   const precompiled: PrecompiledSpriteSheetData = {
     ...spriteSheet,
+    spriteMode,
     vramData,
     tiles,
     metasprites: uniqFrames,

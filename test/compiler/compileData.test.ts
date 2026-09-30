@@ -51,6 +51,10 @@ test("should emit ordered GBA sprite frames and animation ranges", () => {
   expect(output).toContain("{ 0, 2 }");
   expect(output).toContain(".frame_count   = 3");
   expect(output).toContain(".anim_count    = 1");
+  expect(output).toContain(".obj_8x16      = true");
+  expect(
+    emitGBASpriteData({ ...sprite, spriteMode: "8x8" }, "small_sprite"),
+  ).toContain(".obj_8x16      = false");
 });
 
 test("should take into account state value when building projectiles", () => {
