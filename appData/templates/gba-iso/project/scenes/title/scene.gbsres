@@ -1,0 +1,170 @@
+{
+  "_resourceType": "scene",
+  "id": "6678e96f-d1c0-4bf8-856d-4a25737742cd",
+  "_index": 0,
+  "type": "LOGO",
+  "name": "The Sunstone Relay",
+  "symbol": "scene_title",
+  "x": 100,
+  "y": 100,
+  "width": 30,
+  "height": 20,
+  "backgroundId": "5bb8f95f-1c0d-4e0a-88c2-3d18687e234d",
+  "tilesetId": "",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "1706ac37-5ef8-444e-8c63-95179471d952",
+    "e4aa83d0-8311-4ca3-8554-0d524a4cd527",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06"
+  ],
+  "autoFadeSpeed": 1,
+  "script": [
+    {
+      "id": "9f8e0720-8713-433f-8065-abec5d4cafb5",
+      "command": "EVENT_ACTOR_DEACTIVATE",
+      "args": {
+        "actorId": "player"
+      }
+    },
+    {
+      "id": "3586c4e8-d337-4915-86e9-f54f2996401c",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "0",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "108358e7-089f-4750-8883-245cff8c14d2",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "1",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "840e0611-ed4e-451b-8738-985438de5534",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "2",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "b2888865-25d1-494f-81d6-3dbd355d9165",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "3",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "eb90370b-4f48-4326-8bbe-b12d27a4c647",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "4",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "bea11276-c9e9-4d83-8236-cb95b1c0da70",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "5",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "2bafdc92-43ae-4515-89f2-c8b91ca0e536",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "6",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "bda1e753-a38f-4e72-877c-d380611fcda4",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "7",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "51416518-e0e6-4e23-8d92-a323ba89588c",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "8",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "a236f234-5492-4e85-87fd-b0eea1e8d68b",
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "start"
+        ]
+      }
+    },
+    {
+      "id": "08d0c08f-f6da-41f1-874d-d666e8b3fec7",
+      "command": "EVENT_SWITCH_SCENE",
+      "args": {
+        "sceneId": "6447c24e-8073-4878-8c3d-11b86f5f664a",
+        "x": {
+          "type": "number",
+          "value": 4
+        },
+        "y": {
+          "type": "number",
+          "value": 5
+        },
+        "direction": "up",
+        "fadeSpeed": "1"
+      }
+    },
+    {
+      "id": "d737622a-eb91-4b31-8ec9-9bd4c8aeaf5f",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "collisions": "011f+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+011f+"
+}

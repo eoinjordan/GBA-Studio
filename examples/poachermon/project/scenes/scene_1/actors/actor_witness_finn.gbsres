@@ -1,0 +1,41 @@
+{
+  "_resourceType": "actor",
+  "id": "38d4ca60-4302-4222-866f-613838320495",
+  "_index": 0,
+  "symbol": "actor_witness_finn",
+  "prefabId": "",
+  "name": "Witness Finn",
+  "x": 12,
+  "y": 15,
+  "frame": 0,
+  "animate": true,
+  "spriteSheetId": "11b5452b-187c-43a3-afb1-a1f4f74ffda2",
+  "paletteId": "e28289ef-a222-48fa-8c44-af79b5e54e40",
+  "direction": "right",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "bb70c266-afab-49ed-8bf4-848c97016384",
+      "command": "EVENT_TEXT",
+      "args": {
+        "text": "Two snares lie beside the path.\nAsh waits just north of them."
+      }
+    },
+    {
+      "id": "885350b6-1454-49c9-82be-6afdde36865c",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

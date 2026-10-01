@@ -1,0 +1,130 @@
+{
+  "_resourceType": "actor",
+  "id": "f9f7265c-f294-4f16-8930-e6ea5fa547e4",
+  "_index": 0,
+  "symbol": "actor_field_rowan",
+  "prefabId": "",
+  "name": "Captain Rowan",
+  "x": 14,
+  "y": 15,
+  "frame": 0,
+  "animate": true,
+  "spriteSheetId": "998953d1-45ef-4776-8fa8-526e1302a4fb",
+  "paletteId": "35543855-752d-4195-836a-ca14bee206d3",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "1f619583-6f58-42c9-8f8f-feb0572ef0d4",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "3"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "bd449b2c-6d1b-43e3-8e84-05623de208c6",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "4",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "8628b0c3-84dc-4821-85c5-e81ba8640bba",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "14",
+              "value": {
+                "type": "number",
+                "value": 100
+              }
+            }
+          },
+          {
+            "id": "f4007015-f942-4720-8784-f3e5bdb5d4a7",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "player"
+            }
+          },
+          {
+            "id": "704de5d9-d2d1-4170-8a7a-c8b026a420c2",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "CASE CLOSED: THE SNARE AFFAIR\nTwo poachers detained. One life saved."
+            }
+          },
+          {
+            "id": "cea2a589-8ae3-4e25-8b16-7dff8e44f57c",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "FIELD REPORT\nEvidence {1}/2  Arrests {2}/2"
+            }
+          },
+          {
+            "id": "8bd6fe2c-7298-4a41-86c7-0a1621cbefac",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Reserve safe. Field score: {14}.\nPress A, then START for a new case."
+            }
+          },
+          {
+            "id": "fcca4fc0-d841-492d-8f71-818010d0d196",
+            "command": "EVENT_AWAIT_INPUT",
+            "args": {
+              "input": [
+                "start"
+              ]
+            }
+          },
+          {
+            "id": "8a8c7590-da01-4be5-8e30-09b82e58c5e1",
+            "command": "EVENT_SWITCH_SCENE",
+            "args": {
+              "sceneId": "bd336eef-fd67-4d7a-8462-e285544733b1",
+              "x": {
+                "type": "number",
+                "value": 15
+              },
+              "y": {
+                "type": "number",
+                "value": 10
+              },
+              "direction": "up",
+              "fadeSpeed": "1"
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "a166ee4f-d821-425e-8b41-14407ec6fc72",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Find Moss near the north path.\nFree the creature, then report here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "8245f2b0-f695-4e09-806f-e194b23cb119",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

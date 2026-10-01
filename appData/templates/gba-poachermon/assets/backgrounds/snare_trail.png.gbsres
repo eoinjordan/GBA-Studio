@@ -1,0 +1,13 @@
+{
+  "_resourceType": "background",
+  "id": "20bbe7b8-241c-4d94-8260-cf59717641b1",
+  "name": "snare trail",
+  "symbol": "bg_snare_trail",
+  "filename": "snare_trail.png",
+  "tileColors": "",
+  "width": 30,
+  "height": 20,
+  "imageWidth": 240,
+  "imageHeight": 160,
+  "autoColor": true
+}

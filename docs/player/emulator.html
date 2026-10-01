@@ -126,7 +126,7 @@
         Start
       </button>
     </div>
-    <script src="player.js"></script>
+    <script src="player.js?player=3"></script>
     <script>
       (function () {
         const params = new URLSearchParams(window.location.search);
@@ -188,42 +188,72 @@
           report("started", "Game running");
         };
 
-        // Button taps last long enough for a game frame to sample them.
-        // Pointer holds support continuous movement; keyboard activation taps.
+        const input = window.GBAStudioPlayer.createInputController(
+          function (button, value) {
+            const emulator = window.EJS_emulator;
+            if (emulator && emulator.gameManager)
+              emulator.gameManager.simulateInput(0, button, value);
+          },
+        );
+        ["keydown", "keyup"].forEach(function (type) {
+          window.addEventListener(
+            type,
+            function (event) {
+              const button =
+                window.GBAStudioPlayer.KEY_INPUT[event.key.toLowerCase()];
+              if (
+                button === undefined ||
+                /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)
+              )
+                return;
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              if (!event.repeat)
+                input[type === "keydown" ? "press" : "release"](button);
+            },
+            true,
+          );
+        });
+        window.addEventListener("message", function (event) {
+          if (
+            event.source !== window.parent ||
+            event.origin !== window.location.origin ||
+            !event.data ||
+            event.data.source !== "gba-studio-keyboard"
+          )
+            return;
+          if (event.data.reset) input.reset();
+          else if (Number.isInteger(event.data.input))
+            input[event.data.pressed ? "press" : "release"](event.data.input);
+        });
+        window.addEventListener("blur", input.reset);
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) input.reset();
+        });
         document
           .querySelectorAll("#game-controls button")
           .forEach(function (button) {
-            const input = Number(button.dataset.input);
-            let pressedAt = 0;
-            let releaseTimer = null;
+            const code = Number(button.dataset.input);
             let pointerTap = false;
-            const press = function () {
-              window.clearTimeout(releaseTimer);
-              pressedAt = performance.now();
-              window.EJS_emulator.gameManager.simulateInput(0, input, 1);
-            };
-            const release = function () {
-              releaseTimer = window.setTimeout(
-                function () {
-                  window.EJS_emulator.gameManager.simulateInput(0, input, 0);
-                },
-                Math.max(0, 100 - (performance.now() - pressedAt)),
-              );
-            };
             button.addEventListener("pointerdown", function (event) {
               pointerTap = true;
               button.setPointerCapture(event.pointerId);
-              press();
+              input.press(code);
             });
-            button.addEventListener("pointerup", release);
-            button.addEventListener("pointercancel", release);
+            ["pointerup", "pointercancel", "lostpointercapture"].forEach(
+              function (event) {
+                button.addEventListener(event, function () {
+                  input.release(code);
+                });
+              },
+            );
             button.addEventListener("click", function () {
               if (pointerTap) {
                 pointerTap = false;
                 return;
               }
-              press();
-              release();
+              input.press(code);
+              input.release(code);
             });
           });
 

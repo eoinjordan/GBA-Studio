@@ -50,13 +50,25 @@ jobs:
           "$DEVKITARM/bin/arm-none-eabi-gcc" --version
           test -x "$DEVKITPRO/tools/bin/gbafix"
 
-      - name: Build static site
+      - name: Install host test tools
+        # The exported-game check compiles the portable engine with mock hardware.
+        # These are host tools; the ROM build continues to use devkitARM.
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends gcc python3
+
+      - name: Compile browser games
         run: |
           mkdir -p dist/player/roms
           cp -R docs/. dist/
           npm run make:cli
           node out/cli/gb-studio-cli.js make:rom examples/isometric-adventure/project.gbsproj dist/player/roms/isometric-adventure.gba
           node out/cli/gb-studio-cli.js make:rom examples/poachermon/project.gbsproj dist/player/roms/poachermon.gba
+          node scripts/write-rom-manifest.js dist/player
+          node out/cli/gb-studio-cli.js export examples/isometric-adventure/project.gbsproj out/campaign-sunstone --target gba
+          python3 scripts/test-campaign-runtime.py out/campaign-sunstone --sunstone
+          node out/cli/gb-studio-cli.js export examples/poachermon/project.gbsproj out/campaign-poachermon --target gba
+          python3 scripts/test-campaign-runtime.py out/campaign-poachermon
 
       - name: Generate coverage report
         run: |

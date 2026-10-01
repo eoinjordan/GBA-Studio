@@ -1,0 +1,86 @@
+{
+  "_resourceType": "actor",
+  "id": "dd6188e1-20ab-4d5d-87f4-7559992ccad7",
+  "_index": 0,
+  "symbol": "actor_left_snare",
+  "prefabId": "",
+  "name": "West snare",
+  "x": 8,
+  "y": 15,
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "paletteId": "9b00eabc-acc9-46e4-8aea-89f44f98e89f",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "8fdcdd9c-5c86-4b3b-867b-60e7afc8e181",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "8"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "88411c82-581b-430b-82d3-f80978cf1287",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "This snare is already tagged."
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "6be3e143-ce94-407f-8cdf-9800c1d568f6",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "8",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "84698e8b-8cff-40f9-8cce-b37dd5c32be1",
+            "command": "EVENT_INC_VALUE",
+            "args": {
+              "variable": "1"
+            }
+          },
+          {
+            "id": "17d9e1d1-1cbe-40cd-8ae5-b6dc9310e39f",
+            "command": "EVENT_DEC_VALUE",
+            "args": {
+              "variable": "6"
+            }
+          },
+          {
+            "id": "2802aa89-98f3-415a-86f9-2ad9cd382525",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "WEST SNARE TAGGED\nEvidence collected: {1}/2."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "a6c1c9e7-cb09-4177-8c82-418ee3cf1033",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

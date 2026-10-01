@@ -1,0 +1,108 @@
+{
+  "_resourceType": "actor",
+  "id": "4c05184e-420a-4a04-8f97-6389dff0b945",
+  "_index": 0,
+  "symbol": "actor_poacher_ash",
+  "prefabId": "",
+  "name": "Poacher Ash",
+  "x": 14,
+  "y": 10,
+  "frame": 0,
+  "animate": true,
+  "spriteSheetId": "7a8963a3-feb4-431e-8925-6b86d6e768e6",
+  "paletteId": "5c769a01-83e5-4647-8254-5ba44907eec9",
+  "direction": "right",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "c523a243-fe61-4575-8760-1ea072f982e8",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "11"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "032fc33b-a93f-4813-8117-5b8b341185b7",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Ash is detained. The trail is safe."
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "eec97383-6f22-4273-89d0-7bd0f0448221",
+            "command": "EVENT_IF_VALUE",
+            "args": {
+              "variable": "1",
+              "operator": ">=",
+              "comparator": 2
+            },
+            "children": {
+              "true": [
+                {
+                  "id": "149f4478-c3c6-4770-847e-7cc3d16abb57",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "The snares match your pack, Ash.\nYou are under arrest."
+                  }
+                },
+                {
+                  "id": "7865899f-4286-4be2-8106-4cfe0f27ebcd",
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "11",
+                    "value": {
+                      "type": "number",
+                      "value": 1
+                    }
+                  }
+                },
+                {
+                  "id": "7d9da9b6-967a-4049-8002-fd6c9e2f5cad",
+                  "command": "EVENT_INC_VALUE",
+                  "args": {
+                    "variable": "2"
+                  }
+                },
+                {
+                  "id": "43a58832-48a4-4a84-8049-72f50dbb7969",
+                  "command": "EVENT_ACTOR_DEACTIVATE",
+                  "args": {
+                    "actorId": "$self$"
+                  }
+                }
+              ],
+              "false": [
+                {
+                  "id": "3c0831cf-baa5-4526-8a2d-2fe199255098",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "You have no proof, ranger.\nTag both snares first."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ca4bbdf3-3c0b-49e1-8aee-e82dc1e70fe9",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

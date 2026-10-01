@@ -82,9 +82,14 @@ for (const relativePath of [
 }
 
 for (const relativePath of [
-  "examples/poachermon/assets/backgrounds/poachermon_field.png",
-  "examples/isometric-adventure/assets/backgrounds/iso_village.png",
-]) {
+  "examples/poachermon",
+  "examples/isometric-adventure",
+].flatMap((game) =>
+  fs
+    .readdirSync(path.join(root, game, "assets/backgrounds"))
+    .filter((file) => file.endsWith(".png"))
+    .map((file) => `${game}/assets/backgrounds/${file}`),
+)) {
   const png = readPng(relativePath);
   if (png.width !== 240 || png.height !== 160) {
     fail(`${relativePath} must be exactly 240x160`);

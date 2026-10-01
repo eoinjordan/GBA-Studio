@@ -1,0 +1,120 @@
+{
+  "_resourceType": "actor",
+  "id": "0663ac13-4b91-4535-8334-939a6f385e88",
+  "_index": 0,
+  "symbol": "actor_sanctum_nia",
+  "prefabId": "",
+  "name": "Keeper Nia",
+  "x": 5,
+  "y": 5,
+  "isoZ": 0,
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "4abb64b5-33a0-4257-88d1-1802f36f1853",
+  "paletteId": "1706ac37-5ef8-444e-8c63-95179471d952",
+  "direction": "left",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "218b5fdb-fa8a-4e89-8b67-5bb4173403f8",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "4"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "64de7f86-d1d9-418c-869e-c80611d898eb",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "5",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "b7573e10-822e-4dcb-802f-9ef7deb80388",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "player"
+            }
+          },
+          {
+            "id": "cafb2706-e1ee-4a93-83e6-fbf4dbad2ff7",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "THE RELAY SHINES AGAIN\nBoth beacons guide dawn home."
+            }
+          },
+          {
+            "id": "9ef51718-f6f2-4ad0-892d-deaa8319042b",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "THE SUNSTONE RELAY\nJourney complete. Thank you!"
+            }
+          },
+          {
+            "id": "6ecc8464-269b-4724-8308-2da2a20f771d",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Beacons: {1}/2  Core: recovered\nPress A, then START to replay."
+            }
+          },
+          {
+            "id": "8b91f5b8-1747-4886-8eb6-c08afc36cf5b",
+            "command": "EVENT_AWAIT_INPUT",
+            "args": {
+              "input": [
+                "start"
+              ]
+            }
+          },
+          {
+            "id": "62f39d8d-d52d-4641-8726-db02e5ca3751",
+            "command": "EVENT_SWITCH_SCENE",
+            "args": {
+              "sceneId": "6678e96f-d1c0-4bf8-856d-4a25737742cd",
+              "x": {
+                "type": "number",
+                "value": 15
+              },
+              "y": {
+                "type": "number",
+                "value": 10
+              },
+              "direction": "up",
+              "fadeSpeed": "1"
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "4b68f108-cbc2-458d-81d6-bc00a5e727dd",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "The core waits in the north pool.\nStand beside it and press A."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "5c99bba1-089f-4790-81c7-933b8ffc4ff4",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

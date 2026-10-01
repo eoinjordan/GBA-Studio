@@ -2,7 +2,7 @@
   "_resourceType": "project",
   "name": "The Sunstone Relay",
   "author": "GBA Studio",
-  "notes": "A complete isometric mini-adventure: restore two signal beacons, recover the Sunstone Core, and report back to Keeper Nia.",
+  "notes": "The Sunstone Relay: opening title, three playable areas, objective gates, ending and replay.",
   "_version": "4.4.5",
   "_release": "1"
 }

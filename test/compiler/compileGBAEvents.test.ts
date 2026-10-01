@@ -64,15 +64,46 @@ describe("compileGBAScript", () => {
     expect(out[out.length - 1]).toBe(VM_OP_END);
   });
 
-  it("EVENT_TEXT with array of strings joins with newline", () => {
+  it("EVENT_TEXT preserves separate authored pages", () => {
     const events: GBAScriptEvent[] = [
       { command: "EVENT_TEXT", args: { text: ["Hello", "World"] } },
     ];
     const out = compileGBAScript(events, noopCtx);
     expect(out[0]).toBe(VM_OP_SHOW_TEXT);
-    // "Hello\nWorld\0"
-    const str = String.fromCharCode(...out.slice(1, out.indexOf(0x00, 1)));
-    expect(str).toBe("Hello\nWorld");
+    expect(out).toEqual([
+      VM_OP_SHOW_TEXT,
+      ...Array.from("Hello", (c) => c.charCodeAt(0)),
+      0,
+      VM_OP_SHOW_TEXT,
+      ...Array.from("World", (c) => c.charCodeAt(0)),
+      0,
+      VM_OP_END,
+    ]);
+  });
+
+  it("keeps long quest instructions visible across two-line pages", () => {
+    const out = compileGBAScript(
+      [
+        {
+          command: "EVENT_TEXT",
+          args: {
+            text: "Dawn has faded from our valley.\nWill you restore the relay?",
+          },
+        },
+      ],
+      noopCtx,
+    );
+    const pages = [];
+    for (let i = 0; out[i] === VM_OP_SHOW_TEXT; ) {
+      const end = out.indexOf(0, i + 1);
+      pages.push(String.fromCharCode(...out.slice(i + 1, end)));
+      i = end + 1;
+    }
+    expect(pages).toEqual([
+      "Dawn has faded from our\nvalley.",
+      "Will you restore the relay?",
+    ]);
+    expect(pages.every((page) => page.split("\n").length <= 2)).toBe(true);
   });
 
   it("EVENT_SWITCH_SCENE emits its scene destination and facing direction", () => {
@@ -848,6 +879,17 @@ describe("compileGBAScript", () => {
     expect(out[0]).toBe(VM_OP_SET_CONST);
     expect(out[3]).toBe(VM_OP_LOAD_SCENE_AT);
     expect(out[8]).toBe(VM_OP_END);
+  });
+});
+
+describe("title and replay input", () => {
+  it("compiles an explicit Start gate and a high-byte shoulder mask", () => {
+    expect(
+      compileGBAScript(
+        [{ command: "EVENT_AWAIT_INPUT", args: { input: ["start", "r"] } }],
+        makeCtx(),
+      ),
+    ).toEqual([0x19, 0x08, 0x01, VM_OP_END]);
   });
 });
 

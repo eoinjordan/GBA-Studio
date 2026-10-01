@@ -3,6 +3,41 @@ const path = require("path");
 const player = require("../../docs/player/player.js");
 
 describe("GBA Studio browser player", () => {
+  test("published demos use the deployed ROM hash to avoid loading an old cache entry", () => {
+    const demo = player.DEMOS[0];
+    const sha256 = "a".repeat(64);
+    expect(
+      player.publishedRomUrl(demo, {
+        games: [{ url: "roms/isometric-adventure.gba", sha256 }],
+      }),
+    ).toBe(`roms/isometric-adventure.gba?build=${sha256}`);
+    expect(player.publishedRomUrl(demo, null)).toBe(demo.url);
+  });
+  test("quick keyboard taps span a frame, held movement releases, and blur clears inputs", () => {
+    jest.useFakeTimers();
+    const send = jest.fn();
+    const input = player.createInputController(send);
+    input.press(8);
+    input.release(8);
+    jest.advanceTimersByTime(60);
+    expect(send.mock.calls).toEqual([[8, 1]]);
+    jest.advanceTimersByTime(25);
+    expect(send.mock.calls).toEqual([
+      [8, 1],
+      [8, 0],
+    ]);
+    input.press(7);
+    jest.advanceTimersByTime(500);
+    expect(send).toHaveBeenLastCalledWith(7, 1);
+    input.release(7);
+    jest.advanceTimersByTime(1);
+    expect(send).toHaveBeenLastCalledWith(7, 0);
+    input.press(4);
+    input.reset();
+    jest.runAllTimers();
+    expect(send).toHaveBeenLastCalledWith(4, 0);
+    jest.useRealTimers();
+  });
   test("advertised X/A and S/B keys map to the correct RetroPad buttons", () => {
     expect(player.CONTROLS[0][8].value).toBe("x");
     expect(player.CONTROLS[0][0].value).toBe("s");
@@ -68,7 +103,7 @@ describe("GBA Studio browser player", () => {
 
   test("launches each game in a clean isolated emulator frame", () => {
     expect(player.emulatorUrl("roms/My Game.gba", "My Game")).toBe(
-      "emulator.html?rom=roms%2FMy+Game.gba&name=My+Game&player=2",
+      "emulator.html?rom=roms%2FMy+Game.gba&name=My+Game&player=3",
     );
 
     const html = fs.readFileSync(
@@ -108,8 +143,8 @@ describe("GBA Studio browser player", () => {
   test("publishes only the two fully validated feature demos", () => {
     expect(player.DEMOS).toHaveLength(2);
     expect(player.DEMOS.map((demo) => demo.url)).toEqual([
-      "roms/isometric-adventure.gba",
-      "roms/poachermon.gba",
+      "roms/isometric-adventure.gba?build=campaign-3",
+      "roms/poachermon.gba?build=campaign-3",
     ]);
     expect(player.DEMOS.every((demo) => demo.instructions.length > 20)).toBe(
       true,

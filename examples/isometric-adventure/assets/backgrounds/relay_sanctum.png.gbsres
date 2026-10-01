@@ -1,0 +1,13 @@
+{
+  "_resourceType": "background",
+  "id": "85e18254-6c84-4397-8d32-29f2709a8b57",
+  "name": "relay sanctum",
+  "symbol": "bg_relay_sanctum",
+  "filename": "relay_sanctum.png",
+  "tileColors": "",
+  "width": 30,
+  "height": 20,
+  "imageWidth": 240,
+  "imageHeight": 160,
+  "autoColor": true
+}

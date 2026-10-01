@@ -9,7 +9,7 @@
     />
     <title>GBA Studio Browser Player</title>
     <link rel="icon" href="handheld-logo.png" type="image/png" />
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../styles.css?player=3" />
   </head>
   <body class="player-page">
     <header class="site-header">
@@ -86,8 +86,8 @@
         <p class="controls">
           <strong>Keyboard:</strong> arrow keys move, <kbd>X</kbd> is GBA A
           (interact/advance), <kbd>S</kbd> is GBA B, and <kbd>Enter</kbd> is
-          START. A gamepad and the on-screen buttons also work. If an older
-          saved keyboard layout differs, open Control Settings and select Reset.
+          START. Hold a direction to walk; tap X to interact or advance
+          dialogue. A gamepad and the visible buttons also work.
         </p>
         <p class="controls">
           <strong id="route-title">Loaded ROM:</strong>
@@ -109,6 +109,6 @@
     </footer>
 
     <noscript>This player requires JavaScript to run the emulator.</noscript>
-    <script src="player.js"></script>
+    <script src="player.js?player=3"></script>
   </body>
 </html>

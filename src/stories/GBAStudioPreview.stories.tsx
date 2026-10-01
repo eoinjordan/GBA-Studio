@@ -263,8 +263,10 @@ const StudioWorkspace = () => {
             <PanelTitle>
               Project <span>+</span>
             </PanelTitle>
-            <Entity $selected>◇ Sunstone Village</Entity>
-            <Entity>◇ Relay Restored</Entity>
+            <Entity>◇ Opening Title</Entity>
+            <Entity $selected>◇ Keeper Village</Entity>
+            <Entity>◇ Windridge Beacons</Entity>
+            <Entity>◇ Sunstone Sanctum</Entity>
             <PanelTitle>Actors</PanelTitle>
             <Entity>Keeper Nia</Entity>
             <Entity>Sunstone Core</Entity>
@@ -307,7 +309,7 @@ const StudioWorkspace = () => {
               <>
                 <Field>
                   Name
-                  <input value="Sunstone Village" readOnly />
+                  <input value="Keeper Village" readOnly />
                 </Field>
                 <Field>
                   Scene type
@@ -330,14 +332,14 @@ const StudioWorkspace = () => {
               <>
                 <Event>
                   On Init
-                  <small>Show “The relay is fading...”</small>
+                  <small>Show village introduction once</small>
                 </Event>
                 <Event $green>
-                  If beacons = 2<small>Enable Sunstone Core</small>
+                  If Nia has briefed the player<small>Open village exit</small>
                 </Event>
                 <Event>
                   Switch Scene
-                  <small>Relay Restored</small>
+                  <small>Windridge Beacons</small>
                 </Event>
               </>
             )}

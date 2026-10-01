@@ -1,15 +1,15 @@
 {
   "_resourceType": "scene",
-  "id": "5ce7e000-0000-4a00-8000-000000000099",
-  "_index": 1,
+  "id": "0792402c-3322-41a5-8d07-5940c200f715",
+  "_index": 3,
   "type": "TOPDOWN",
-  "name": "Case Closed",
-  "symbol": "scene_poachermon_case_closed",
-  "x": 520,
+  "name": "3: Reedbank Rescue",
+  "symbol": "scene_case_closed",
+  "x": 1150,
   "y": 100,
   "width": 30,
   "height": 20,
-  "backgroundId": "b9a1c0de-0000-4a00-8000-000000000001",
+  "backgroundId": "4f014a46-5854-4ce3-8af4-c8858ce08f3c",
   "tilesetId": "",
   "colorModeOverride": "none",
   "paletteIds": [],
@@ -26,55 +26,75 @@
   "autoFadeSpeed": 1,
   "script": [
     {
-      "id": "closed-tone",
-      "command": "EVENT_PALETTE_SET_BACKGROUND",
-      "args": {
-        "tone": 2
-      }
-    },
-    {
-      "id": "closed-check",
+      "id": "7f6f49b0-fa53-4d34-8446-d495f91d64e2",
       "command": "EVENT_IF_TRUE",
       "args": {
-        "variable": "4"
+        "variable": "17"
       },
       "children": {
-        "true": [
-          {
-            "id": "closed-title",
-            "command": "EVENT_TEXT",
-            "args": {
-              "text": "CASE CLOSED!\n2 poachers reported safely."
-            }
-          },
-          {
-            "id": "closed-wait",
-            "command": "EVENT_WAIT",
-            "args": {
-              "frames": 12
-            }
-          },
-          {
-            "id": "closed-score",
-            "command": "EVENT_TEXT",
-            "args": {
-              "text": "Creature safe. Field score {14}.\nSTART reopens the patrol."
-            }
-          }
-        ],
+        "true": [],
         "false": [
           {
-            "id": "closed-error",
+            "id": "a390d2e5-ce3e-44b9-8dd5-694bc3481580",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "17",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "211e7821-0ac8-4173-8ba0-c530b4d7eaef",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "The paperwork escaped."
+              "text": "REEDBANK RESCUE\nCatch Moss, then free the creature."
             }
           }
         ]
       }
     },
     {
-      "id": "closed-end",
+      "id": "49206ab9-aa03-4051-8003-5e08ebeba423",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "12"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "2c66c55b-9394-4b25-8646-be6642e61219",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "8f2fe3ee-a3fe-4726-814e-1339792e4817"
+            }
+          }
+        ],
+        "false": []
+      }
+    },
+    {
+      "id": "d1b71ad9-642c-4e62-8560-04368406a4d0",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "13"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "d407f921-750a-4089-8c69-0c747ec33b85",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "53dce7bc-bf93-4312-82ff-f7ae1443f0f9"
+            }
+          }
+        ],
+        "false": []
+      }
+    },
+    {
+      "id": "d0ba95ea-d4f4-4a50-8a52-27a651ce86ec",
       "command": "EVENT_END",
       "args": {}
     }
@@ -82,5 +102,5 @@
   "playerHit1Script": [],
   "playerHit2Script": [],
   "playerHit3Script": [],
-  "collisions": "015b+001c+012+008+01c+008+012+008+01c+008+012+008+01c+008+012+008+01c+008+012+008+01c+008+012+008+01c+008+012+008+01c+008+012+008+01c+008+01f+003+01e+001c+012+001c+012+001c+012+001c+012+001c+012+001c+011f+"
+  "collisions": "011f+001c+012+001c+012+0015+016+00!012+0015+016+00!012+0015+016+00!012+0015+016+00!012+0015+016+00!012+0015+016+00!012+0015+016+00!012+0015+016+00!012+0015+016+00!012+001c+012+0015+016+00!012+0015+016+00!012+0015+016+00!012+0015+016+00!012+001c+012+001c+011f+"
 }

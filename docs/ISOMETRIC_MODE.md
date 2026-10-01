@@ -14,7 +14,7 @@ with their grid projected as 2:1 diamonds.
 4. Build the project and run the ROM on hardware, mGBA, or the
    [browser player](player/).
 
-The included two-scene game, **The Sunstone Relay**, is also available at
+The included title and three-scene game, **The Sunstone Relay**, is also available at
 `examples/isometric-adventure/`.
 
 ## Coordinates and projection

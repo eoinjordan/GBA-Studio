@@ -1,0 +1,90 @@
+{
+  "_resourceType": "actor",
+  "id": "062c0e83-ed6d-4805-85cf-aad6b1793f04",
+  "_index": 0,
+  "symbol": "actor_captain_rowan",
+  "prefabId": "",
+  "name": "Captain Rowan",
+  "x": 15,
+  "y": 17,
+  "frame": 0,
+  "animate": true,
+  "spriteSheetId": "998953d1-45ef-4776-8fa8-526e1302a4fb",
+  "paletteId": "35543855-752d-4195-836a-ca14bee206d3",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "aac0f97f-791a-4187-8d00-0ffd257eae56",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "0"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "743f0066-1d44-4123-8c0d-6a7ec0a84a78",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Follow the west trail marker.\nTag two snares, then catch Ash."
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "9d69a351-c907-4dcf-86dc-0bbf98ba9a40",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "CASE 001: THE SNARE AFFAIR\nSnares threaten the reserve."
+            }
+          },
+          {
+            "id": "4b33c927-4e26-4f6f-80fd-08ea56808519",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "0",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "92de9cf1-457e-4544-89b7-bf436a6b59ba",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "6",
+              "value": {
+                "type": "number",
+                "value": 2
+              }
+            }
+          },
+          {
+            "id": "a654111a-1bec-41be-8a58-93fb22790f56",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Find evidence on Snare Trail.\nThen rescue the river creature."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "bf81575c-a8f2-4794-8d31-546b94faf0eb",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

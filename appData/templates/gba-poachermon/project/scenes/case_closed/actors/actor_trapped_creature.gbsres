@@ -1,0 +1,110 @@
+{
+  "_resourceType": "actor",
+  "id": "53dce7bc-bf93-4312-82ff-f7ae1443f0f9",
+  "_index": 0,
+  "symbol": "actor_trapped_creature",
+  "prefabId": "",
+  "name": "Trapped creature",
+  "x": 18,
+  "y": 10,
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "cf49e225-5c19-4eba-8200-2a06bfc771e9",
+  "paletteId": "01edf222-4cde-45ee-8946-98984e07fbe4",
+  "direction": "left",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "fdd7ef8e-ce9c-4cba-800c-d7996b82a3e3",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "13"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "7224ada8-f9e7-4277-8910-eaca53560ee0",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "The creature is safe now."
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "86e25e66-4186-4995-8f75-6d8c3636a86a",
+            "command": "EVENT_IF_TRUE",
+            "args": {
+              "variable": "12"
+            },
+            "children": {
+              "true": [
+                {
+                  "id": "efa1faa3-2a24-414e-849e-917057d39498",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "You cut the last snare free.\nThe creature returns to the reeds."
+                  }
+                },
+                {
+                  "id": "2589bb30-eddb-45d5-8ccf-fca533b9f433",
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "13",
+                    "value": {
+                      "type": "number",
+                      "value": 1
+                    }
+                  }
+                },
+                {
+                  "id": "f5667366-fbf3-4ffd-83d5-973714162850",
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "3",
+                    "value": {
+                      "type": "number",
+                      "value": 1
+                    }
+                  }
+                },
+                {
+                  "id": "19cde992-c450-4e97-89d8-ec25110b75a1",
+                  "command": "EVENT_ACTOR_DEACTIVATE",
+                  "args": {
+                    "actorId": "$self$"
+                  }
+                }
+              ],
+              "false": [
+                {
+                  "id": "d8ba5bb2-8e9c-4d14-87d4-be7d478724fc",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "Moss still guards the snare.\nDetain him before the rescue."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "12b2519d-f717-4c43-8453-89642c0b612b",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

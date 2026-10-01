@@ -1,0 +1,58 @@
+{
+  "_resourceType": "trigger",
+  "id": "fec3c924-34d3-4787-881e-6fe07000f46e",
+  "symbol": "trigger_ridge_exit",
+  "name": "trigger ridge exit",
+  "_index": 0,
+  "x": 6,
+  "y": 5,
+  "width": 1,
+  "height": 1,
+  "script": [
+    {
+      "id": "b7ac4916-b45b-48be-82d6-3191d60ab6a9",
+      "command": "EVENT_IF_VALUE",
+      "args": {
+        "variable": "1",
+        "operator": ">=",
+        "comparator": 2
+      },
+      "children": {
+        "true": [
+          {
+            "id": "1bfb2b2d-a0f3-4a30-8d43-eda757e12b72",
+            "command": "EVENT_SWITCH_SCENE",
+            "args": {
+              "sceneId": "676ddaa2-770a-4780-8d4e-06223d0b1344",
+              "x": {
+                "type": "number",
+                "value": 4
+              },
+              "y": {
+                "type": "number",
+                "value": 5
+              },
+              "direction": "up",
+              "fadeSpeed": "1"
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "81b097a7-de3a-4704-82ed-580e50be6615",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "The shrine gate is still sealed.\nLight both beacons: {1}/2."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "d88aceda-d0b9-49fb-82fb-35a4f66cc2e3",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "leaveScript": []
+}

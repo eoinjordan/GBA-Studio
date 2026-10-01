@@ -1,0 +1,13 @@
+{
+  "_resourceType": "background",
+  "id": "4f014a46-5854-4ce3-8af4-c8858ce08f3c",
+  "name": "reedbank",
+  "symbol": "bg_reedbank",
+  "filename": "reedbank.png",
+  "tileColors": "",
+  "width": 30,
+  "height": 20,
+  "imageWidth": 240,
+  "imageHeight": 160,
+  "autoColor": true
+}

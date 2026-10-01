@@ -217,7 +217,7 @@ function loadFoliage(id, width, height) {
   );
 }
 
-function renderIsometricBackground() {
+function renderIsometricBackground(stage = 0) {
   const output = image(240, 160, [11, 22, 40, 255]);
   for (const [id, width, height, x, y] of [
     [55, 34, 25, 14, 31],
@@ -228,8 +228,20 @@ function renderIsometricBackground() {
   const tiles = new Map(
     [22, 53, 83, 100, 104, 107].map((id) => [id, loadIsoTile(id)]),
   );
-  const water = new Set(["1,2", "1,3", "2,2"]);
-  const beacons = new Set(["3,0", "0,3", "7,3"]);
+  const water = new Set(
+    stage === 1
+      ? []
+      : stage === 2
+        ? ["3,2", "2,2", "2,1"]
+        : ["1,2", "1,3", "2,2"],
+  );
+  const beacons = new Set(
+    stage === 1
+      ? ["1,2", "6,3"]
+      : stage === 2
+        ? ["3,0", "3,2"]
+        : ["3,0", "0,3", "7,3"],
+  );
   const cells = [];
   for (let y = 0; y < 7; y += 1) {
     for (let x = 0; x < 8; x += 1) cells.push({ x, y });
@@ -258,7 +270,9 @@ function renderIsometricBackground() {
     [5, 4, 3, 6, 10],
     [4, 1, 62, 7, 9],
   ];
-  for (const [x, y, id, width, height] of decorations) {
+  for (const [x, y, id, width, height] of stage
+    ? decorations.slice(0, 3)
+    : decorations) {
     const rootX = 96 + (x - y) * 16 + 16;
     const rootY = 16 + (x + y) * 8 + 14;
     blit(
@@ -513,4 +527,4 @@ function applyCc0ShowcaseArt() {
   writePng(`${isoSprites}/sunstone_core.png`, sunstone);
 }
 
-module.exports = { applyCc0ShowcaseArt };
+module.exports = { applyCc0ShowcaseArt, renderIsometricBackground };
