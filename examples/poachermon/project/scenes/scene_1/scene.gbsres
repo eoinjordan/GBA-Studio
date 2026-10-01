@@ -49,7 +49,7 @@
             "id": "30ca0f44-2acd-47a5-8343-bc9ac4b7707a",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "RANGER OUTPOST\nA talks. Ask Rowan for your case."
+              "text": "RANGER OUTPOST\nA talks. Ask Rowan for a case."
             }
           }
         ]

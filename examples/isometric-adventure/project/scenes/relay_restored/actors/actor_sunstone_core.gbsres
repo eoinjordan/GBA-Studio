@@ -53,7 +53,7 @@
             "id": "c1ed0576-22f9-4d7e-8e6d-21d88c54a27f",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "SUNSTONE RECOVERED\nBring its light to Keeper Nia."
+              "text": "SUNSTONE RECOVERED\nBring the core to Nia."
             }
           },
           {

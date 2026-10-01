@@ -19,7 +19,7 @@ Validation:
 - Engine host tests: 92 VM/unit, 23 integration and one textbox test passed. Tang renderer tests passed.
 - Both exported campaigns ran through the actual C engine with mock hardware: title, objective gates, repeat interactions, return visits, ending and replay passed. Test placements exercise interactions and trigger entry; separate collision searches verify reachable routes.
 - Both ARM GBA ROMs and RV32IM Tang firmware compiled successfully.
-- Sunstone completed through all three areas using normal browser keyboard input; ending and replay worked.
+- Both games completed through all three areas using normal browser keyboard input. Sunstone replay returned to the title. Poachermon reached its closed-case ending.
 
 The current hardware upload could not run because the previously used COM5 device is absent. This build has no new camera or LCD measurement. The earlier Windows installation and hardware test remain recorded separately in `windows-local-e2e-2026-10-01.json`.
 

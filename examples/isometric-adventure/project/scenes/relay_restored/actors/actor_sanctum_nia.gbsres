@@ -51,7 +51,7 @@
             "id": "cafb2706-e1ee-4a93-83e6-fbf4dbad2ff7",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "THE RELAY SHINES AGAIN\nBoth beacons guide dawn home."
+              "text": "THE RELAY SHINES AGAIN\nBoth beacons guide dawn."
             }
           },
           {
@@ -65,7 +65,7 @@
             "id": "6ecc8464-269b-4724-8308-2da2a20f771d",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Beacons: {1}/2  Core: recovered\nPress A, then START to replay."
+              "text": "Beacons {1}/2. Core found.\nA, then START to replay."
             }
           },
           {

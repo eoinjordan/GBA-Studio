@@ -32,7 +32,7 @@
             "id": "032fc33b-a93f-4813-8117-5b8b341185b7",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Ash is detained. The trail is safe."
+              "text": "Ash is detained."
             }
           }
         ],
@@ -51,7 +51,7 @@
                   "id": "149f4478-c3c6-4770-847e-7cc3d16abb57",
                   "command": "EVENT_TEXT",
                   "args": {
-                    "text": "The snares match your pack, Ash.\nYou are under arrest."
+                    "text": "The snares match your pack.\nYou are under arrest."
                   }
                 },
                 {

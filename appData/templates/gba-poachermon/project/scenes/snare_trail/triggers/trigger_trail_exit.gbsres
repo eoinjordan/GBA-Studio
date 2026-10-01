@@ -40,7 +40,7 @@
             "id": "d5c3df69-12f9-4b69-8d7e-e4a380f14372",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Ash must be detained first.\nEvidence: {1}/2. Find both snares."
+              "text": "Ash must be detained first.\nEvidence collected: {1}/2."
             }
           }
         ]

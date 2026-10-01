@@ -61,21 +61,21 @@
             "id": "704de5d9-d2d1-4170-8a7a-c8b026a420c2",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "CASE CLOSED: THE SNARE AFFAIR\nTwo poachers detained. One life saved."
+              "text": "CASE 001 CLOSED\nTwo arrests. One life saved."
             }
           },
           {
             "id": "cea2a589-8ae3-4e25-8b16-7dff8e44f57c",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "FIELD REPORT\nEvidence {1}/2  Arrests {2}/2"
+              "text": "Evidence {1}/2 recovered.\nArrests {2}/2 completed."
             }
           },
           {
             "id": "8bd6fe2c-7298-4a41-86c7-0a1621cbefac",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Reserve safe. Field score: {14}.\nPress A, then START for a new case."
+              "text": "Reserve safe. Score: {14}.\nA, then START for a new case."
             }
           },
           {

@@ -4,7 +4,12 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { PNG } = require("pngjs");
-const { renderIsometricBackground } = require("./lib/cc0-showcase-art");
+const {
+  renderIsometricBackground,
+  loadFoliage,
+  blit,
+  quantize,
+} = require("./lib/cc0-showcase-art");
 const root = path.resolve(__dirname, "..");
 const id = (seed) => {
   const h = crypto.createHash("sha256").update(seed).digest("hex");
@@ -253,6 +258,7 @@ const font = {
   X: "10001100010101000100010101000110001",
   Y: "10001100010101000100001000010000100",
   Z: "11111000010001000100010001000011111",
+  0: "01110100011001110101110011000101110",
   1: "00100011000010000100001000010001110",
   2: "01110100010000100010001000100011111",
   3: "11110000010000101110000010000111110",
@@ -317,21 +323,8 @@ function field(stage) {
   fill(image, 104, 8, 24, 144, "D3A474");
   fill(image, 16, 88, 208, 16, "D3A474");
   fill(image, 110, 8, 12, 144, "F0D59B");
-  const source = PNG.sync.read(
-    fs.readFileSync(
-      path.join(root, oldPoach, "assets/backgrounds/poachermon_field.png"),
-    ),
-  );
-  const tree = (x, y) => {
-    for (let dy = 0; dy < 24; dy++)
-      for (let dx = 0; dx < 16; dx++)
-        source.data.copy(
-          image.data,
-          ((y + dy) * 240 + x + dx) * 4,
-          ((8 + dy) * 240 + 16 + dx) * 4,
-          ((8 + dy) * 240 + 16 + dx) * 4 + 4,
-        );
-  };
+  const crown = loadFoliage(7, 16, 24);
+  const tree = (x, y) => blit(image, crown, x, y);
   for (const x of [16, 40, 64, 160, 184, 208]) {
     tree(x, 0);
     tree(x, 136);
@@ -351,13 +344,30 @@ function field(stage) {
       [40, 40],
       [176, 40],
       [48, 112],
-      [184, 112],
+      [200, 112],
     ])
       tree(x, y);
     fill(image, 64, 120, 8, 8, "F7EDC3");
     fill(image, 184, 120, 8, 8, "F7EDC3");
   }
-  return image;
+  return quantize(image, [
+    "#244632",
+    "#426b3b",
+    "#638e43",
+    "#94b95a",
+    "#b8cd78",
+    "#463b32",
+    "#795338",
+    "#ac7951",
+    "#d3a474",
+    "#f0d59b",
+    "#2b596b",
+    "#478795",
+    "#72bac1",
+    "#bddee0",
+    "#d99662",
+    "#f7edc3",
+  ]);
 }
 
 function makeSun() {
@@ -409,13 +419,11 @@ function makeSun() {
   actor(game, "iso_village", sunActor, "actor_keeper_nia", "Keeper Nia", 5, 4, [
     branch(
       0,
-      [text("Follow the gold east marker.\nTwo ridge beacons need waking.")],
+      [text("Follow the gold east marker.\nWake both ridge beacons.")],
       [
-        text("Dawn has faded from our valley.\nWill you restore the relay?"),
+        text("Dawn has left our valley.\nWill you restore the relay?"),
         set(0, 1),
-        text(
-          "Wake both Windridge beacons.\nThen bring the core to the shrine.",
-        ),
+        text("Wake both Windridge beacons.\nThen find the sanctum core."),
       ],
     ),
   ]);
@@ -423,7 +431,7 @@ function makeSun() {
     branch(
       0,
       [go(ridgeId, 2, 5)],
-      [text("Talk to Keeper Nia first.\nShe stands north of the start.")],
+      [text("Talk to Keeper Nia first.\nShe waits north of the start.")],
     ),
   ]);
   scene(
@@ -433,7 +441,7 @@ function makeSun() {
     "2: Windridge Beacons",
     2,
     ridgeBg,
-    visit(7, "WINDRIDGE\nStep on the two gold beacons."),
+    visit(7, "WINDRIDGE\nStep on both signal markers."),
     grid(8, 7),
   );
   for (const [flag, x, y, label] of [
@@ -459,7 +467,7 @@ function makeSun() {
       1,
       2,
       [go(finalId, 4, 5)],
-      [text("The shrine gate is still sealed.\nLight both beacons: {1}/2.")],
+      [text("The shrine gate is sealed.\nLight both beacons: {1}/2.")],
     ),
   ]);
   scene(
@@ -495,7 +503,7 @@ function makeSun() {
         [text("The core is already yours.")],
         [
           set(4, 1),
-          text("SUNSTONE RECOVERED\nBring its light to Keeper Nia."),
+          text("SUNSTONE RECOVERED\nBring the core to Nia."),
           hide("$self$"),
         ],
       ),
@@ -515,11 +523,9 @@ function makeSun() {
         [
           set(5, 1),
           hide("player"),
-          text("THE RELAY SHINES AGAIN\nBoth beacons guide dawn home."),
+          text("THE RELAY SHINES AGAIN\nBoth beacons guide dawn."),
           text("THE SUNSTONE RELAY\nJourney complete. Thank you!"),
-          text(
-            "Beacons: {1}/2  Core: recovered\nPress A, then START to replay.",
-          ),
+          text("Beacons {1}/2. Core found.\nA, then START to replay."),
           wait(),
           go(titleId, 15, 10),
         ],
@@ -583,7 +589,7 @@ function makePoach() {
     "1: Ranger Outpost",
     1,
     poachScene.backgroundId,
-    visit(15, "RANGER OUTPOST\nA talks. Ask Rowan for your case."),
+    visit(15, "RANGER OUTPOST\nA talks. Ask Rowan for a case."),
     poachScene.collisions,
   );
   actor(
@@ -597,18 +603,12 @@ function makePoach() {
     [
       branch(
         0,
-        [
-          text(
-            "Follow the west trail marker.\nTag two snares, then catch Ash.",
-          ),
-        ],
+        [text("Take the west trail exit.\nTag two snares. Catch Ash.")],
         [
           text("CASE 001: THE SNARE AFFAIR\nSnares threaten the reserve."),
           set(0, 1),
           set(6, 2),
-          text(
-            "Find evidence on Snare Trail.\nThen rescue the river creature.",
-          ),
+          text("Find evidence on Snare Trail.\nThen rescue the creature."),
         ],
       ),
     ],
@@ -621,7 +621,7 @@ function makePoach() {
     "Witness Finn",
     12,
     15,
-    [text("Two snares lie beside the path.\nAsh waits just north of them.")],
+    [text("Two snares lie by the path.\nAsh waits north of them.")],
   );
   trigger(
     game,
@@ -633,26 +633,24 @@ function makePoach() {
       branch(
         0,
         [go(trailId, 14, 17)],
-        [
-          text(
-            "Ask Captain Rowan for the case.\nHe is beside the outpost door.",
-          ),
-        ],
+        [text("Ask Captain Rowan for the case.\nRowan waits by the door.")],
       ),
     ],
     2,
     1,
   );
-  const trailBlocks = [
-    [5, 5],
-    [6, 5],
-    [22, 5],
-    [23, 5],
-    [6, 14],
-    [7, 14],
-    [23, 14],
-    [24, 14],
+  const fieldTrees = [
+    [3, 2],
+    [6, 2],
+    [9, 2],
+    [21, 2],
+    [24, 2],
+    [27, 2],
+    [1, 6],
+    [1, 10],
+    [1, 14],
   ];
+  const trailBlocks = [...fieldTrees, [6, 7], [23, 7], [7, 16], [26, 16]];
   scene(
     game,
     poachScene,
@@ -661,10 +659,7 @@ function makePoach() {
     2,
     trailBg,
     [
-      ...visit(
-        16,
-        "SNARE TRAIL\nTag both snares before confronting Ash.",
-      ).slice(0, -1),
+      ...visit(16, "SNARE TRAIL\nTag both snares. Catch Ash.").slice(0, -1),
       branch(11, [hide(id(`${game}:snare_trail:actor_poacher_ash`))]),
       end(),
     ],
@@ -713,13 +708,13 @@ function makePoach() {
     [
       branch(
         11,
-        [text("Ash is detained. The trail is safe.")],
+        [text("Ash is detained.")],
         [
           count(
             1,
             2,
             [
-              text("The snares match your pack, Ash.\nYou are under arrest."),
+              text("The snares match your pack.\nYou are under arrest."),
               set(11, 1),
               inc(2),
               hide("$self$"),
@@ -750,17 +745,13 @@ function makePoach() {
       branch(
         11,
         [go(finalId, 14, 17)],
-        [
-          text(
-            "Ash must be detained first.\nEvidence: {1}/2. Find both snares.",
-          ),
-        ],
+        [text("Ash must be detained first.\nEvidence collected: {1}/2.")],
       ),
     ],
     2,
     1,
   );
-  const riverBlocks = [];
+  const riverBlocks = [...fieldTrees];
   for (let y = 3; y < 17; y++)
     for (let x = 22; x < 28; x++) if (y !== 12) riverBlocks.push([x, y]);
   scene(
@@ -771,10 +762,10 @@ function makePoach() {
     3,
     riverBg,
     [
-      ...visit(
-        17,
-        "REEDBANK RESCUE\nCatch Moss, then free the creature.",
-      ).slice(0, -1),
+      ...visit(17, "REEDBANK RESCUE\nCatch Moss. Free the creature.").slice(
+        0,
+        -1,
+      ),
       branch(12, [hide(id(`${game}:case_closed:actor_poacher_moss`))]),
       branch(13, [hide(id(`${game}:case_closed:actor_trapped_creature`))]),
       end(),
@@ -794,9 +785,7 @@ function makePoach() {
         12,
         [text("Moss has been detained.")],
         [
-          text(
-            "Ash named your trapping route.\nThe riverbank is closed, Moss.",
-          ),
+          text("Ash named your trap route.\nYou are under arrest, Moss."),
           set(12, 1),
           inc(2),
           hide("$self$"),
@@ -820,18 +809,12 @@ function makePoach() {
           branch(
             12,
             [
-              text(
-                "You cut the last snare free.\nThe creature returns to the reeds.",
-              ),
+              text("You cut the last snare free.\nThe creature is free."),
               set(13, 1),
               set(3, 1),
               hide("$self$"),
             ],
-            [
-              text(
-                "Moss still guards the snare.\nDetain him before the rescue.",
-              ),
-            ],
+            [text("Moss still guards the snare.\nDetain him before rescuing.")],
           ),
         ],
       ),
@@ -852,13 +835,9 @@ function makePoach() {
           set(4, 1),
           set(14, 100),
           hide("player"),
-          text(
-            "CASE CLOSED: THE SNARE AFFAIR\nTwo poachers detained. One life saved.",
-          ),
-          text("FIELD REPORT\nEvidence {1}/2  Arrests {2}/2"),
-          text(
-            "Reserve safe. Field score: {14}.\nPress A, then START for a new case.",
-          ),
+          text("CASE 001 CLOSED\nTwo arrests. One life saved."),
+          text("Evidence {1}/2 recovered.\nArrests {2}/2 completed."),
+          text("Reserve safe. Score: {14}.\nA, then START for a new case."),
           wait(),
           go(titleId, 15, 10),
         ],

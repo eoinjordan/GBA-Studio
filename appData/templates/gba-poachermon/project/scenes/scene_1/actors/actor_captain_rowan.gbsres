@@ -32,7 +32,7 @@
             "id": "743f0066-1d44-4123-8c0d-6a7ec0a84a78",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Follow the west trail marker.\nTag two snares, then catch Ash."
+              "text": "Take the west trail exit.\nTag two snares. Catch Ash."
             }
           }
         ],
@@ -70,7 +70,7 @@
             "id": "a654111a-1bec-41be-8a58-93fb22790f56",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Find evidence on Snare Trail.\nThen rescue the river creature."
+              "text": "Find evidence on Snare Trail.\nThen rescue the creature."
             }
           }
         ]

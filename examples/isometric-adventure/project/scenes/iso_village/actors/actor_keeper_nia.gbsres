@@ -33,7 +33,7 @@
             "id": "64796a05-a8de-49f1-8725-916dd75c8dae",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Follow the gold east marker.\nTwo ridge beacons need waking."
+              "text": "Follow the gold east marker.\nWake both ridge beacons."
             }
           }
         ],
@@ -42,7 +42,7 @@
             "id": "79ad2b58-9d75-4e35-8f66-bdac8c8b1fae",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Dawn has faded from our valley.\nWill you restore the relay?"
+              "text": "Dawn has left our valley.\nWill you restore the relay?"
             }
           },
           {
@@ -60,7 +60,7 @@
             "id": "31ef2484-57d3-4721-87ee-0c6c4d575864",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Wake both Windridge beacons.\nThen bring the core to the shrine."
+              "text": "Wake both Windridge beacons.\nThen find the sanctum core."
             }
           }
         ]

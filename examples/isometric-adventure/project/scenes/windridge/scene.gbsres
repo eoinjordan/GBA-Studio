@@ -49,7 +49,7 @@
             "id": "55218329-ff03-4a8b-82a7-59e321c8e832",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "WINDRIDGE\nStep on the two gold beacons."
+              "text": "WINDRIDGE\nStep on both signal markers."
             }
           }
         ]

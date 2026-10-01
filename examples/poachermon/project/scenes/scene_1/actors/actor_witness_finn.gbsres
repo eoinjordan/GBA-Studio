@@ -24,7 +24,7 @@
       "id": "bb70c266-afab-49ed-8bf4-848c97016384",
       "command": "EVENT_TEXT",
       "args": {
-        "text": "Two snares lie beside the path.\nAsh waits just north of them."
+        "text": "Two snares lie by the path.\nAsh waits north of them."
       }
     },
     {

@@ -40,7 +40,7 @@
             "id": "52fb1c5c-05b0-4ada-8600-aa145e79f0c8",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Talk to Keeper Nia first.\nShe stands north of the start."
+              "text": "Talk to Keeper Nia first.\nShe waits north of the start."
             }
           }
         ]

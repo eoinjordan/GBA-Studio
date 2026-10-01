@@ -40,7 +40,7 @@
             "id": "3df1c6fd-0ea5-41de-82cf-3c908805d581",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "Ask Captain Rowan for the case.\nHe is beside the outpost door."
+              "text": "Ask Captain Rowan for the case.\nRowan waits by the door."
             }
           }
         ]

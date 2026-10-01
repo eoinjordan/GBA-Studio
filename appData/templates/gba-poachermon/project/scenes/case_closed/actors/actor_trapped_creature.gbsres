@@ -49,7 +49,7 @@
                   "id": "efa1faa3-2a24-414e-849e-917057d39498",
                   "command": "EVENT_TEXT",
                   "args": {
-                    "text": "You cut the last snare free.\nThe creature returns to the reeds."
+                    "text": "You cut the last snare free.\nThe creature is free."
                   }
                 },
                 {
@@ -87,7 +87,7 @@
                   "id": "d8ba5bb2-8e9c-4d14-87d4-be7d478724fc",
                   "command": "EVENT_TEXT",
                   "args": {
-                    "text": "Moss still guards the snare.\nDetain him before the rescue."
+                    "text": "Moss still guards the snare.\nDetain him before rescuing."
                   }
                 }
               ]

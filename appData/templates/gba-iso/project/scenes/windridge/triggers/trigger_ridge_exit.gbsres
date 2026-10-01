@@ -42,7 +42,7 @@
             "id": "81b097a7-de3a-4704-82ed-580e50be6615",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "The shrine gate is still sealed.\nLight both beacons: {1}/2."
+              "text": "The shrine gate is sealed.\nLight both beacons: {1}/2."
             }
           }
         ]

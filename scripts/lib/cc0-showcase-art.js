@@ -527,4 +527,10 @@ function applyCc0ShowcaseArt() {
   writePng(`${isoSprites}/sunstone_core.png`, sunstone);
 }
 
-module.exports = { applyCc0ShowcaseArt, renderIsometricBackground };
+module.exports = {
+  applyCc0ShowcaseArt,
+  renderIsometricBackground,
+  loadFoliage,
+  blit,
+  quantize,
+};
