@@ -168,7 +168,12 @@ const makeBuild = async ({
   const options = {
     cwd: buildRoot,
     env,
-    shell: true,
+    // GBA tools are native executables. Running them through cmd.exe causes
+    // arguments such as a user-defined ROM filename containing spaces to be
+    // split before gcc/objcopy/gbafix receive them. In particular, gbafix then
+    // reports "Error opening input file!" and exits with -1 (4294967295 on
+    // Windows) even though linking itself succeeded.
+    shell: !isGBA,
   };
 
   // Build source files in parallel

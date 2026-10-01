@@ -61,7 +61,7 @@ export const autoPalette = (
         tilePaletteCache[tileKey] = palette;
       }
       const key = palette.join("");
-      if (paletteCache[key]) {
+      if (paletteCache[key] !== undefined) {
         tilePaletteMap[ti] = paletteCache[key];
       } else {
         tilePaletteMap[ti] = allPalettes.length;
@@ -132,7 +132,7 @@ export const autoPaletteUsingTiles = (
         tileData,
       );
       const key = JSON.stringify(palette);
-      if (paletteCache[key]) {
+      if (paletteCache[key] !== undefined) {
         tilePaletteMap[ti] = paletteCache[key];
       } else {
         tilePaletteMap[ti] = allPalettes.length;
@@ -355,6 +355,54 @@ const findClosestHexColor = (
 };
 
 /**
+ * Reduce a set of colors to four deterministic, visually distinct
+ * representatives. Auto-color backgrounds must fit the GBA's eight
+ * four-color background palette banks; returning more palettes and wrapping
+ * their indices corrupts the relationship between tile data and colors.
+ */
+const reduceHexPalette = (
+  colors: VariableLengthHexPalette,
+): VariableLengthHexPalette => {
+  const uniqueColors = Array.from(new Set(colors));
+  if (uniqueColors.length <= 4) {
+    return uniqueColors;
+  }
+
+  // Farthest-point selection is deterministic and keeps distinct hue/value
+  // extremes without the combinatorial cost of testing every four-color set.
+  const palette = [uniqueColors[0]];
+  while (palette.length < 4) {
+    let farthestColor = uniqueColors[0];
+    let farthestDistance = -1;
+    for (const color of uniqueColors) {
+      if (palette.includes(color)) continue;
+      const distance = Math.min(
+        ...palette.map((entry) => manhattanHexDistance(color, entry)),
+      );
+      if (distance > farthestDistance) {
+        farthestColor = color;
+        farthestDistance = distance;
+      }
+    }
+    palette.push(farthestColor);
+  }
+  return palette;
+};
+
+const paletteMergeDistance = (
+  colors: VariableLengthHexPalette,
+  mergedPalette: VariableLengthHexPalette,
+) =>
+  colors.reduce(
+    (total, color) =>
+      total +
+      Math.min(
+        ...mergedPalette.map((entry) => manhattanHexDistance(color, entry)),
+      ),
+    0,
+  );
+
+/**
  * Compress array of hex palettes by merging overlapping palettes
  * builds a mapping table from old palette to new index
  */
@@ -395,16 +443,49 @@ const compressPalettes = (allPalettes: VariableLengthHexPalette[]) => {
     }
   }
 
+  // Hardware attributes contain only a three-bit palette number. If exact
+  // overlap merging still leaves more than eight palettes, repeatedly merge
+  // the pair that introduces the least color error and re-index its tiles.
+  while (outPalettes.length > 8) {
+    let bestI = 0;
+    let bestJ = 1;
+    let bestPalette = reduceHexPalette([
+      ...outPalettes[bestI],
+      ...outPalettes[bestJ],
+    ]);
+    let bestDistance = paletteMergeDistance(
+      [...outPalettes[bestI], ...outPalettes[bestJ]],
+      bestPalette,
+    );
+
+    for (let i = 0; i < outPalettes.length; i++) {
+      for (let j = i + 1; j < outPalettes.length; j++) {
+        const colors = [...outPalettes[i], ...outPalettes[j]];
+        const candidate = reduceHexPalette(colors);
+        const distance = paletteMergeDistance(colors, candidate);
+        if (distance < bestDistance) {
+          bestI = i;
+          bestJ = j;
+          bestPalette = candidate;
+          bestDistance = distance;
+        }
+      }
+    }
+
+    outPalettes[bestI] = bestPalette;
+    originIndices[bestI] = [...originIndices[bestI], ...originIndices[bestJ]];
+    outPalettes.splice(bestJ, 1);
+    originIndices.splice(bestJ, 1);
+  }
+
   // Sort palettes by lightness
   outPalettes = outPalettes.map(sortHexPalette);
 
   // Generate mapping table
-  const mappingTable = new Array(allPalettes.length)
-    .fill(0)
-    .map((a, i) => i % 8);
+  const mappingTable = new Array(allPalettes.length).fill(0);
   originIndices.forEach((origins, newIndex) => {
     origins.forEach((origin) => {
-      mappingTable[origin] = newIndex % 8;
+      mappingTable[origin] = newIndex;
     });
   });
 

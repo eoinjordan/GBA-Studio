@@ -437,6 +437,7 @@ export const SpriteResource = Type.Object({
   animSpeed: Type.Union([Type.Number(), Type.Null()]),
   states: Type.Array(SpriteState),
   spriteMode: Type.Optional(SpriteModeSetting),
+  transparentColor: Type.Optional(Type.String()),
 });
 
 export type SpriteResource = Static<typeof SpriteResource>;

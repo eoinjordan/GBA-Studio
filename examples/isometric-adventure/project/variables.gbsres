@@ -1,5 +1,12 @@
 {
   "_resourceType": "variables",
-  "variables": [],
+  "variables": [
+    { "id": "0", "name": "Briefing accepted", "symbol": "var_iso_briefing" },
+    { "id": "1", "name": "Beacons restored", "symbol": "var_iso_beacons" },
+    { "id": "2", "name": "West beacon restored", "symbol": "var_iso_west_beacon" },
+    { "id": "3", "name": "East beacon restored", "symbol": "var_iso_east_beacon" },
+    { "id": "4", "name": "Sunstone recovered", "symbol": "var_iso_sunstone" },
+    { "id": "5", "name": "Village relay restored", "symbol": "var_iso_complete" }
+  ],
   "constants": []
 }

@@ -1,17 +1,22 @@
 # Isometric template asset credits
 
-The custom isometric art bundled with this template is **original work,
-released into the public domain under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)**.
-You may use, modify, and redistribute it for any purpose without attribution.
+The production environment is derived from Kenney's
+[Isometric Tiles Landscape](https://kenney.nl/assets/isometric-tiles-landscape)
+and [Foliage Pack](https://kenney.nl/assets/foliage-pack).
+The hero and Keeper Nia silhouettes are derived from DezrasDragons'
+[Isometric Classic Hero](https://opengameart.org/content/isometric-classic-hero-tiles-32x32).
+Both sources are released under
+[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-| File | Description | License |
-|------|-------------|---------|
-| `backgrounds/iso_village.png` | 240×160 isometric village scene (grass diamonds, stone path, lake, trees, house) drawn for the engine's 32×16 isometric projection | CC0 1.0 |
-| `sprites/iso_hero.png` | 64×16 four-direction isometric character (SE / SW / NW / NE) for the `iso_movement` animation type | CC0 1.0 |
+| File                          | Description                                                                      | License |
+| ----------------------------- | -------------------------------------------------------------------------------- | ------- |
+| `backgrounds/iso_village.png` | 240x160 composited relay highland with paths, spring, and three beacon landmarks | CC0 1.0 |
+| `sprites/iso_hero.png`        | 64x16 recolored relay keeper with four isometric directions                      | CC0 1.0 |
+| `sprites/keeper_nia.png`      | 64x16 recolored keeper with four isometric directions                            | CC0 1.0 |
+| `sprites/sunstone_core.png`   | 16x16 recolored magical sunstone quest prop                                      | CC0 1.0 |
 
-These were authored specifically to match the GBA engine's isometric tile
-projection (`ISO_TILE_W = 32`, `ISO_TILE_H = 16`) and the diamond depth grid, so
-the diamonds line up exactly with the in-editor isometric overlay.
+The source art is recomposed and palette-reduced specifically for the GBA
+engine's isometric projection, 8x8 background tiles, four-color sprite
+palettes, explicit palette slots, and alpha transparency.
 
-The remaining UI/emote/font assets are inherited from the standard GB Studio
-template and retain their original GB Studio licensing.
+The remaining UI, emote, and font assets are inherited from the standard GB Studio template and retain their original licensing.

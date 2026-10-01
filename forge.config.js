@@ -40,6 +40,20 @@ const findAvailablePort = async (startPort, reservedPorts = new Set()) => {
 
 module.exports = async () => {
   const { MakerAppImage } = await import("@reforged/maker-appimage");
+  const windowsSigning =
+    process.env.WINDOWS_CERTIFICATE_FILE &&
+    process.env.WINDOWS_CERTIFICATE_PASSWORD
+      ? {
+          certificateFile: process.env.WINDOWS_CERTIFICATE_FILE,
+          certificatePassword: process.env.WINDOWS_CERTIFICATE_PASSWORD,
+          hashes: ["sha256"],
+          timestampServer:
+            process.env.WINDOWS_TIMESTAMP_SERVER ||
+            "http://timestamp.digicert.com",
+          description: "GBA Studio",
+          website: "https://eoinjordan.github.io/GBA-Studio/",
+        }
+      : undefined;
   const reservedPorts = new Set();
   const webpackPort = await findAvailablePort(
     parsePort(process.env.GBA_STUDIO_WEBPACK_PORT || process.env.PORT, 3000),
@@ -60,6 +74,7 @@ module.exports = async () => {
           exe: "gba-studio.exe",
           loadingGif: "src/assets/app/install.gif",
           setupIcon: "src/assets/app/icon/app_icon.ico",
+          ...(windowsSigning ? { windowsSign: windowsSigning } : {}),
         },
       },
       {
@@ -93,6 +108,7 @@ module.exports = async () => {
       executableName: "gba-studio",
       packageManager: "yarn",
       icon: "src/assets/app/icon/app_icon",
+      ...(windowsSigning ? { windowsSign: windowsSigning } : {}),
       darwinDarkModeSupport: true,
       extendInfo: "src/assets/app/Info.plist",
       extraResource: ["src/assets/app/icon/gbsproj.icns"],

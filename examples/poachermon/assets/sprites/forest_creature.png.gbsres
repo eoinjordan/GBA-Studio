@@ -1,0 +1,129 @@
+{
+  "_resourceType": "sprite",
+  "id": "cf49e225-5c19-4eba-8200-2a06bfc771e9",
+  "name": "Forest Creature",
+  "symbol": "sprite_forest_creature",
+  "states": [
+    {
+      "id": "90b4bd36-6299-419b-85ea-970c8df0b42f",
+      "name": "",
+      "animationType": "fixed",
+      "flipLeft": false,
+      "animations": [
+        {
+          "id": "e03f976c-30b1-400b-8df2-74faad4fab92",
+          "frames": [
+            {
+              "id": "4943e03e-ef89-4062-869c-cc0966adb761",
+              "tiles": [
+                {
+                  "id": "8a41945c-dfb6-4c5f-8016-3b65e0eb4268",
+                  "x": 0,
+                  "y": 0,
+                  "sliceX": 0,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 6,
+                  "paletteIndex": 6,
+                  "objPalette": "OBP0",
+                  "priority": false
+                },
+                {
+                  "id": "711d905c-090c-4ce0-8a52-804550e53316",
+                  "x": 8,
+                  "y": 0,
+                  "sliceX": 8,
+                  "sliceY": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "palette": 6,
+                  "paletteIndex": 6,
+                  "objPalette": "OBP0",
+                  "priority": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "6fce86b1-391b-4394-805f-4c429092c574",
+          "frames": [
+            {
+              "id": "2d84aeba-dd10-458c-8bc7-49ef9559bf8e",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "7c44f9a1-e8c1-4db4-8aa2-bc44648d51d5",
+          "frames": [
+            {
+              "id": "e9b80053-d75e-4842-8ec3-c13b8a112814",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "f9993edf-12a2-4c2f-8295-dec6dce1410b",
+          "frames": [
+            {
+              "id": "77d0ca3c-bfba-4875-87a0-fb9b59c1cedf",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "ea4abdb3-ad1d-464f-883d-7bec4c948bae",
+          "frames": [
+            {
+              "id": "a16592bb-b0d2-425d-87ab-2ef703e72290",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "b3dc3dbd-87e3-47a4-8695-f18a5cfd02ae",
+          "frames": [
+            {
+              "id": "6f3cdf23-801b-47d2-8513-60dad357e066",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "a4c6dc54-a8d0-44d5-89c0-80f79d6b2421",
+          "frames": [
+            {
+              "id": "de83c573-e527-4427-8a47-9e962d6e7262",
+              "tiles": []
+            }
+          ]
+        },
+        {
+          "id": "65cf71c5-4764-4489-8485-3ff311efc1f8",
+          "frames": [
+            {
+              "id": "d93b2cd5-6a3d-4af6-89dd-24e12726e393",
+              "tiles": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "numTiles": 2,
+  "canvasWidth": 16,
+  "canvasHeight": 16,
+  "boundsX": 0,
+  "boundsY": 0,
+  "boundsWidth": 16,
+  "boundsHeight": 16,
+  "animSpeed": 15,
+  "filename": "forest_creature.png",
+  "width": 16,
+  "height": 16,
+  "transparentColor": "000000",
+  "checksum": "",
+  "numFrames": 1
+}

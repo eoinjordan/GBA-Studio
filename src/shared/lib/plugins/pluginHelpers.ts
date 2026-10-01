@@ -1,5 +1,4 @@
 import semverGt from "semver/functions/gt";
-import { join } from "path";
 import type {
   InstalledPluginData,
   PluginMetadata,

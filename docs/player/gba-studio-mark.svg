@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title description">
+  <title id="title">GBA Studio</title>
+  <desc id="description">A handheld game screen containing an isometric landscape</desc>
+  <defs>
+    <linearGradient id="body" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A78BFA"/>
+      <stop offset="1" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="18" y1="14" x2="46" y2="39" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9F99D"/>
+      <stop offset=".5" stop-color="#65A36E"/>
+      <stop offset=".51" stop-color="#38664F"/>
+      <stop offset="1" stop-color="#182B25"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#body)" d="M13 4h38a9 9 0 0 1 9 9v38a9 9 0 0 1-9 9H13a9 9 0 0 1-9-9V13a9 9 0 0 1 9-9Z"/>
+  <path fill="#0A0B12" d="M13 10h38a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H13a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4Z"/>
+  <path fill="url(#screen)" d="M15 15h34v24H15z"/>
+  <path fill="#D9C98E" d="m15 31 17-9 17 9-17 8-17-8Z"/>
+  <path fill="#69B578" d="m15 25 8-4 8 4-8 4-8-4Zm18 1 8-4 8 4-8 4-8-4Z"/>
+  <path fill="#F5E9B8" d="m28 28 4-2 4 2-4 2-4-2Z"/>
+  <path fill="#29243C" d="M15 50h11v3H15zM19 46h3v11h-3z"/>
+  <circle cx="46" cy="50" r="3" fill="#D9F99D"/>
+  <circle cx="52" cy="54" r="3" fill="#F0ABFC"/>
+  <path fill="#C4B5FD" d="M29 51h8v2h-8z"/>
+</svg>

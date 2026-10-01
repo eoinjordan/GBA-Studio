@@ -416,6 +416,7 @@ export type SpriteSheet = {
   animSpeed: number | null;
   states: SpriteStateData[];
   spriteMode?: SpriteModeSetting;
+  transparentColor?: string;
 };
 
 export type SpriteSheetNormalized = Omit<SpriteSheet, "states"> & {

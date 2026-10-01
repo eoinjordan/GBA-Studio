@@ -5,7 +5,6 @@ import {
 } from "lib/compiler/compileGBAEvents";
 
 const VM_OP_END = 0x00;
-const VM_OP_LOAD_SCENE = 0x01;
 const VM_OP_SET_SCENE_TONE = 0x02;
 const VM_OP_WAIT = 0x03;
 const VM_OP_SET_CONST = 0x04;
@@ -28,6 +27,7 @@ const VM_OP_ACTOR_SET_HIDDEN = 0x14;
 const VM_OP_ACTOR_SET_COLLISIONS = 0x15;
 const VM_OP_IF_ACTOR_AT_POS = 0x16;
 const VM_OP_IF_ACTOR_RELATIVE = 0x17;
+const VM_OP_LOAD_SCENE_AT = 0x18;
 
 const noopCtx = {
   sceneIndexById: {} as Record<string, number>,
@@ -75,15 +75,21 @@ describe("compileGBAScript", () => {
     expect(str).toBe("Hello\nWorld");
   });
 
-  it("EVENT_SWITCH_SCENE emits VM_OP_LOAD_SCENE with the resolved scene index", () => {
+  it("EVENT_SWITCH_SCENE emits its scene destination and facing direction", () => {
     const ctx = makeCtx({ "scene-abc": 2 });
     const events: GBAScriptEvent[] = [
-      { command: "EVENT_SWITCH_SCENE", args: { sceneId: "scene-abc" } },
+      {
+        command: "EVENT_SWITCH_SCENE",
+        args: {
+          sceneId: "scene-abc",
+          x: { type: "number", value: 7 },
+          y: { type: "number", value: 4 },
+          direction: "up",
+        },
+      },
     ];
     const out = compileGBAScript(events, ctx);
-    expect(out[0]).toBe(VM_OP_LOAD_SCENE);
-    expect(out[1]).toBe(2);
-    expect(out[2]).toBe(VM_OP_END);
+    expect(out).toEqual([VM_OP_LOAD_SCENE_AT, 2, 7, 4, 3, VM_OP_END]);
   });
 
   it("EVENT_SWITCH_SCENE to unknown scene emits a warning and is skipped", () => {
@@ -840,8 +846,8 @@ describe("compileGBAScript", () => {
     ];
     const out = compileGBAScript(events, ctx);
     expect(out[0]).toBe(VM_OP_SET_CONST);
-    expect(out[3]).toBe(VM_OP_LOAD_SCENE);
-    expect(out[5]).toBe(VM_OP_END);
+    expect(out[3]).toBe(VM_OP_LOAD_SCENE_AT);
+    expect(out[8]).toBe(VM_OP_END);
   });
 });
 

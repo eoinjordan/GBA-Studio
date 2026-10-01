@@ -14,10 +14,10 @@ import {
   TOOL_COLORS,
   TOOL_COLLISIONS,
   TOOL_ERASER,
-  TILE_SIZE,
 } from "consts";
 import {
   sceneSelectors,
+  backgroundSelectors,
   getMaxSceneRight,
   getMaxSceneBottom,
 } from "store/features/entities/entitiesState";
@@ -30,6 +30,7 @@ import { useAppDispatch, useAppSelector, useAppStore } from "store/hooks";
 import { SceneNormalized } from "shared/lib/entities/entitiesTypes";
 import { Selection } from "ui/document/Selection";
 import useResizeObserver from "ui/hooks/use-resize-observer";
+import { isoCanvasDimensions } from "shared/lib/entities/isoUtils";
 
 const MOUSE_ZOOM_SPEED = 0.5;
 
@@ -113,6 +114,9 @@ const WorldView = () => {
   const scenesLookup = useAppSelector((state) =>
     sceneSelectors.selectEntities(state),
   );
+  const backgroundsLookup = useAppSelector((state) =>
+    backgroundSelectors.selectEntities(state),
+  );
   const allSceneIds = useAppSelector(sceneSelectors.selectIds);
 
   const showConnections = useAppSelector(
@@ -132,6 +136,22 @@ const WorldView = () => {
   const viewportHeight = scrollContainerSize?.height ?? 0;
 
   const zoomRatio = useAppSelector((state) => (state.editor.zoom || 100) / 100);
+
+  const getSceneDimensions = useCallback(
+    (scene: SceneNormalized) => {
+      if (scene.type !== "ISOMETRIC") {
+        return { width: scene.width * 8, height: scene.height * 8 };
+      }
+      const background = backgroundsLookup[scene.backgroundId];
+      return isoCanvasDimensions(
+        scene.width,
+        scene.height,
+        (background?.width ?? 0) * 8,
+        (background?.height ?? 0) * 8,
+      );
+    },
+    [backgroundsLookup],
+  );
 
   const scrollWidth = useAppSelector((state) =>
     Math.max(viewportWidth / (zoomRatio ?? 1), getMaxSceneRight(state) + 20),
@@ -502,11 +522,14 @@ const WorldView = () => {
       }
       const halfViewWidth = 0.5 * view.clientWidth;
       const halfViewHeight = 0.5 * view.clientHeight;
+      const matchingSceneDimensions = getSceneDimensions(onlyMatchingScene);
       const newScrollX =
-        (onlyMatchingScene.x + onlyMatchingScene.width * 8 * 0.5) * zoomRatio -
+        (onlyMatchingScene.x + matchingSceneDimensions.width * 0.5) *
+          zoomRatio -
         halfViewWidth;
       const newScrollY =
-        (onlyMatchingScene.y + onlyMatchingScene.height * 8 * 0.5) * zoomRatio -
+        (onlyMatchingScene.y + matchingSceneDimensions.height * 0.5) *
+          zoomRatio -
         halfViewHeight;
       viewContents.style.transform = `scale(${zoomRatio})`;
       view.scroll({
@@ -520,7 +543,14 @@ const WorldView = () => {
     prevZoomRatio.current = zoomRatio;
     prevOnlyMatchingScene.current = onlyMatchingScene;
     prevLoaded.current = loaded;
-  }, [loaded, onlyMatchingScene, scrollRef, store, zoomRatio]);
+  }, [
+    getSceneDimensions,
+    loaded,
+    onlyMatchingScene,
+    scrollRef,
+    store,
+    zoomRatio,
+  ]);
 
   //#endregion
 
@@ -556,10 +586,11 @@ const WorldView = () => {
           const scenes = Object.values(scenesLookup) as SceneNormalized[];
           const selectedSceneIds = scenes
             .filter((scene) => {
+              const dimensions = getSceneDimensions(scene);
               return (
-                scene.x + scene.width * TILE_SIZE >= rect.x &&
+                scene.x + dimensions.width >= rect.x &&
                 scene.x <= rect.x + rect.width &&
-                scene.y + scene.height * TILE_SIZE + SCENE_VERTICAL_PADDING >=
+                scene.y + dimensions.height + SCENE_VERTICAL_PADDING >=
                   rect.y &&
                 scene.y <= rect.y + rect.height
               );
@@ -571,7 +602,7 @@ const WorldView = () => {
         setSelectionEnd(point);
       }
     },
-    [dispatch, scenesLookup, scrollRef, zoomRatio],
+    [dispatch, getSceneDimensions, scenesLookup, scrollRef, zoomRatio],
   );
 
   const onEndMultiSelection = useCallback(

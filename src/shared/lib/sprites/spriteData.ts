@@ -32,6 +32,22 @@ export const spriteDataIndexFn: ImageIndexFunction = (r, g, b, _a) => {
   }
 };
 
+export const spriteDataIndexFnWithTransparentColor = (
+  transparentColor: string,
+): ImageIndexFunction => {
+  const normalized = transparentColor.replace(/^#/, "").padStart(6, "0");
+  const transparentR = parseInt(normalized.slice(0, 2), 16);
+  const transparentG = parseInt(normalized.slice(2, 4), 16);
+  const transparentB = parseInt(normalized.slice(4, 6), 16);
+
+  return (r, g, b, a) => {
+    if (r === transparentR && g === transparentG && b === transparentB) {
+      return Color.Transparent;
+    }
+    return spriteDataIndexFn(r, g, b, a);
+  };
+};
+
 export const removeIndexedImageMask = (
   inData: IndexedImage,
   maskData: IndexedImage,

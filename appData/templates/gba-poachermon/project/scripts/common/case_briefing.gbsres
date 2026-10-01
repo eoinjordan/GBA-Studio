@@ -23,7 +23,7 @@
     { "id": "brief-captain-solid", "command": "EVENT_ACTOR_COLLISIONS_ENABLE", "args": { "actorId": "bc140f2d-d829-480b-a837-1d6e3fdf0101" } },
     { "id": "brief-color", "command": "EVENT_IF_COLOR_SUPPORTED", "args": {}, "children": { "true": [ { "id": "brief-color-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 0 } } ], "false": [] } },
     { "id": "brief-wait", "command": "EVENT_WAIT", "args": { "frames": 2 } },
-    { "id": "brief-text", "command": "EVENT_TEXT", "args": { "text": "CASE 001: SNARE AFFAIR\nPatrol route {5} assigned." } },
+    { "id": "brief-text", "command": "EVENT_TEXT", "args": { "text": "CASE 001: REEDLINE SNARE\nTrail-cam route {5}. Tag 2 clues." } },
     { "id": "brief-end", "command": "EVENT_END", "args": {} }
   ]
 }

@@ -1,27 +1,190 @@
 {
-  "_resourceType": "actor", "id": "86697d89-5192-4ef2-b319-a5556ad7a105", "_index": 4,
-  "symbol": "actor_poacher_ash", "prefabId": "", "name": "Poacher Ash",
-  "x": 8, "y": 15, "frame": 0, "animate": true,
-  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd", "paletteId": "", "direction": "right",
-  "moveSpeed": 1, "animSpeed": 15, "isPinned": false, "persistent": true,
-  "collisionGroup": "", "collisionExtraFlags": [], "prefabScriptOverrides": {},
+  "_resourceType": "actor",
+  "id": "86697d89-5192-4ef2-b319-a5556ad7a105",
+  "_index": 4,
+  "symbol": "actor_poacher_ash",
+  "prefabId": "",
+  "name": "Poacher Ash",
+  "x": 8,
+  "y": 15,
+  "frame": 0,
+  "animate": true,
+  "spriteSheetId": "7a8963a3-feb4-431e-8925-6b86d6e768e6",
+  "paletteId": "5c769a01-83e5-4647-8254-5ba44907eec9",
+  "direction": "right",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
   "script": [
-    { "id": "ash-not-caught", "command": "EVENT_IF_FALSE", "args": { "variable": "11" }, "children": { "true": [
-      { "id": "ash-evidence-check", "command": "EVENT_IF_VALUE", "args": { "variable": "1", "operator": ">=", "comparator": 2 }, "children": { "true": [
-        { "id": "ash-relative", "command": "EVENT_IF_ACTOR_RELATIVE_TO_ACTOR", "args": { "actorId": "$self$", "otherActorId": "player", "operation": "left" }, "children": { "true": [ { "id": "ash-blocked", "command": "EVENT_TEXT", "args": { "text": "Ash: You boxed me in!\nThose evidence tags prove nothing!" } } ], "false": [ { "id": "ash-turn", "command": "EVENT_TEXT", "args": { "text": "Ash: I was merely relocating wire." } } ] } },
-        { "id": "ash-face", "command": "EVENT_ACTOR_SET_DIRECTION", "args": { "actorId": "$self$", "direction": { "type": "direction", "value": "up" } } },
-        { "id": "ash-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 1 } },
-        { "id": "ash-arrest", "command": "EVENT_TEXT", "args": { "text": "CAUGHT: POACHER ASH\nReported for safe collection." } },
-        { "id": "ash-set", "command": "EVENT_SET_VALUE", "args": { "variable": "11", "value": { "type": "true" } } },
-        { "id": "ash-inc", "command": "EVENT_INC_VALUE", "args": { "variable": "2" } },
-        { "id": "ash-collisions", "command": "EVENT_ACTOR_COLLISIONS_DISABLE", "args": { "actorId": "$self$" } },
-        { "id": "ash-step", "command": "EVENT_ACTOR_MOVE_RELATIVE", "args": { "actorId": "$self$", "x": { "type": "number", "value": -1 }, "y": { "type": "number", "value": 0 } } },
-        { "id": "ash-wait", "command": "EVENT_WAIT", "args": { "frames": 8 } },
-        { "id": "ash-hide", "command": "EVENT_ACTOR_DEACTIVATE", "args": { "actorId": "$self$" } },
-        { "id": "ash-reset-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 0 } }
-      ], "false": [ { "id": "ash-no-proof", "command": "EVENT_TEXT", "args": { "text": "Ash: No evidence, no report.\nFind 2 tagged clues first." } } ] } }
-    ], "false": [ { "id": "ash-repeat", "command": "EVENT_TEXT", "args": { "text": "Ash is already on the incident log." } } ] } },
-    { "id": "ash-end", "command": "EVENT_END", "args": {} }
+    {
+      "id": "ash-not-caught",
+      "command": "EVENT_IF_FALSE",
+      "args": {
+        "variable": "11"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "ash-evidence-check",
+            "command": "EVENT_IF_VALUE",
+            "args": {
+              "variable": "1",
+              "operator": ">=",
+              "comparator": 2
+            },
+            "children": {
+              "true": [
+                {
+                  "id": "ash-relative",
+                  "command": "EVENT_IF_ACTOR_RELATIVE_TO_ACTOR",
+                  "args": {
+                    "actorId": "$self$",
+                    "otherActorId": "player",
+                    "operation": "left"
+                  },
+                  "children": {
+                    "true": [
+                      {
+                        "id": "ash-blocked",
+                        "command": "EVENT_TEXT",
+                        "args": {
+                          "text": "Ash: You boxed me in!\nThose evidence tags prove nothing!"
+                        }
+                      }
+                    ],
+                    "false": [
+                      {
+                        "id": "ash-turn",
+                        "command": "EVENT_TEXT",
+                        "args": {
+                          "text": "Ash: I was merely relocating wire."
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "id": "ash-face",
+                  "command": "EVENT_ACTOR_SET_DIRECTION",
+                  "args": {
+                    "actorId": "$self$",
+                    "direction": {
+                      "type": "direction",
+                      "value": "up"
+                    }
+                  }
+                },
+                {
+                  "id": "ash-tone",
+                  "command": "EVENT_PALETTE_SET_BACKGROUND",
+                  "args": {
+                    "tone": 1
+                  }
+                },
+                {
+                  "id": "ash-arrest",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "CAUGHT: POACHER ASH\nReported for safe collection."
+                  }
+                },
+                {
+                  "id": "ash-set",
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "11",
+                    "value": {
+                      "type": "true"
+                    }
+                  }
+                },
+                {
+                  "id": "ash-inc",
+                  "command": "EVENT_INC_VALUE",
+                  "args": {
+                    "variable": "2"
+                  }
+                },
+                {
+                  "id": "ash-collisions",
+                  "command": "EVENT_ACTOR_COLLISIONS_DISABLE",
+                  "args": {
+                    "actorId": "$self$"
+                  }
+                },
+                {
+                  "id": "ash-step",
+                  "command": "EVENT_ACTOR_MOVE_RELATIVE",
+                  "args": {
+                    "actorId": "$self$",
+                    "x": {
+                      "type": "number",
+                      "value": -1
+                    },
+                    "y": {
+                      "type": "number",
+                      "value": 0
+                    }
+                  }
+                },
+                {
+                  "id": "ash-wait",
+                  "command": "EVENT_WAIT",
+                  "args": {
+                    "frames": 8
+                  }
+                },
+                {
+                  "id": "ash-hide",
+                  "command": "EVENT_ACTOR_DEACTIVATE",
+                  "args": {
+                    "actorId": "$self$"
+                  }
+                },
+                {
+                  "id": "ash-reset-tone",
+                  "command": "EVENT_PALETTE_SET_BACKGROUND",
+                  "args": {
+                    "tone": 0
+                  }
+                }
+              ],
+              "false": [
+                {
+                  "id": "ash-no-proof",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "Ash: No evidence, no report.\nFind 2 tagged clues first."
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "ash-repeat",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Ash is already on the incident log."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ash-end",
+      "command": "EVENT_END",
+      "args": {}
+    }
   ],
-  "startScript": [], "updateScript": [], "hit1Script": [], "hit2Script": [], "hit3Script": []
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
 }

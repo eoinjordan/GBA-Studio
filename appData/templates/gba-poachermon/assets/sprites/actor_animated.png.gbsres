@@ -340,7 +340,7 @@
       ]
     }
   ],
-  "numTiles": 10,
+  "numTiles": 12,
   "canvasWidth": 16,
   "canvasHeight": 16,
   "boundsX": 0,
@@ -351,6 +351,7 @@
   "filename": "actor_animated.png",
   "width": 96,
   "height": 16,
-  "checksum": "cd6c8ebac31ccd6a325b8a7e94a05d442ae6725e",
+  "transparentColor": "000000",
+  "checksum": "",
   "numFrames": 6
 }

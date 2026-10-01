@@ -24,8 +24,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 2,
+                  "paletteIndex": 2,
                   "objPalette": "OBP0",
                   "priority": false
                 },
@@ -37,8 +37,8 @@
                   "sliceY": 0,
                   "flipX": false,
                   "flipY": false,
-                  "palette": 0,
-                  "paletteIndex": 0,
+                  "palette": 2,
+                  "paletteIndex": 2,
                   "objPalette": "OBP0",
                   "priority": false
                 }
@@ -123,6 +123,6 @@
   "filename": "static.png",
   "width": 16,
   "height": 16,
-  "checksum": "ed08d198cc3dd48f9bfba000769904ae41b36db8",
+  "checksum": "",
   "numFrames": 1
 }

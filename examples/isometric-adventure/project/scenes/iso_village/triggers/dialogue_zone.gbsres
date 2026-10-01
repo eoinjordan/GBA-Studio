@@ -2,22 +2,46 @@
   "_resourceType": "trigger",
   "id": "5ce7e000-0000-4a00-8000-000000000t01",
   "_index": 0,
-  "symbol": "trigger_dialogue_zone",
+  "symbol": "trigger_west_beacon",
   "prefabId": "",
-  "name": "Dialogue Zone",
-  "x": 7,
-  "y": 3,
-  "width": 3,
-  "height": 3,
+  "name": "West Signal Beacon",
+  "x": 1,
+  "y": 5,
+  "width": 1,
+  "height": 1,
   "prefabScriptOverrides": {},
   "script": [
     {
-      "id": "5ce7e000-0000-4a00-8000-000000000e02",
-      "command": "EVENT_TEXT",
-      "args": {
-        "text": "You entered the\nNPC's area."
+      "id": "west-briefing-check",
+      "command": "EVENT_IF_FALSE",
+      "args": { "variable": "0" },
+      "children": {
+        "true": [
+          { "id": "west-locked", "command": "EVENT_TEXT", "args": { "text": "The west marker is silent.\nAsk Keeper Nia about it." } }
+        ],
+        "false": [
+          {
+            "id": "west-new-check",
+            "command": "EVENT_IF_FALSE",
+            "args": { "variable": "2" },
+            "children": {
+              "true": [
+                { "id": "west-restore", "command": "EVENT_TEXT", "args": { "text": "WEST BEACON RESTORED!\nA signal crosses the grass." } },
+                { "id": "west-set", "command": "EVENT_SET_VALUE", "args": { "variable": "2", "value": { "type": "true" } } },
+                { "id": "west-count", "command": "EVENT_INC_VALUE", "args": { "variable": "1" } },
+                { "id": "west-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 1 } },
+                { "id": "west-wait", "command": "EVENT_WAIT", "args": { "frames": 8 } },
+                { "id": "west-reset-tone", "command": "EVENT_PALETTE_SET_BACKGROUND", "args": { "tone": 0 } }
+              ],
+              "false": [
+                { "id": "west-repeat", "command": "EVENT_TEXT", "args": { "text": "The west beacon is already lit." } }
+              ]
+            }
+          }
+        ]
       }
-    }
+    },
+    { "id": "west-end", "command": "EVENT_END", "args": {} }
   ],
   "leaveScript": []
 }

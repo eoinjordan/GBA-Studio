@@ -5,7 +5,6 @@ are intentionally not committed to the repository.
 
 The current public demos are generated from:
 
-- `examples/starter-project/project.gbsproj`
 - `examples/isometric-adventure/project.gbsproj`
 - `examples/poachermon/project.gbsproj`
 

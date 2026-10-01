@@ -270,3 +270,21 @@ export const toEngineOrder = <T>(arr: T[]): T[] => {
     arr[5], // Left Moving
   ];
 };
+
+/**
+ * Reorders the isometric editor slots (NE, SE, SW, NW) into the runtime's
+ * animation table order (down/SW, right/SE, up/NE, left/NW), followed by the
+ * corresponding moving slots.
+ */
+export const toIsometricEngineOrder = <T>(arr: T[]): T[] => {
+  return [
+    arr[2], // Down / SW
+    arr[1], // Right / SE
+    arr[0], // Up / NE
+    arr[3], // Left / NW
+    arr[6], // Down / SW moving
+    arr[5], // Right / SE moving
+    arr[4], // Up / NE moving
+    arr[7], // Left / NW moving
+  ];
+};

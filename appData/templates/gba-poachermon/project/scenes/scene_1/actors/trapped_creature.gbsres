@@ -1,24 +1,151 @@
 {
-  "_resourceType": "actor", "id": "8d14a725-3e43-4016-8a91-293f33a3a107", "_index": 6,
-  "symbol": "actor_trapped_creature", "prefabId": "", "name": "Trapped Creature",
-  "x": 20, "y": 17, "frame": 0, "animate": false,
-  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6", "paletteId": "", "direction": "left",
-  "moveSpeed": 1, "animSpeed": 15, "isPinned": false, "persistent": true,
-  "collisionGroup": "", "collisionExtraFlags": [], "prefabScriptOverrides": {},
+  "_resourceType": "actor",
+  "id": "8d14a725-3e43-4016-8a91-293f33a3a107",
+  "_index": 6,
+  "symbol": "actor_trapped_creature",
+  "prefabId": "",
+  "name": "Trapped Creature",
+  "x": 20,
+  "y": 17,
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "cf49e225-5c19-4eba-8200-2a06bfc771e9",
+  "paletteId": "01edf222-4cde-45ee-8946-98984e07fbe4",
+  "direction": "left",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
   "script": [
-    { "id": "creature-new", "command": "EVENT_IF_FALSE", "args": { "variable": "3" }, "children": { "true": [
-      { "id": "creature-safe-check", "command": "EVENT_IF_VALUE", "args": { "variable": "2", "operator": ">=", "comparator": 2 }, "children": { "true": [
-        { "id": "creature-rescue-text", "command": "EVENT_TEXT", "args": { "text": "You cut the snare carefully.\nThe creature chirps: prrp!" } },
-        { "id": "creature-set", "command": "EVENT_SET_VALUE", "args": { "variable": "3", "value": { "type": "true" } } },
-        { "id": "creature-copy", "command": "EVENT_SET_VALUE", "args": { "variable": "13", "value": { "type": "variable", "value": "3" } } },
-        { "id": "creature-face", "command": "EVENT_ACTOR_SET_DIRECTION", "args": { "actorId": "$self$", "direction": { "type": "direction", "value": "right" } } },
-        { "id": "creature-hop", "command": "EVENT_ACTOR_MOVE_RELATIVE", "args": { "actorId": "$self$", "x": { "type": "number", "value": 1 }, "y": { "type": "number", "value": 0 } } },
-        { "id": "creature-collisions", "command": "EVENT_ACTOR_COLLISIONS_DISABLE", "args": { "actorId": "$self$" } },
-        { "id": "creature-wait", "command": "EVENT_WAIT", "args": { "frames": 10 } },
-        { "id": "creature-hide", "command": "EVENT_ACTOR_DEACTIVATE", "args": { "actorId": "$self$" } }
-      ], "false": [ { "id": "creature-danger", "command": "EVENT_TEXT", "args": { "text": "The creature is frightened.\nSecure both poachers first." } } ] } }
-    ], "false": [ { "id": "creature-repeat", "command": "EVENT_TEXT", "args": { "text": "Only a safely cut snare remains." } } ] } },
-    { "id": "creature-end", "command": "EVENT_END", "args": {} }
+    {
+      "id": "creature-new",
+      "command": "EVENT_IF_FALSE",
+      "args": {
+        "variable": "3"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "creature-safe-check",
+            "command": "EVENT_IF_VALUE",
+            "args": {
+              "variable": "2",
+              "operator": ">=",
+              "comparator": 2
+            },
+            "children": {
+              "true": [
+                {
+                  "id": "creature-rescue-text",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "You cut the snare carefully.\nThe creature chirps: prrp!"
+                  }
+                },
+                {
+                  "id": "creature-set",
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "3",
+                    "value": {
+                      "type": "true"
+                    }
+                  }
+                },
+                {
+                  "id": "creature-copy",
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "13",
+                    "value": {
+                      "type": "variable",
+                      "value": "3"
+                    }
+                  }
+                },
+                {
+                  "id": "creature-face",
+                  "command": "EVENT_ACTOR_SET_DIRECTION",
+                  "args": {
+                    "actorId": "$self$",
+                    "direction": {
+                      "type": "direction",
+                      "value": "right"
+                    }
+                  }
+                },
+                {
+                  "id": "creature-hop",
+                  "command": "EVENT_ACTOR_MOVE_RELATIVE",
+                  "args": {
+                    "actorId": "$self$",
+                    "x": {
+                      "type": "number",
+                      "value": 1
+                    },
+                    "y": {
+                      "type": "number",
+                      "value": 0
+                    }
+                  }
+                },
+                {
+                  "id": "creature-collisions",
+                  "command": "EVENT_ACTOR_COLLISIONS_DISABLE",
+                  "args": {
+                    "actorId": "$self$"
+                  }
+                },
+                {
+                  "id": "creature-wait",
+                  "command": "EVENT_WAIT",
+                  "args": {
+                    "frames": 10
+                  }
+                },
+                {
+                  "id": "creature-hide",
+                  "command": "EVENT_ACTOR_DEACTIVATE",
+                  "args": {
+                    "actorId": "$self$"
+                  }
+                }
+              ],
+              "false": [
+                {
+                  "id": "creature-danger",
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": "The creature is frightened.\nSecure both poachers first."
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "creature-repeat",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Only a safely cut snare remains."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "creature-end",
+      "command": "EVENT_END",
+      "args": {}
+    }
   ],
-  "startScript": [], "updateScript": [], "hit1Script": [], "hit2Script": [], "hit3Script": []
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
 }
