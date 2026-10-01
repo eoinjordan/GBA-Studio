@@ -1,4 +1,7 @@
 import { keyBy } from "lodash";
+import { readFile } from "fs-extra";
+import { assetFilename } from "shared/lib/helpers/assets";
+import { compileGbaBackground } from "./compileGbaBackground";
 import { uniq } from "lodash";
 import SparkMD5 from "spark-md5";
 import { eventHasArg } from "lib/helpers/eventSystem";
@@ -1409,7 +1412,11 @@ export const emitGBASpriteData = (
   const fallbackMetaspriteIndex =
     orderedMetaspriteIndexes.find(
       (index) => (metasprites[index]?.length ?? 0) > 0,
-    ) ?? Math.max(0, metasprites.findIndex((metasprite) => metasprite.length > 0));
+    ) ??
+    Math.max(
+      0,
+      metasprites.findIndex((metasprite) => metasprite.length > 0),
+    );
   const fallbackMetasprite = metasprites[fallbackMetaspriteIndex] ?? [];
   const emittedMetaspriteIndexes = orderedMetaspriteIndexes.map((index) =>
     (metasprites[index]?.length ?? 0) > 0 ? index : fallbackMetaspriteIndex,
@@ -1417,8 +1424,7 @@ export const emitGBASpriteData = (
 
   const metaspriteBlocks = metasprites
     .map((metasprite, metaspriteIndex) => {
-      const unused =
-        metasprite.length === 0 ? " __attribute__((unused))" : "";
+      const unused = metasprite.length === 0 ? " __attribute__((unused))" : "";
       const lines =
         metasprite.length > 0
           ? metasprite
@@ -1654,155 +1660,179 @@ const compileGBA = async (
     }
   });
 
-  const sceneBlocks = precompiled.sceneData
-    .map((scene, index) => {
-      const sceneSymbol = sceneSymbols[index];
-      const rawScene = projectData.scenes.find((item) => item.id === scene.id);
-      const rawTriggers = rawScene?.triggers ?? scene.triggers;
-      const background = scene.background;
-      const bgTileset = background?.tileset
-        ? convertGbTilesetToGba4bpp(background.tileset.data)
-        : new Uint8Array();
-      const bgTilemap = background?.tilemap
-        ? Uint8Array.from(background.tilemap.data)
-        : new Uint8Array();
-      const bgTilemapAttr = background?.tilemapAttr
-        ? Uint8Array.from(background.tilemapAttr.data)
-        : new Uint8Array();
-      const bgPalette = toGbaPaletteData(
-        precompiled.usedPalettes[
-          precompiled.scenePaletteIndexes[scene.id] || 0
-        ],
-      );
-      const spritePalette = toGbaPaletteData(
-        precompiled.usedPalettes[
-          precompiled.sceneActorPaletteIndexes[scene.id] || 0
-        ],
-      );
-      const localSprites = collectUniqueSprites(scene, precompiled.usedSprites);
-      const spriteIndexById = Object.fromEntries(
-        localSprites.map((sprite, spriteIndex) => [sprite.id, spriteIndex]),
-      ) as Record<string, number>;
-
-      const spriteBlocks = localSprites
-        .map((sprite, spriteIndex) => {
-          const spriteSymbol = `${sceneSymbol}_sprite_${spriteIndex}`;
-          return emitGBASpriteData(sprite, spriteSymbol, warnings);
-        })
-        .join("\n\n");
-
-      const spriteTableLines =
-        localSprites.length > 0
-          ? localSprites
-              .map(
-                (_, spriteIndex) => `  &${sceneSymbol}_sprite_${spriteIndex}`,
-              )
-              .join(",\n")
-          : "  NULL";
-      const spriteTable = `static const gba_sprite_def_t *const ${sceneSymbol}_sprites[${Math.max(
-        1,
-        localSprites.length,
-      )}] = {\n${spriteTableLines}\n};`;
-
-      // The runtime indexes the collision grid by logical scene dimensions.
-      // Always emit exactly that many bytes so an empty or short project map
-      // cannot turn a valid movement check into an out-of-bounds ROM read.
-      const collisionData = Array.from(
-        { length: Math.max(1, scene.width * scene.height) },
-        (_, collisionIndex) => scene.collisions[collisionIndex] ?? 0,
-      );
-      const collisionArray = `static const uint8_t ${sceneSymbol}_collisions[${collisionData.length}] = {${formatCByteArray(
-        collisionData,
-      )}\n};`;
-      // Runtime actor indices: 0 is the player, scene actors follow in order.
-      const actorIndexById = Object.fromEntries(
-        scene.actors.map((actor, actorIndex) => [actor.id, actorIndex + 1]),
-      ) as Record<string, number>;
-      const sceneEventCtx = {
-        ...gbaEventCtx,
-        actorIndexById,
-        coordinateScale: scene.type === "ISOMETRIC" ? 1 : 8,
-      };
-
-      // Scene scripts are lifecycle scripts: the runtime schedules them once
-      // after loading the scene and spawning its player/actors.
-      const sceneScriptEvents = (rawScene?.script ??
-        scene.script ??
-        []) as GBAScriptEvent[];
-      const hasSceneStartScript =
-        sceneScriptEvents.length > 0 &&
-        !(
-          sceneScriptEvents.length === 1 &&
-          sceneScriptEvents[0].command === "EVENT_END"
+  const sceneBlocks = (
+    await Promise.all(
+      precompiled.sceneData.map(async (scene, index) => {
+        const sceneSymbol = sceneSymbols[index];
+        const rawScene = projectData.scenes.find(
+          (item) => item.id === scene.id,
         );
-      const sceneStartScriptSymbol = hasSceneStartScript
-        ? `${sceneSymbol}_start_script`
-        : null;
-      const sceneStartScriptBlock = sceneStartScriptSymbol
-        ? emitGBAScriptC(
-            sceneStartScriptSymbol,
-            compileGBAScript(sceneScriptEvents, sceneEventCtx),
-          )
-        : "";
+        const rawTriggers = rawScene?.triggers ?? scene.triggers;
+        const background = scene.background;
+        const sourceBackground = projectData.backgrounds.find(
+          (item) => item.id === background?.id,
+        );
+        const nativeBackground = sourceBackground?.autoColor
+          ? compileGbaBackground(
+              await readFile(
+                assetFilename(projectRoot, "backgrounds", sourceBackground),
+              ),
+            )
+          : undefined;
+        const bgTileset =
+          nativeBackground?.tileset ??
+          (background?.tileset
+            ? convertGbTilesetToGba4bpp(background.tileset.data)
+            : new Uint8Array());
+        const bgTilemap =
+          nativeBackground?.tilemap ??
+          (background?.tilemap
+            ? Uint8Array.from(background.tilemap.data)
+            : new Uint8Array());
+        const bgTilemapAttr =
+          nativeBackground?.attributes ??
+          (background?.tilemapAttr
+            ? Uint8Array.from(background.tilemapAttr.data)
+            : new Uint8Array());
+        const bgPalette =
+          nativeBackground?.palette ??
+          toGbaPaletteData(
+            precompiled.usedPalettes[
+              precompiled.scenePaletteIndexes[scene.id] || 0
+            ],
+          );
+        const spritePalette = toGbaPaletteData(
+          precompiled.usedPalettes[
+            precompiled.sceneActorPaletteIndexes[scene.id] || 0
+          ],
+        );
+        const localSprites = collectUniqueSprites(
+          scene,
+          precompiled.usedSprites,
+        );
+        const spriteIndexById = Object.fromEntries(
+          localSprites.map((sprite, spriteIndex) => [sprite.id, spriteIndex]),
+        ) as Record<string, number>;
 
-      // Compile trigger scripts and emit trigger array.
-      const triggerScriptBlocks: string[] = [];
-      const triggerScriptSymbols: (string | null)[] = rawTriggers.map(
-        (trigger, triggerIndex) => {
-          const scriptEvents = trigger.script as GBAScriptEvent[] | undefined;
-          if (!scriptEvents || scriptEvents.length === 0) return null;
-          if (
-            scriptEvents.length === 1 &&
-            scriptEvents[0].command === "EVENT_END"
-          )
-            return null;
-          const symbol = `${sceneSymbol}_trigger_${triggerIndex}_script`;
-          const bytecode = compileGBAScript(scriptEvents, sceneEventCtx);
-          triggerScriptBlocks.push(emitGBAScriptC(symbol, bytecode));
-          return symbol;
-        },
-      );
-      const triggerArray =
-        rawTriggers.length > 0
-          ? `static const gba_trigger_def_t ${sceneSymbol}_triggers[${rawTriggers.length}] = {\n${rawTriggers
-              .map((trigger, triggerIndex) => {
-                const scriptSym = triggerScriptSymbols[triggerIndex];
-                return `  { ${trigger.x}, ${trigger.y}, ${trigger.width}, ${trigger.height}, ${scriptSym ?? "NULL"} }`;
-              })
-              .join(",\n")}\n};`
+        const spriteBlocks = localSprites
+          .map((sprite, spriteIndex) => {
+            const spriteSymbol = `${sceneSymbol}_sprite_${spriteIndex}`;
+            return emitGBASpriteData(sprite, spriteSymbol, warnings);
+          })
+          .join("\n\n");
+
+        const spriteTableLines =
+          localSprites.length > 0
+            ? localSprites
+                .map(
+                  (_, spriteIndex) => `  &${sceneSymbol}_sprite_${spriteIndex}`,
+                )
+                .join(",\n")
+            : "  NULL";
+        const spriteTable = `static const gba_sprite_def_t *const ${sceneSymbol}_sprites[${Math.max(
+          1,
+          localSprites.length,
+        )}] = {\n${spriteTableLines}\n};`;
+
+        // The runtime indexes the collision grid by logical scene dimensions.
+        // Always emit exactly that many bytes so an empty or short project map
+        // cannot turn a valid movement check into an out-of-bounds ROM read.
+        const collisionData = Array.from(
+          { length: Math.max(1, scene.width * scene.height) },
+          (_, collisionIndex) => scene.collisions[collisionIndex] ?? 0,
+        );
+        const collisionArray = `static const uint8_t ${sceneSymbol}_collisions[${collisionData.length}] = {${formatCByteArray(
+          collisionData,
+        )}\n};`;
+        // Runtime actor indices: 0 is the player, scene actors follow in order.
+        const actorIndexById = Object.fromEntries(
+          scene.actors.map((actor, actorIndex) => [actor.id, actorIndex + 1]),
+        ) as Record<string, number>;
+        const sceneEventCtx = {
+          ...gbaEventCtx,
+          actorIndexById,
+          coordinateScale: scene.type === "ISOMETRIC" ? 1 : 8,
+        };
+
+        // Scene scripts are lifecycle scripts: the runtime schedules them once
+        // after loading the scene and spawning its player/actors.
+        const sceneScriptEvents = (rawScene?.script ??
+          scene.script ??
+          []) as GBAScriptEvent[];
+        const hasSceneStartScript =
+          sceneScriptEvents.length > 0 &&
+          !(
+            sceneScriptEvents.length === 1 &&
+            sceneScriptEvents[0].command === "EVENT_END"
+          );
+        const sceneStartScriptSymbol = hasSceneStartScript
+          ? `${sceneSymbol}_start_script`
+          : null;
+        const sceneStartScriptBlock = sceneStartScriptSymbol
+          ? emitGBAScriptC(
+              sceneStartScriptSymbol,
+              compileGBAScript(sceneScriptEvents, sceneEventCtx),
+            )
           : "";
-      // Compile actor interact scripts.
-      const actorScriptBlocks: string[] = [];
-      const actorScriptSymbols: (string | null)[] = scene.actors.map(
-        (actor, actorIndex) => {
-          const scriptEvents = actor.script as GBAScriptEvent[] | undefined;
-          if (!scriptEvents || scriptEvents.length === 0) return null;
-          if (
-            scriptEvents.length === 1 &&
-            scriptEvents[0].command === "EVENT_END"
-          )
-            return null;
-          const symbol = `${sceneSymbol}_actor_${actorIndex}_interact_script`;
-          const bytecode = compileGBAScript(scriptEvents, {
-            ...sceneEventCtx,
-            selfActorIndex: actorIndex + 1,
-          });
-          actorScriptBlocks.push(emitGBAScriptC(symbol, bytecode));
-          return symbol;
-        },
-      );
-      const actorArray =
-        scene.actors.length > 0
-          ? `static const gba_actor_def_t ${sceneSymbol}_actors[${scene.actors.length}] = {\n${scene.actors
-              .map((actor, actorIndex) => {
-                const spriteIndex = spriteIndexById[actor.spriteSheetId] ?? 0;
-                const scriptSym = actorScriptSymbols[actorIndex];
-                // Isometric actors store tile-grid coordinates directly;
-                // top-down actors use pixel position (tile * 8).
-                const isIso = scene.type === "ISOMETRIC";
-                const actorX = isIso ? actor.x || 0 : (actor.x || 0) * 8;
-                const actorY = isIso ? actor.y || 0 : (actor.y || 0) * 8;
-                return `  {
+
+        // Compile trigger scripts and emit trigger array.
+        const triggerScriptBlocks: string[] = [];
+        const triggerScriptSymbols: (string | null)[] = rawTriggers.map(
+          (trigger, triggerIndex) => {
+            const scriptEvents = trigger.script as GBAScriptEvent[] | undefined;
+            if (!scriptEvents || scriptEvents.length === 0) return null;
+            if (
+              scriptEvents.length === 1 &&
+              scriptEvents[0].command === "EVENT_END"
+            )
+              return null;
+            const symbol = `${sceneSymbol}_trigger_${triggerIndex}_script`;
+            const bytecode = compileGBAScript(scriptEvents, sceneEventCtx);
+            triggerScriptBlocks.push(emitGBAScriptC(symbol, bytecode));
+            return symbol;
+          },
+        );
+        const triggerArray =
+          rawTriggers.length > 0
+            ? `static const gba_trigger_def_t ${sceneSymbol}_triggers[${rawTriggers.length}] = {\n${rawTriggers
+                .map((trigger, triggerIndex) => {
+                  const scriptSym = triggerScriptSymbols[triggerIndex];
+                  return `  { ${trigger.x}, ${trigger.y}, ${trigger.width}, ${trigger.height}, ${scriptSym ?? "NULL"} }`;
+                })
+                .join(",\n")}\n};`
+            : "";
+        // Compile actor interact scripts.
+        const actorScriptBlocks: string[] = [];
+        const actorScriptSymbols: (string | null)[] = scene.actors.map(
+          (actor, actorIndex) => {
+            const scriptEvents = actor.script as GBAScriptEvent[] | undefined;
+            if (!scriptEvents || scriptEvents.length === 0) return null;
+            if (
+              scriptEvents.length === 1 &&
+              scriptEvents[0].command === "EVENT_END"
+            )
+              return null;
+            const symbol = `${sceneSymbol}_actor_${actorIndex}_interact_script`;
+            const bytecode = compileGBAScript(scriptEvents, {
+              ...sceneEventCtx,
+              selfActorIndex: actorIndex + 1,
+            });
+            actorScriptBlocks.push(emitGBAScriptC(symbol, bytecode));
+            return symbol;
+          },
+        );
+        const actorArray =
+          scene.actors.length > 0
+            ? `static const gba_actor_def_t ${sceneSymbol}_actors[${scene.actors.length}] = {\n${scene.actors
+                .map((actor, actorIndex) => {
+                  const spriteIndex = spriteIndexById[actor.spriteSheetId] ?? 0;
+                  const scriptSym = actorScriptSymbols[actorIndex];
+                  // Isometric actors store tile-grid coordinates directly;
+                  // top-down actors use pixel position (tile * 8).
+                  const isIso = scene.type === "ISOMETRIC";
+                  const actorX = isIso ? actor.x || 0 : (actor.x || 0) * 8;
+                  const actorY = isIso ? actor.y || 0 : (actor.y || 0) * 8;
+                  return `  {
     .x = ${actorX}, .y = ${actorY}, .sprite_index = ${spriteIndex},
     .direction = ${toGbaDirection(actor.direction)},
     .move_speed = ${Math.max(1, Math.min(255, Math.round(actor.moveSpeed || 1)))}, .anim_speed = ${ensureNumber(actor.animSpeed, 15)},
@@ -1816,39 +1846,43 @@ const compileGBA = async (
         : 0
     }
   }`;
-              })
-              .join(",\n")}\n};`
-          : "";
-      const bgTilesetArray = `static const uint8_t ${sceneSymbol}_tileset[${Math.max(
-        1,
-        bgTileset.length,
-      )}] = {${
-        bgTileset.length > 0 ? `${formatCByteArray(bgTileset)}\n` : "\n  0x00\n"
-      }};`;
-      const bgTilemapArray = `static const uint8_t ${sceneSymbol}_tilemap[${Math.max(
-        1,
-        bgTilemap.length,
-      )}] = {${
-        bgTilemap.length > 0 ? `${formatCByteArray(bgTilemap)}\n` : "\n  0x00\n"
-      }};`;
-      const bgTilemapAttrArray =
-        bgTilemapAttr.length > 0
-          ? `static const uint8_t ${sceneSymbol}_tilemap_attr[${bgTilemapAttr.length}] = {${formatCByteArray(
-              bgTilemapAttr,
-            )}\n};`
-          : "";
-      const bgPaletteArray = `static const uint16_t ${sceneSymbol}_bg_palette[128] = {${formatCWordArray(
-        bgPalette,
-      )}\n};`;
-      const spritePaletteArray = `static const uint16_t ${sceneSymbol}_sprite_palette[128] = {${formatCWordArray(
-        spritePalette,
-      )}\n};`;
-      const playerSpriteIndex = scene.playerSprite
-        ? (spriteIndexById[scene.playerSprite.id] ?? 0)
-        : 0;
-      const isIsoScene = scene.type === "ISOMETRIC";
-      const sceneDef = isIsoScene
-        ? `/* Isometric scene: actors/triggers use tile-grid coordinates.
+                })
+                .join(",\n")}\n};`
+            : "";
+        const bgTilesetArray = `static const uint8_t ${sceneSymbol}_tileset[${Math.max(
+          1,
+          bgTileset.length,
+        )}] = {${
+          bgTileset.length > 0
+            ? `${formatCByteArray(bgTileset)}\n`
+            : "\n  0x00\n"
+        }};`;
+        const bgTilemapArray = `static const uint8_t ${sceneSymbol}_tilemap[${Math.max(
+          1,
+          bgTilemap.length,
+        )}] = {${
+          bgTilemap.length > 0
+            ? `${formatCByteArray(bgTilemap)}\n`
+            : "\n  0x00\n"
+        }};`;
+        const bgTilemapAttrArray =
+          bgTilemapAttr.length > 0
+            ? `static const uint8_t ${sceneSymbol}_tilemap_attr[${bgTilemapAttr.length}] = {${formatCByteArray(
+                bgTilemapAttr,
+              )}\n};`
+            : "";
+        const bgPaletteArray = `static const uint16_t ${sceneSymbol}_bg_palette[128] = {${formatCWordArray(
+          bgPalette,
+        )}\n};`;
+        const spritePaletteArray = `static const uint16_t ${sceneSymbol}_sprite_palette[128] = {${formatCWordArray(
+          spritePalette,
+        )}\n};`;
+        const playerSpriteIndex = scene.playerSprite
+          ? (spriteIndexById[scene.playerSprite.id] ?? 0)
+          : 0;
+        const isIsoScene = scene.type === "ISOMETRIC";
+        const sceneDef = isIsoScene
+          ? `/* Isometric scene: actors/triggers use tile-grid coordinates.
  * iso_tile_w=${ISO_TILE_W} iso_tile_h=${ISO_TILE_H} */
 static const gba_iso_scene_def_t ${sceneSymbol} = {
   .base = {
@@ -1876,7 +1910,7 @@ static const gba_iso_scene_def_t ${sceneSymbol} = {
   .iso_tile_w = ${ISO_TILE_W},
   .iso_tile_h = ${ISO_TILE_H},
 };`
-        : `static const gba_scene_def_t ${sceneSymbol} = {
+          : `static const gba_scene_def_t ${sceneSymbol} = {
   .width          = ${scene.width},
   .height         = ${scene.height},
   .type           = ${sceneTypeIds[scene.type] ?? 0},
@@ -1899,32 +1933,33 @@ static const gba_iso_scene_def_t ${sceneSymbol} = {
   .background_height = ${Math.max(0, Math.min(255, background.height))},
 };`;
 
-      sceneMap[scene.symbol] = {
-        id: scene.id,
-        name: scene.name || `Scene ${index + 1}`,
-        symbol: scene.symbol,
-      };
+        sceneMap[scene.symbol] = {
+          id: scene.id,
+          name: scene.name || `Scene ${index + 1}`,
+          symbol: scene.symbol,
+        };
 
-      return [
-        bgTilesetArray,
-        bgTilemapArray,
-        bgTilemapAttrArray,
-        bgPaletteArray,
-        spritePaletteArray,
-        collisionArray,
-        sceneStartScriptBlock,
-        ...triggerScriptBlocks,
-        ...actorScriptBlocks,
-        actorArray,
-        triggerArray,
-        spriteBlocks,
-        spriteTable,
-        sceneDef,
-      ]
-        .filter(Boolean)
-        .join("\n\n");
-    })
-    .join("\n\n");
+        return [
+          bgTilesetArray,
+          bgTilemapArray,
+          bgTilemapAttrArray,
+          bgPaletteArray,
+          spritePaletteArray,
+          collisionArray,
+          sceneStartScriptBlock,
+          ...triggerScriptBlocks,
+          ...actorScriptBlocks,
+          actorArray,
+          triggerArray,
+          spriteBlocks,
+          spriteTable,
+          sceneDef,
+        ]
+          .filter(Boolean)
+          .join("\n\n");
+      }),
+    )
+  ).join("\n\n");
 
   // Iso scenes are declared as gba_iso_scene_def_t; cast to the base type for
   // the scene table. The cast is safe because base is the first struct member.

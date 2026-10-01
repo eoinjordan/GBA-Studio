@@ -12,10 +12,14 @@ the same project to the native GBA-engine runtime, then load it over USB.
 
 ## Project Status
 
-<img width="673" height="480" alt="image" src="https://github.com/user-attachments/assets/3e5c7afd-c222-48e3-93ac-08c4681f2a43" />
+![The Sunstone Relay running in the current browser player](docs/screenshots/sunstone-relay-browser.jpg)
 
+![Poachermon with the current assets and dialogue renderer](docs/screenshots/poachermon-dialogue-browser.jpg)
 
-<img width="647" height="451" alt="image" src="https://github.com/user-attachments/assets/f88dc5e2-879c-4e38-8c0b-18bd9fbda729" />
+The desktop Handheld panel builds the open project, loads its native game over
+USB, or programs the FPGA and then loads the game. The Windows 4.4.9 installer,
+current browser games and hardware checks are described in
+[the validation report](docs/HANDHELD_VALIDATION.md).
 
 The editor opens projects and builds sample `.gba` ROMs locally and in CI.
 Electron packaging scripts produce desktop installers. GBA support remains
@@ -81,9 +85,9 @@ This fork sits alongside Eoin Jordan's GB Studio MCP/agent work: [gb-studio-agen
 
 For more information on the upstream project see the original [GB Studio](https://www.gbstudio.dev) site.
 
-![GBA Studio](gbstudio.gif)
+![Sunstone Relay on the Tang Nano 20K LCD](docs/screenshots/sunstone-relay-lcd.jpg)
 
-GBA Studio consists of an [Electron](https://electronjs.org/) game builder application and a C based game engine using [GBDK](http://gbdk.sourceforge.net/).
+GBA Studio consists of an [Electron](https://electronjs.org/) game builder application and a C game engine. The GBA target uses devkitARM; the Tang Nano 20K target uses LLVM to build native RISC-V firmware.
 
 ## Installation
 

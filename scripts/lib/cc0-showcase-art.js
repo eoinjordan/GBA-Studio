@@ -142,7 +142,26 @@ function renderPoachermonBackground() {
       }
     }
   }
-  return resizeNearest(large, 240, 160);
+  // A shared 16-color field palette separates paths, roof edges and water
+  // on the small LCD, without changing tile coordinates or collision maps.
+  return quantize(resizeNearest(large, 240, 160), [
+    "#244632",
+    "#426b3b",
+    "#638e43",
+    "#94b95a",
+    "#b8cd78",
+    "#463b32",
+    "#795338",
+    "#ac7951",
+    "#d3a474",
+    "#f0d59b",
+    "#2b596b",
+    "#478795",
+    "#72bac1",
+    "#bddee0",
+    "#d99662",
+    "#f7edc3",
+  ]);
 }
 
 function parseHex(color) {
@@ -262,11 +281,11 @@ function renderIsometricBackground() {
     "#d6c39b",
     "#eef0d2",
     "#294e36",
-    "#40713b",
-    "#66a044",
-    "#96cb57",
-    "#397b91",
-    "#79bac1",
+    "#3d6e46",
+    "#639749",
+    "#abd26b",
+    "#307b98",
+    "#92d0d3",
   ]);
 }
 

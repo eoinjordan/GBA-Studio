@@ -12,6 +12,23 @@
   "use strict";
 
   const EMULATOR_DATA_URL = "https://cdn.emulatorjs.org/4.2.3/data/";
+  const CONTROLS = {
+    0: {
+      0: { value: "s", value2: "BUTTON_2" },
+      8: { value: "x", value2: "BUTTON_1" },
+      2: { value: "v", value2: "SELECT" },
+      3: { value: "enter", value2: "START" },
+      4: { value: "up arrow", value2: "DPAD_UP" },
+      5: { value: "down arrow", value2: "DPAD_DOWN" },
+      6: { value: "left arrow", value2: "DPAD_LEFT" },
+      7: { value: "right arrow", value2: "DPAD_RIGHT" },
+      10: { value: "q", value2: "LEFT_TOP_SHOULDER" },
+      11: { value: "e", value2: "RIGHT_TOP_SHOULDER" },
+    },
+    1: {},
+    2: {},
+    3: {},
+  };
   const DEMOS = Object.freeze([
     Object.freeze({
       title: "The Sunstone Relay",
@@ -21,6 +38,7 @@
         "Talk to Keeper Nia, walk onto the west and east signal markers, claim the green lake core with X, then return to Nia. Press Enter on the ending to replay.",
       tag: "Isometric",
       url: "roms/isometric-adventure.gba",
+      screenshot: "screenshots/sunstone-relay.jpg",
     }),
     Object.freeze({
       title: "Poachermon: Case 001",
@@ -30,6 +48,7 @@
         "Finish Rowan's briefing, tag the west and east snares, confront Ash and Moss, free the pink creature, then return to Rowan.",
       tag: "Adventure",
       url: "roms/poachermon.gba",
+      screenshot: "screenshots/poachermon.jpg",
     }),
   ]);
 
@@ -69,6 +88,7 @@
     target.EJS_player = "#game";
     target.EJS_core = "gba";
     target.EJS_controlScheme = "gba";
+    target.EJS_defaultControls = CONTROLS;
     target.EJS_gameUrl = url;
     target.EJS_pathtodata = EMULATOR_DATA_URL;
     target.EJS_color = "#8b5cf6";
@@ -208,7 +228,12 @@
       const description = doc.createElement("span");
       description.textContent = demo.description;
 
-      card.append(tag, title, description);
+      const screenshot = document.createElement("img");
+      screenshot.src = demo.screenshot;
+      screenshot.alt = demo.title + " running in the browser";
+      screenshot.width = 240;
+      screenshot.height = 160;
+      card.append(screenshot, tag, title, description);
       card.addEventListener("click", function () {
         launch(demo.url, demo.title, demo);
       });
@@ -250,6 +275,7 @@
   }
 
   return {
+    CONTROLS,
     DEMOS,
     EMULATOR_DATA_URL,
     configureEmulator,

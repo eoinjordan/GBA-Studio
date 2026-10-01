@@ -1,0 +1,8 @@
+Application icon for GBA Studio, based on the compact handheld case.
+Wide purple shell with rounded upper corners and a curved lower edge.
+Central black 3:2 LCD bezel, left black D-pad, two right magenta buttons,
+slanted Start/Select pills and a lime power LED. The screen shows a green
+isometric tile and a gold sunstone. Front view, crisp geometric silhouettes,
+restrained shading, transparent background, generous padding, no text.
+Raster master: src/assets/app/icon/handheld-master.png.
+PNG, ICO and ICNS exports preserve its proportions and alpha channel.

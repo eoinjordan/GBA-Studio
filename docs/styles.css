@@ -154,3 +154,5 @@ footer { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 24px 0 
 @media (prefers-reduced-motion: no-preference) {
   .primary-button, .secondary-button, .demo-card { transition: transform 150ms ease, border-color 150ms ease, background 150ms ease; }
 }
+:root { --handheld-purple: #7652ba; }
+.demo-card img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; image-rendering: pixelated; border-radius: 6px; margin-bottom: 12px; }

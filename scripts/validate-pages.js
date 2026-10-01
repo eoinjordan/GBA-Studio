@@ -25,6 +25,7 @@ const emulatorHtml = fs.readFileSync(
 requireFile("styles.css");
 requireFile("player/player.js");
 requireFile("player/gba-studio-mark.svg");
+requireFile("player/handheld-logo.png");
 
 if (!landing.includes('href="player/"'))
   fail("landing page does not link to player");
@@ -57,6 +58,7 @@ if (
 }
 
 for (const demo of player.DEMOS) {
+  requireFile(path.posix.join("player", demo.screenshot));
   const relativePath = path.posix.join("player", demo.url);
   const rom = fs.readFileSync(requireFile(relativePath));
   if (!player.hasValidGbaHeader(rom))

@@ -9,6 +9,36 @@ GBA-FPGA. It displays a centred 240x160 game image. ROM assets, scripts and
 runtime state use SDRAM, while the FPGA draws tiles, sprites and dialogue.
 Games load over the board's USB UART without an SD card.
 
+## Desktop controls
+
+Open a project and choose **Handheld** in the toolbar. Configure Python,
+the GBA-FPGA checkout, USB UART and programmer. **Build game** exports the
+current editor state to `build/tang/firmware/game.tang.bin`.
+**Build + load game** uploads it to the installed platform.
+**Flash FPGA + load** programs the platform and then uploads the game.
+The panel shows the build log, CRC, CPU status and measured frame rate.
+
+SRAM configuration is selected by default for temporary tests. Uncheck it
+to write the FPGA configuration to flash. The game itself remains in SDRAM
+and needs another upload after power-off or FPGA reprogramming.
+
+The tested Windows cable uses index **4** (USB Debugger A), USB location
+**289**, and UART **COM5**. Get current locations with Gowin's
+`programmer_cli --scan-cables`; enumeration and driver types can change.
+Builds require Python, LLVM and the GBA-FPGA checkout even in the installed
+Studio application. USB loading additionally requires pyserial.
+
+## One-command build, flash and load
+
+```sh
+python scripts/build-tang.py examples/isometric-adventure/project.gbsproj out/tang/relay --port COM5 --flash --sram --cable-index 4 --location 289
+```
+
+To use a game directory directly, copy `game.tang.bin` and `build.json` into
+GBA-FPGA's `tangnano20k/studio_lcd/game/`. Its `flash studio_lcd --port ...`
+command finds and loads that game automatically. An ARM `.gba` file cannot
+replace the native Tang export.
+
 1. Update the bundled engine: `git submodule update --init --recursive`.
 2. Install Node.js, Python 3, LLVM (clang, LLD, llvm-objcopy), and pyserial:
    `python -m pip install pyserial`.

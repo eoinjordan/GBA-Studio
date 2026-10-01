@@ -3,6 +3,17 @@ const path = require("path");
 const player = require("../../docs/player/player.js");
 
 describe("GBA Studio browser player", () => {
+  test("advertised X/A and S/B keys map to the correct RetroPad buttons", () => {
+    expect(player.CONTROLS[0][8].value).toBe("x");
+    expect(player.CONTROLS[0][0].value).toBe("s");
+    const html = fs.readFileSync(
+      path.join(__dirname, "../../docs/player/emulator.html"),
+      "utf8",
+    );
+    expect(html).toContain(
+      "window.EJS_defaultControls = window.GBAStudioPlayer.CONTROLS",
+    );
+  });
   test("accepts GBA filenames case-insensitively", () => {
     expect(player.isGbaFileName("demo.gba")).toBe(true);
     expect(player.isGbaFileName("DEMO.GBA")).toBe(true);
@@ -91,7 +102,7 @@ describe("GBA Studio browser player", () => {
     expect(html).toContain(
       "storybook/?path=/story/gba-studio-preview--studio-workspace-preview",
     );
-    expect(html).toContain("player/gba-studio-mark.svg");
+    expect(html).toContain("player/handheld-logo.png");
   });
 
   test("publishes only the two fully validated feature demos", () => {

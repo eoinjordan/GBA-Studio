@@ -17,8 +17,8 @@
       }
 
       body {
-        display: grid;
-        place-items: stretch;
+        display: flex;
+        flex-direction: column;
         color: #f5f3ff;
         font:
           14px system-ui,
@@ -27,6 +27,31 @@
 
       #shell {
         position: relative;
+        flex: 1;
+        min-height: 0;
+      }
+
+      #game-controls {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px;
+        background: #101323;
+      }
+
+      #game-controls button {
+        min-width: 40px;
+        min-height: 36px;
+        border: 1px solid #8068b8;
+        border-radius: 6px;
+        color: #f5f3ff;
+        background: #29203f;
+        touch-action: none;
+        cursor: pointer;
+      }
+
+      #game-controls button:focus-visible {
+        outline: 2px solid #d9f99d;
       }
 
       .boot-status {
@@ -75,6 +100,33 @@
         Loading emulator controls…
       </button>
     </div>
+    <div id="game-controls" aria-label="Game buttons">
+      <button type="button" data-input="4" aria-label="Move up" disabled>
+        ↑
+      </button>
+      <button type="button" data-input="5" aria-label="Move down" disabled>
+        ↓
+      </button>
+      <button type="button" data-input="6" aria-label="Move left" disabled>
+        ←
+      </button>
+      <button type="button" data-input="7" aria-label="Move right" disabled>
+        →
+      </button>
+      <button
+        type="button"
+        data-input="8"
+        aria-label="A: interact or advance"
+        disabled
+      >
+        A
+      </button>
+      <button type="button" data-input="0" aria-label="B" disabled>B</button>
+      <button type="button" data-input="3" aria-label="Start" disabled>
+        Start
+      </button>
+    </div>
+    <script src="player.js"></script>
     <script>
       (function () {
         const params = new URLSearchParams(window.location.search);
@@ -101,6 +153,7 @@
         window.EJS_player = "#game";
         window.EJS_core = "gba";
         window.EJS_controlScheme = "gba";
+        window.EJS_defaultControls = window.GBAStudioPlayer.CONTROLS;
         window.EJS_gameUrl = rom;
         window.EJS_gameName = name;
         window.EJS_pathtodata = "https://cdn.emulatorjs.org/4.2.3/data/";
@@ -121,8 +174,58 @@
         };
         window.EJS_onGameStart = function () {
           bootStatus.hidden = true;
+          document
+            .querySelectorAll("#game-controls button")
+            .forEach(function (button) {
+              button.disabled = false;
+            });
+          const canvas = document.querySelector("#game canvas");
+          if (canvas) {
+            canvas.tabIndex = 0;
+            canvas.setAttribute("aria-label", name + " game screen");
+            canvas.focus();
+          }
           report("started", "Game running");
         };
+
+        // Button taps last long enough for a game frame to sample them.
+        // Pointer holds support continuous movement; keyboard activation taps.
+        document
+          .querySelectorAll("#game-controls button")
+          .forEach(function (button) {
+            const input = Number(button.dataset.input);
+            let pressedAt = 0;
+            let releaseTimer = null;
+            let pointerTap = false;
+            const press = function () {
+              window.clearTimeout(releaseTimer);
+              pressedAt = performance.now();
+              window.EJS_emulator.gameManager.simulateInput(0, input, 1);
+            };
+            const release = function () {
+              releaseTimer = window.setTimeout(
+                function () {
+                  window.EJS_emulator.gameManager.simulateInput(0, input, 0);
+                },
+                Math.max(0, 100 - (performance.now() - pressedAt)),
+              );
+            };
+            button.addEventListener("pointerdown", function (event) {
+              pointerTap = true;
+              button.setPointerCapture(event.pointerId);
+              press();
+            });
+            button.addEventListener("pointerup", release);
+            button.addEventListener("pointercancel", release);
+            button.addEventListener("click", function () {
+              if (pointerTap) {
+                pointerTap = false;
+                return;
+              }
+              press();
+              release();
+            });
+          });
 
         bootStatus.addEventListener("click", function () {
           const startButton = document.querySelector(".ejs_start_button");
