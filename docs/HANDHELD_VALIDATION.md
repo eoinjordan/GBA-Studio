@@ -17,11 +17,25 @@ disables actions while busy, displays errors and streams build/programmer logs.
 SRAM programming is selected initially. Unchecking it writes FPGA flash.
 Game firmware is held in SDRAM and must be loaded again after power-off.
 
-Studio 4.4.9 is installed locally as a portable app, with a **GBA Studio 4.4.9**
-Start menu entry. The installed executable reports version 4.4.9, and its app
-archive SHA256 matches the packaged build. The earlier 4.4.8 Squirrel installer
-succeeded; creating the final 4.4.9 Squirrel installer failed because the disk
-ran out of space. The complete 4.4.9 app was copied and launched successfully.
+The final Windows 4.4.9 Squirrel installer was built and installed after more
+disk space became available. Setup exited with code 0; the installed executable
+and Windows uninstall entry both report 4.4.9. The installed app archive SHA256
+matches the packaged build. The owner confirmed that the installed editor
+opened Sunstone Relay.
+
+The installed archive's compiler worker was extracted and run against Sunstone,
+then its bundled engine was compiled with LLVM. Both steps succeeded and produced
+the same 35,536-byte firmware and SHA256 as the prior hardware check. This checks
+the distributed compiler and engine; it does not exercise Electron's worker
+startup inside the archive or the native Handheld button click.
+
+The resulting firmware was then programmed and uploaded through Gowin and
+COM5: programming passed, CRC `ee54d55f` was verified, and the board reported
+28.915 fps with no CPU fault. [Windows installation and hardware results](reports/windows-local-e2e-2026-10-01.json)
+record the individual phases and package hashes. The native Handheld action
+is awaiting an owner-operated check because desktop automation cannot start.
+No fresh webcam check was possible: DirectShow could not enumerate video devices.
+
 React tests exercise configuration,
 required fields, current-project submission, errors and success messages;
 command tests check literal arguments and failed subprocesses. The full
