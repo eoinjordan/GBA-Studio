@@ -17,7 +17,12 @@ disables actions while busy, displays errors and streams build/programmer logs.
 SRAM programming is selected initially. Unchecking it writes FPGA flash.
 Game firmware is held in SDRAM and must be loaded again after power-off.
 
-The Windows installer was built locally. React tests exercise configuration,
+Studio 4.4.9 is installed locally as a portable app, with a **GBA Studio 4.4.9**
+Start menu entry. The installed executable reports version 4.4.9, and its app
+archive SHA256 matches the packaged build. The earlier 4.4.8 Squirrel installer
+succeeded; creating the final 4.4.9 Squirrel installer failed because the disk
+ran out of space. The complete 4.4.9 app was copied and launched successfully.
+React tests exercise configuration,
 required fields, current-project submission, errors and success messages;
 command tests check literal arguments and failed subprocesses. The full
 source-build/program/upload/report command was exercised on the real board.
@@ -74,3 +79,20 @@ are included; the final icon formats are generated from that master.
 The player pins EmulatorJS 4.2.3. Input bindings and on-screen buttons follow
 the upstream [control mapping](https://emulatorjs.org/docs4devs/control-mapping/)
 and [input implementation](https://github.com/EmulatorJS/EmulatorJS/blob/v4.2.3/data/src/GameManager.js).
+
+## Published checks
+
+The current [browser player](https://eoinjordan.github.io/GBA-Studio/player/)
+and workspace preview were deployed from commit `992d8a093`. Studio CI,
+the Pages build, the engine tests and FPGA Windows/Linux/macOS checks passed.
+Both public games were checked again for dialogue and movement after deployment.
+
+![Published game selection](screenshots/player-games.jpg)
+
+![Published Sunstone gameplay](screenshots/sunstone-relay-live.jpg)
+
+![Published Poachermon gameplay](screenshots/poachermon-live.jpg)
+
+![Published browser workspace preview](screenshots/workspace-browser.jpg)
+
+The workspace image shows the browser preview, not the native editor.
