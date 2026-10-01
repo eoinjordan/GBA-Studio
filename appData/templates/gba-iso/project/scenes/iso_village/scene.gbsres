@@ -1,11 +1,11 @@
 {
   "_resourceType": "scene",
-  "id": "5ce7e000-0000-4a00-8000-000000000iso",
-  "_index": 0,
+  "id": "6447c24e-8073-4878-8c3d-11b86f5f664a",
+  "_index": 1,
   "type": "ISOMETRIC",
-  "name": "Sunstone Relay - Dawn Circuit",
+  "name": "1: Keeper Village",
   "symbol": "scene_iso_village",
-  "x": 100,
+  "x": 450,
   "y": 100,
   "width": 8,
   "height": 7,
@@ -26,89 +26,37 @@
   "autoFadeSpeed": 1,
   "script": [
     {
-      "id": "iso-start-reset-briefing",
-      "command": "EVENT_SET_VALUE",
+      "id": "648669bf-68f6-4e41-8d5e-fa69ca0fdf7f",
+      "command": "EVENT_IF_TRUE",
       "args": {
-        "variable": "0",
-        "value": {
-          "type": "false"
-        }
+        "variable": "6"
+      },
+      "children": {
+        "true": [],
+        "false": [
+          {
+            "id": "2ef367f1-4a28-48eb-854e-a6a5e8ae325c",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "6",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "e106eb3c-24b1-4aaa-8dd7-9c06eea39f28",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "KEEPER VILLAGE\nTalk to Nia. A interacts."
+            }
+          }
+        ]
       }
     },
     {
-      "id": "iso-start-reset-count",
-      "command": "EVENT_SET_VALUE",
-      "args": {
-        "variable": "1",
-        "value": {
-          "type": "number",
-          "value": 0
-        }
-      }
-    },
-    {
-      "id": "iso-start-reset-west",
-      "command": "EVENT_SET_VALUE",
-      "args": {
-        "variable": "2",
-        "value": {
-          "type": "false"
-        }
-      }
-    },
-    {
-      "id": "iso-start-reset-east",
-      "command": "EVENT_SET_VALUE",
-      "args": {
-        "variable": "3",
-        "value": {
-          "type": "false"
-        }
-      }
-    },
-    {
-      "id": "iso-start-reset-core",
-      "command": "EVENT_SET_VALUE",
-      "args": {
-        "variable": "4",
-        "value": {
-          "type": "false"
-        }
-      }
-    },
-    {
-      "id": "iso-start-reset-complete",
-      "command": "EVENT_SET_VALUE",
-      "args": {
-        "variable": "5",
-        "value": {
-          "type": "false"
-        }
-      }
-    },
-    {
-      "id": "iso-start-tone",
-      "command": "EVENT_PALETTE_SET_BACKGROUND",
-      "args": {
-        "tone": 0
-      }
-    },
-    {
-      "id": "iso-start-title",
-      "command": "EVENT_TEXT",
-      "args": {
-        "text": "THE SUNSTONE RELAY\nThree paths. One fading dawn."
-      }
-    },
-    {
-      "id": "iso-start-help",
-      "command": "EVENT_TEXT",
-      "args": {
-        "text": "Wake both beacons, claim the core.\nKeeper Nia will guide you."
-      }
-    },
-    {
-      "id": "iso-start-end",
+      "id": "fa3e6a18-8714-40a2-8ce4-eb6e8501e14d",
       "command": "EVENT_END",
       "args": {}
     }
@@ -116,5 +64,5 @@
   "playerHit1Script": [],
   "playerHit2Script": [],
   "playerHit3Script": [],
-  "collisions": "019+006+012+00!01!003+013+00!01!004+013+002+01!002+012+006+019+"
+  "collisions": "019+006+014+004+013+005+012+004+01!00!012+006+019+"
 }

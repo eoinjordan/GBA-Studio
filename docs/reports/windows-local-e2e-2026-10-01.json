@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-01",
+  "studio_version": "4.4.9",
+  "windows_installer": {
+    "type": "Squirrel",
+    "build": "passed",
+    "exit_code": 0,
+    "executable_version": "4.4.9",
+    "uninstall_entry_version": "4.4.9",
+    "app_asar_sha256": "87cb2edc7cd9463ce8260974b10459da6c48667a2a4988dc3ff7263f25576f1b"
+  },
+  "native_editor": {
+    "project": "The Sunstone Relay",
+    "open": "confirmed by owner",
+    "handheld_flash_button": "awaiting owner-operated check",
+    "automation": "unavailable: desktop-control helper could not initialize"
+  },
+  "distributed_compiler": {
+    "method": "Extracted installed buildWorker.js executed as a Node worker",
+    "result": "passed",
+    "worker_sha256": "5b4cb63b1fe9a46e1e7d1f241a6a5cfe3547a526d9cf6a00396285ab08872ee5",
+    "bundled_engine_llvm_build": "passed",
+    "electron_worker_inside_asar": "not exercised"
+  },
+  "hardware": {
+    "device": "GW2AR-LV18QN88C8/I7",
+    "programmer": "Gowin V1.9.12.04",
+    "cable_index": 4,
+    "usb_location": 289,
+    "port": "COM5",
+    "mode": "SRAM",
+    "programming": "passed",
+    "firmware_bytes": 35536,
+    "firmware_sha256": "8793304bdbe55d93109d5a5bf9238b1dd4ab4b5ab614b2221f6a044621f14d83",
+    "crc32": "ee54d55f",
+    "loaded": true,
+    "cpu_fault": false,
+    "benchmark_seconds": 5.015,
+    "rendered_frames": 145,
+    "fps": 28.915,
+    "instruction_address": "000041d8",
+    "last_bus_address_low16": "0008"
+  },
+  "visual_check": "unavailable: DirectShow could not enumerate video devices",
+  "limitations": [
+    "The distributed compiler and hardware flow passed separately; the native Handheld action still needs its owner-operated check.",
+    "Game firmware is volatile SDRAM content and must be uploaded again after power-off.",
+    "No new calibrated voltage, current or power measurements were taken."
+  ]
+}

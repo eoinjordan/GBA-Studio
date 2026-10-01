@@ -1,11 +1,11 @@
 {
   "_resourceType": "scene",
-  "id": "5ce7e000-0000-4a00-8000-000000000002",
-  "_index": 0,
+  "id": "7671f207-60dd-4ac5-8d9d-578b2cc5f93c",
+  "_index": 1,
   "type": "TOPDOWN",
-  "name": "Reedline Ranger Outpost",
-  "symbol": "scene_poachermon_field_office",
-  "x": 100,
+  "name": "1: Ranger Outpost",
+  "symbol": "scene_scene_1",
+  "x": 450,
   "y": 100,
   "width": 30,
   "height": 20,
@@ -26,81 +26,37 @@
   "autoFadeSpeed": 1,
   "script": [
     {
-      "id": "poachermon-scene-group",
-      "command": "EVENT_GROUP",
+      "id": "98c59651-762f-4b66-83b1-3f8027e57001",
+      "command": "EVENT_IF_TRUE",
       "args": {
-        "__label": "Case briefing lifecycle"
+        "variable": "15"
       },
       "children": {
-        "true": [
+        "true": [],
+        "false": [
           {
-            "id": "poachermon-first-visit",
-            "command": "EVENT_IF_FALSE",
+            "id": "524f757b-477f-47c8-8724-d7bfcd6d98db",
+            "command": "EVENT_SET_VALUE",
             "args": {
-              "variable": "0"
-            },
-            "children": {
-              "true": [
-                {
-                  "id": "poachermon-title",
-                  "command": "EVENT_TEXT",
-                  "args": {
-                    "text": "POACHERMON!\nBEIGE CRIMES UNIT"
-                  }
-                },
-                {
-                  "id": "poachermon-call-briefing",
-                  "command": "EVENT_CALL_CUSTOM_EVENT",
-                  "args": {
-                    "customEventId": "d7ca5701-5d2d-4b81-8a2f-8815e163db01"
-                  }
-                }
-              ],
-              "false": [
-                {
-                  "id": "poachermon-reactivate-witness",
-                  "command": "EVENT_ACTOR_ACTIVATE",
-                  "args": {
-                    "actorId": "a02ea894-b111-4cd8-9125-4df27903a102"
-                  }
-                },
-                {
-                  "id": "poachermon-resume",
-                  "command": "EVENT_TEXT",
-                  "args": {
-                    "text": "CASE 001 RESUMED\nEvidence {1}/2  Caught {2}/2"
-                  }
-                }
-              ]
+              "variable": "15",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
             }
           },
           {
-            "id": "poachermon-briefing-active",
-            "command": "EVENT_IF",
+            "id": "30ca0f44-2acd-47a5-8343-bc9ac4b7707a",
+            "command": "EVENT_TEXT",
             "args": {
-              "condition": {
-                "type": "variable",
-                "value": "0"
-              }
-            },
-            "children": {
-              "true": [
-                {
-                  "id": "poachermon-objective",
-                  "command": "EVENT_TEXT",
-                  "args": {
-                    "text": "Talk to Captain Rowan.\nA interacts. D-pad moves."
-                  }
-                }
-              ],
-              "false": []
+              "text": "RANGER OUTPOST\nA talks. Ask Rowan for a case."
             }
           }
         ]
       }
     },
     {
-      "id": "poachermon-scene-end",
+      "id": "6c74a5b3-e1b3-4d25-8f0c-5abb650c3adc",
       "command": "EVENT_END",
       "args": {}
     }

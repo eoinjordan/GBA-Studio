@@ -39,6 +39,7 @@ import useWindowFocus from "ui/hooks/use-window-focus";
 import useWindowSize from "ui/hooks/use-window-size";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import API from "renderer/lib/api";
+import HandheldPanel from "./HandheldPanel";
 
 const sectionAccelerators = {
   world: "CommandOrControl+1",
@@ -76,6 +77,7 @@ const AppToolbar: FC = () => {
   const showZoom = zoomSections.includes(section);
   const showSearch = section === "world";
   const [searchTerm, setSearchTerm] = useState<string>(initalSearchTerm);
+  const [showHandheld, setShowHandheld] = useState(false);
   const windowFocus = useWindowFocus();
   const windowSize = useWindowSize();
   const smallZoom = (windowSize.width || 0) < 900;
@@ -286,6 +288,14 @@ const AppToolbar: FC = () => {
         </MenuItem>
       </DropdownButton>
       <FixedSpacer width={10} />
+      <Button
+        title="Build, flash and load a Studio game on Tang Nano 20K"
+        disabled={running}
+        onClick={() => setShowHandheld(true)}
+      >
+        Handheld
+      </Button>
+      {showHandheld && <HandheldPanel onClose={() => setShowHandheld(false)} />}
       {cancelling ? (
         <Button title={l10n("BUILD_CANCELLING")} onClick={openBuildLog}>
           <DotsIcon />

@@ -1,0 +1,13 @@
+{
+  "_resourceType": "background",
+  "id": "28111379-f7f8-4c2f-80db-2252cd7bf759",
+  "name": "poachermon title",
+  "symbol": "bg_poachermon_title",
+  "filename": "poachermon_title.png",
+  "tileColors": "",
+  "width": 30,
+  "height": 20,
+  "imageWidth": 240,
+  "imageHeight": 160,
+  "autoColor": true
+}

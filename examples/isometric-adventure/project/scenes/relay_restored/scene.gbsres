@@ -1,15 +1,15 @@
 {
   "_resourceType": "scene",
-  "id": "5ce7e000-0000-4a00-8000-000000000end",
-  "_index": 1,
+  "id": "676ddaa2-770a-4780-8d4e-06223d0b1344",
+  "_index": 3,
   "type": "ISOMETRIC",
-  "name": "Relay Restored",
-  "symbol": "scene_iso_relay_restored",
-  "x": 480,
+  "name": "3: Sunstone Sanctum",
+  "symbol": "scene_relay_restored",
+  "x": 1150,
   "y": 100,
   "width": 8,
   "height": 7,
-  "backgroundId": "b9a1c0de-0000-4a00-8000-000000000001",
+  "backgroundId": "85e18254-6c84-4397-8d32-29f2709a8b57",
   "tilesetId": "",
   "colorModeOverride": "none",
   "paletteIds": [],
@@ -26,55 +26,56 @@
   "autoFadeSpeed": 1,
   "script": [
     {
-      "id": "ending-tone",
-      "command": "EVENT_PALETTE_SET_BACKGROUND",
-      "args": {
-        "tone": 2
-      }
-    },
-    {
-      "id": "ending-complete-check",
+      "id": "3650afc2-0636-46e1-8f1f-f2afc281ffb3",
       "command": "EVENT_IF_TRUE",
       "args": {
-        "variable": "5"
+        "variable": "8"
       },
       "children": {
-        "true": [
-          {
-            "id": "ending-title",
-            "command": "EVENT_TEXT",
-            "args": {
-              "text": "SUNSTONE RELAY RESTORED!\nBoth village paths now glow."
-            }
-          },
-          {
-            "id": "ending-wait",
-            "command": "EVENT_WAIT",
-            "args": {
-              "frames": 12
-            }
-          },
-          {
-            "id": "ending-replay",
-            "command": "EVENT_TEXT",
-            "args": {
-              "text": "DEMO COMPLETE\nPress START to replay."
-            }
-          }
-        ],
+        "true": [],
         "false": [
           {
-            "id": "ending-incomplete",
+            "id": "69b6287a-c3e1-4143-87b7-42f022702dc5",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "8",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "36775756-9782-4b57-8926-7d05dd1d2e3a",
             "command": "EVENT_TEXT",
             "args": {
-              "text": "The relay is still dark.\nPress START and finish the route."
+              "text": "SUNSTONE SANCTUM\nTake the lake core to Nia."
             }
           }
         ]
       }
     },
     {
-      "id": "ending-end",
+      "id": "db4dda52-2565-4c97-8e3f-ebbf1edff756",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "4"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "8b2aeba7-7e2a-48ef-84db-22acca56d236",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "d2b50f20-8122-4a1e-8a9b-71cf1a5a78e2"
+            }
+          }
+        ],
+        "false": []
+      }
+    },
+    {
+      "id": "61ca4680-f330-4b58-8ca0-83e03535abce",
       "command": "EVENT_END",
       "args": {}
     }
@@ -82,5 +83,5 @@
   "playerHit1Script": [],
   "playerHit2Script": [],
   "playerHit3Script": [],
-  "collisions": "11111111100000011010001110100001110010011000000111111111"
+  "collisions": "019+00!01!004+012+00!012+003+012+006+012+006+012+004+01!00!019+"
 }

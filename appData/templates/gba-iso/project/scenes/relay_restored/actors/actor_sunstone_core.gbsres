@@ -1,0 +1,80 @@
+{
+  "_resourceType": "actor",
+  "id": "d2b50f20-8122-4a1e-8a9b-71cf1a5a78e2",
+  "_index": 0,
+  "symbol": "actor_sunstone_core",
+  "prefabId": "",
+  "name": "Sunstone Core",
+  "x": 3,
+  "y": 2,
+  "isoZ": 0,
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "26580148-2fdd-48c8-8a2c-18d68731cd61",
+  "paletteId": "e4aa83d0-8311-4ca3-8554-0d524a4cd527",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "3011e911-f4a7-4f72-8c06-0ed73a8e38cc",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "4"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "dc8bf049-210d-4c04-8c54-1176d1d3f961",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "The core is already yours."
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "e3c86399-e1ac-4965-8837-8596f7ff22a8",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "4",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "c1ed0576-22f9-4d7e-8e6d-21d88c54a27f",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "SUNSTONE RECOVERED\nBring the core to Nia."
+            }
+          },
+          {
+            "id": "f7a9d962-f540-483c-8613-e9f3f271fb29",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "$self$"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "c6713f24-7cfb-4337-86a0-20928fdd7e98",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

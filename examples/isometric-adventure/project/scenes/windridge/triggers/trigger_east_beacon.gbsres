@@ -1,0 +1,56 @@
+{
+  "_resourceType": "trigger",
+  "id": "36a4d650-fea7-4cee-8e32-80c14f2c380e",
+  "symbol": "trigger_east_beacon",
+  "name": "trigger east beacon",
+  "_index": 0,
+  "x": 6,
+  "y": 3,
+  "width": 1,
+  "height": 1,
+  "script": [
+    {
+      "id": "8757e227-3ac5-41bc-8a3b-04367260c6a9",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "3"
+      },
+      "children": {
+        "true": [],
+        "false": [
+          {
+            "id": "a7de946b-f7a5-4430-8e42-7afb4633907e",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "3",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "2ea3cd37-b422-4636-840b-994fca88057a",
+            "command": "EVENT_INC_VALUE",
+            "args": {
+              "variable": "1"
+            }
+          },
+          {
+            "id": "89c1857c-e123-43a1-89cf-20bc7d2acb68",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "EAST BEACON LIT\nBeacons restored: {1}/2."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "a036b0a8-ee15-4bd2-8a22-fa688750803b",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "leaveScript": []
+}

@@ -49,6 +49,17 @@ jobs:
       - name: Build CLI
         run: npm run make:cli
 
+      - name: Install Tang compiler
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends clang lld llvm python3
+
+      - name: Build native Tang games
+        run: |
+          python3 scripts/build-tang.py appData/templates/gba-blank/project.gbsproj out/tang/blank
+          python3 scripts/build-tang.py examples/starter-project/project.gbsproj out/tang/starter
+          python3 scripts/build-tang.py examples/poachermon/project.gbsproj out/tang/poachermon
+
       - name: Verify devkitPro GBA toolchain
         run: |
           test "$DEVKITPRO" = "/opt/devkitpro"
@@ -82,6 +93,7 @@ jobs:
             out/SunstoneRelay.gba
             appData/engine/gbavm/bin/game.gba
             out/ci/RunProject/**
+            out/tang/**
 
   build-windows-installer:
     runs-on: windows-latest

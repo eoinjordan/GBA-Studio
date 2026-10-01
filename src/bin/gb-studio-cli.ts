@@ -21,6 +21,7 @@ type Command = "export" | "make:rom" | "make:pocket" | "make:web";
 type CommandOptions = {
   onlyData?: boolean;
   verbose?: boolean;
+  target?: "gb" | "gba";
 };
 
 const buildTypeForCommand = (
@@ -51,7 +52,10 @@ const main = async (
   const projectRoot = Path.resolve(Path.dirname(projectFile));
   const loadedProject = await loadProject(projectFile);
   const project = decompressProjectResources(loadedProject.resources);
-  const buildType = buildTypeForCommand(command, destination);
+  const buildType =
+    command === "export" && options.target === "gba"
+      ? "gba"
+      : buildTypeForCommand(command, destination);
 
   // Load engine schema
   const engineSchema = await loadEngineSchema(projectRoot);
@@ -163,10 +167,14 @@ program.version(VERSION);
 
 program
   .command("export <projectFile> <destination>")
-  .description("Export a project file to a GBDK project with engine and data")
+  .description("Export a project with engine and generated game data")
+  .option("--target <target>", "Export target: gb or gba", "gb")
   .option("-d, --onlyData", "Only replace data folder in destination")
   .option("-v, --verbose", "Verbose output")
   .action((source, destination, options: CommandOptions) => {
+    if (options.target !== "gb" && options.target !== "gba") {
+      throw new Error("Export target must be gb or gba");
+    }
     return main("export", source, destination, options);
   });
 

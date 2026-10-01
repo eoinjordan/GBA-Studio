@@ -1,0 +1,56 @@
+{
+  "_resourceType": "trigger",
+  "id": "48c790bc-9e48-4a23-810d-df99fa04be60",
+  "symbol": "trigger_west_beacon",
+  "name": "trigger west beacon",
+  "_index": 0,
+  "x": 1,
+  "y": 2,
+  "width": 1,
+  "height": 1,
+  "script": [
+    {
+      "id": "1a8e2f9b-ec09-4df1-8d40-e48aa6fa56d7",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "2"
+      },
+      "children": {
+        "true": [],
+        "false": [
+          {
+            "id": "8a3edca3-732f-4177-8f24-96f0141f94a6",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "2",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "7a9d2b0d-40f5-40f6-8660-27e9ecf1c3e6",
+            "command": "EVENT_INC_VALUE",
+            "args": {
+              "variable": "1"
+            }
+          },
+          {
+            "id": "5c2d2308-3861-42a7-866b-7a3a20e1c13b",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "WEST BEACON LIT\nBeacons restored: {1}/2."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "6fc0c369-be5d-4c61-8b51-3ad557ff5f89",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "leaveScript": []
+}

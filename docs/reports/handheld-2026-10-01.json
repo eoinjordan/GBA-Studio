@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-01",
+  "device": "GW2AR-LV18QN88C8/I7",
+  "engine_commit": "4e780bb69334bb6a2de0cc0ff8fe67aa3f2c3f9c",
+  "studio_version": "4.4.9",
+  "programmer": {
+    "tool": "Gowin V1.9.12.04 programmer_cli",
+    "cable_index": 4,
+    "location": 289,
+    "mode": "SRAM"
+  },
+  "display": {
+    "width": 480,
+    "height": 272,
+    "game_width": 240,
+    "game_height": 160
+  },
+  "games": [
+    {
+      "firmware": "game.tang.bin",
+      "sha256": "8793304bdbe55d93109d5a5bf9238b1dd4ab4b5ab614b2221f6a044621f14d83",
+      "bytes": 35536,
+      "transfer": {
+        "loaded": true,
+        "bytes": 35536,
+        "crc32": "ee54d55f",
+        "frames": 0,
+        "cpu_fault": false
+      },
+      "benchmark": {
+        "seconds": 5.015,
+        "rendered_frames": 145,
+        "fps": 28.915
+      },
+      "status": {
+        "loaded": true,
+        "bytes": 35536,
+        "crc32": "ee54d55f",
+        "frames": 199,
+        "cpu_fault": false
+      },
+      "debug": {
+        "instruction_address": "000041d8",
+        "last_bus_address_low16": "0008"
+      },
+      "game": "The Sunstone Relay"
+    },
+    {
+      "firmware": "game.tang.bin",
+      "sha256": "64a2c049bc2fc25ec60ffa0497c6019a4d091b5d5063a902eaf79c101312a41e",
+      "bytes": 34096,
+      "transfer": {
+        "loaded": true,
+        "bytes": 34096,
+        "crc32": "d2265165",
+        "frames": 0,
+        "cpu_fault": false
+      },
+      "benchmark": {
+        "seconds": 5.012,
+        "rendered_frames": 145,
+        "fps": 28.928
+      },
+      "status": {
+        "loaded": true,
+        "bytes": 34096,
+        "crc32": "d2265165",
+        "frames": 200,
+        "cpu_fault": false
+      },
+      "debug": {
+        "instruction_address": "0000420c",
+        "last_bus_address_low16": "4208"
+      },
+      "game": "Poachermon: Case 001"
+    }
+  ],
+  "limits": [
+    "Game firmware is volatile in SDRAM.",
+    "Windows native UI clicks could not be automated because the desktop control helper failed to initialize.",
+    "Camera confirms displayed content, not calibrated color or electrical measurements.",
+    "Browser checks cover boot, dialogue advance and movement; full quests were not replayed."
+  ]
+}

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import styled from "styled-components";
+import handheldLogo from "../assets/app/icon/app_icon.png";
+import relayScreenshot from "../assets/templatePreview/gba-iso.png";
 
 const Shell = styled.div`
   min-height: 100vh;
@@ -34,23 +36,10 @@ const Topbar = styled.header`
   background: #171a27;
 `;
 
-const Mark = styled.span`
-  width: 32px;
+const Mark = styled.img`
+  width: 48px;
   height: 32px;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  background: #7c3aed;
-  box-shadow: inset 0 -3px 0 #5b21b6;
-
-  &::before {
-    width: 16px;
-    height: 11px;
-    border: 2px solid #d8f8df;
-    border-radius: 3px;
-    background: #18382b;
-    content: "";
-  }
+  object-fit: contain;
 `;
 
 const ProjectTitle = styled.div`
@@ -175,46 +164,11 @@ const Scene = styled.div`
   place-items: center;
 `;
 
-const IsoBoard = styled.div`
-  position: relative;
-  width: 480px;
-  height: 330px;
-  transform: translateY(18px);
-`;
-
-const Tile = styled.span<{ $x: number; $y: number; $path: boolean }>`
-  position: absolute;
-  left: ${({ $x, $y }) => 192 + ($x - $y) * 34}px;
-  top: ${({ $x, $y }) => 36 + ($x + $y) * 17}px;
-  width: 68px;
-  height: 34px;
-  border: 1px solid #0e3b2e;
-  background: ${({ $path }) => ($path ? "#c8b889" : "#4a9b67")};
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  filter: drop-shadow(0 2px 0 #18382b);
-`;
-
-const Actor = styled.span<{ $left: number; $top: number; $accent?: boolean }>`
-  position: absolute;
-  z-index: 3;
-  left: ${({ $left }) => $left}px;
-  top: ${({ $top }) => $top}px;
-  width: 24px;
-  height: 32px;
-  border: 4px solid #15221e;
-  border-radius: 7px 7px 4px 4px;
-  background: ${({ $accent }) => ($accent ? "#f2bd61" : "#a78bfa")};
-  box-shadow: 0 5px 0 #0005;
-
-  &::after {
-    position: absolute;
-    right: 2px;
-    bottom: 4px;
-    left: 2px;
-    height: 9px;
-    background: #312e55;
-    content: "";
-  }
+const SceneImage = styled.img`
+  width: min(90%, 720px);
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+  image-rendering: pixelated;
 `;
 
 const PlayOverlay = styled.div`
@@ -226,21 +180,12 @@ const PlayOverlay = styled.div`
   background: #05060ad9;
 `;
 
-const PreviewScreen = styled.div`
-  width: min(80%, 600px);
-  aspect-ratio: 3 / 2;
-  padding: 20px;
-  display: grid;
-  place-items: end center;
-  border: 12px solid #272936;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 56% 45%, #d9f0ae 0 7%, transparent 7.5%),
-    linear-gradient(155deg, transparent 49%, #b9aa7d 50% 61%, transparent 62%),
-    #438b61;
-  box-shadow: 0 18px 60px #000;
-  color: #142018;
-  font-weight: 900;
+const PreviewFrame = styled.iframe`
+  width: min(95%, 720px);
+  height: min(80%, 540px);
+  border: 1px solid #8068b8;
+  border-radius: 10px;
+  background: #05060a;
 `;
 
 const Field = styled.label`
@@ -279,11 +224,6 @@ const Event = styled.div<{ $green?: boolean }>`
   }
 `;
 
-const boardTiles = Array.from({ length: 35 }, (_, index) => ({
-  x: index % 7,
-  y: Math.floor(index / 7),
-}));
-
 const StudioWorkspace = () => {
   const [mode, setMode] = useState<"world" | "script">("world");
   const [running, setRunning] = useState(false);
@@ -292,10 +232,10 @@ const StudioWorkspace = () => {
     <Shell>
       <Window>
         <Topbar>
-          <Mark aria-hidden="true" />
+          <Mark src={handheldLogo} alt="GBA Studio handheld" />
           <ProjectTitle>
             <strong>The Sunstone Relay</strong>
-            <span>GBA Studio · Isometric project</span>
+            <span>GBA Studio · Browser workspace preview</span>
           </ProjectTitle>
           <ToolButton
             $active={mode === "world"}
@@ -310,7 +250,9 @@ const StudioWorkspace = () => {
             Script
           </ToolButton>
           <Spacer />
-          <ToolButton>Build ROM</ToolButton>
+          <ToolButton disabled title="Build and flash in the desktop app">
+            Build in desktop app
+          </ToolButton>
           <ToolButton $primary onClick={() => setRunning(true)}>
             ▶ Run
           </ToolButton>
@@ -321,8 +263,10 @@ const StudioWorkspace = () => {
             <PanelTitle>
               Project <span>+</span>
             </PanelTitle>
-            <Entity $selected>◇ Sunstone Village</Entity>
-            <Entity>◇ Relay Restored</Entity>
+            <Entity>◇ Opening Title</Entity>
+            <Entity $selected>◇ Keeper Village</Entity>
+            <Entity>◇ Windridge Beacons</Entity>
+            <Entity>◇ Sunstone Sanctum</Entity>
             <PanelTitle>Actors</PanelTitle>
             <Entity>Keeper Nia</Entity>
             <Entity>Sunstone Core</Entity>
@@ -340,24 +284,18 @@ const StudioWorkspace = () => {
               <span>Isometric · 100%</span>
             </CanvasToolbar>
             <Scene>
-              <IsoBoard aria-label="Isometric scene editor preview">
-                {boardTiles.map(({ x, y }) => (
-                  <Tile
-                    key={`${x}-${y}`}
-                    $x={x}
-                    $y={y}
-                    $path={x === 3 || y === 2}
-                  />
-                ))}
-                <Actor $left={226} $top={144} />
-                <Actor $left={296} $top={178} $accent />
-              </IsoBoard>
+              <SceneImage
+                src={relayScreenshot}
+                alt="The current Sunstone Relay game"
+              />
             </Scene>
             {running && (
               <PlayOverlay>
-                <PreviewScreen>
-                  Preview running · Arrow keys move · X interacts
-                </PreviewScreen>
+                <PreviewFrame
+                  title="Play The Sunstone Relay"
+                  src="../player/emulator.html?rom=roms%2Fisometric-adventure.gba&name=The%20Sunstone%20Relay"
+                  allow="autoplay; fullscreen; gamepad"
+                />
                 <ToolButton $primary onClick={() => setRunning(false)}>
                   Stop preview
                 </ToolButton>
@@ -371,7 +309,7 @@ const StudioWorkspace = () => {
               <>
                 <Field>
                   Name
-                  <input value="Sunstone Village" readOnly />
+                  <input value="Keeper Village" readOnly />
                 </Field>
                 <Field>
                   Scene type
@@ -384,22 +322,24 @@ const StudioWorkspace = () => {
                   <input value="Iso Village" readOnly />
                 </Field>
                 <Event $green>
-                  ✓ GBA validation
-                  <small>8 palettes · 600 tiles · collision ready</small>
+                  Current sample assets
+                  <small>
+                    177 unique background tiles · authored RGB colors
+                  </small>
                 </Event>
               </>
             ) : (
               <>
                 <Event>
                   On Init
-                  <small>Show “The relay is fading...”</small>
+                  <small>Show village introduction once</small>
                 </Event>
                 <Event $green>
-                  If beacons = 2<small>Enable Sunstone Core</small>
+                  If Nia has briefed the player<small>Open village exit</small>
                 </Event>
                 <Event>
                   Switch Scene
-                  <small>Relay Restored</small>
+                  <small>Windridge Beacons</small>
                 </Event>
               </>
             )}

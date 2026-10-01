@@ -12,28 +12,96 @@
   "use strict";
 
   const EMULATOR_DATA_URL = "https://cdn.emulatorjs.org/4.2.3/data/";
+  const CONTROLS = {
+    0: {
+      0: { value: "s", value2: "BUTTON_2" },
+      8: { value: "x", value2: "BUTTON_1" },
+      2: { value: "v", value2: "SELECT" },
+      3: { value: "enter", value2: "START" },
+      4: { value: "up arrow", value2: "DPAD_UP" },
+      5: { value: "down arrow", value2: "DPAD_DOWN" },
+      6: { value: "left arrow", value2: "DPAD_LEFT" },
+      7: { value: "right arrow", value2: "DPAD_RIGHT" },
+      10: { value: "q", value2: "LEFT_TOP_SHOULDER" },
+      11: { value: "e", value2: "RIGHT_TOP_SHOULDER" },
+    },
+    1: {},
+    2: {},
+    3: {},
+  };
   const DEMOS = Object.freeze([
     Object.freeze({
       title: "The Sunstone Relay",
       description:
-        "Complete a two-scene quest using isometric movement, collisions, triggers, interaction, depth ordering, variables, and scene transitions.",
+        "A title and three-scene adventure: wake the Windridge beacons and restore the Sunstone Sanctum.",
       instructions:
-        "Talk to Keeper Nia, walk onto the west and east signal markers, claim the green lake core with X, then return to Nia. Press Enter on the ending to replay.",
+        "Press Enter on the title. Talk to Keeper Nia with X, take the east exit to Windridge, light both gold beacons, then enter the sanctum. Claim the lake core and speak to Nia. Advance the ending with X, then Enter to replay.",
       tag: "Isometric",
-      url: "roms/isometric-adventure.gba",
+      url: "roms/isometric-adventure.gba?build=campaign-3",
+      screenshot: "screenshots/sunstone-relay.jpg",
     }),
     Object.freeze({
       title: "Poachermon: Case 001",
       description:
         "Collect evidence, report two poachers, rescue a trapped creature, and close a complete scripted case.",
       instructions:
-        "Finish Rowan's briefing, tag the west and east snares, confront Ash and Moss, free the pink creature, then return to Rowan.",
+        "Press Enter on the title. Talk to Rowan with X, take the west exit to Snare Trail, tag both snares and detain Ash. Take the north exit to Reedbank, detain Moss, free the creature and report to Rowan. X advances dialogue; Enter replays after the ending.",
       tag: "Adventure",
-      url: "roms/poachermon.gba",
+      url: "roms/poachermon.gba?build=campaign-3",
+      screenshot: "screenshots/poachermon.jpg",
     }),
   ]);
 
   let activeObjectUrl = null;
+
+  const KEY_INPUT = Object.freeze({
+    x: 8,
+    s: 0,
+    v: 2,
+    enter: 3,
+    arrowup: 4,
+    arrowdown: 5,
+    arrowleft: 6,
+    arrowright: 7,
+    q: 10,
+    e: 11,
+  });
+
+  // A tap must span a sampled game frame; a held key remains held until release.
+  function createInputController(send, clock = globalThis) {
+    const pressed = new Map();
+    const timers = new Map();
+    function press(input) {
+      if (timers.has(input)) clock.clearTimeout(timers.get(input));
+      timers.delete(input);
+      if (!pressed.has(input)) {
+        pressed.set(input, clock.Date.now());
+        send(input, 1);
+      }
+    }
+    function release(input) {
+      if (!pressed.has(input)) return;
+      if (timers.has(input)) clock.clearTimeout(timers.get(input));
+      timers.set(
+        input,
+        clock.setTimeout(
+          function () {
+            send(input, 0);
+            pressed.delete(input);
+            timers.delete(input);
+          },
+          Math.max(0, 85 - (clock.Date.now() - pressed.get(input))),
+        ),
+      );
+    }
+    function reset() {
+      timers.forEach((timer) => clock.clearTimeout(timer));
+      pressed.forEach((_time, input) => send(input, 0));
+      timers.clear();
+      pressed.clear();
+    }
+    return { press, release, reset };
+  }
 
   function isGbaFileName(name) {
     return typeof name === "string" && /\.gba$/i.test(name.trim());
@@ -61,7 +129,7 @@
   function demoFromUrl(url) {
     const cleanUrl = String(url || "").split(/[?#]/, 1)[0];
     return DEMOS.find(function (demo) {
-      return demo.url === cleanUrl;
+      return demo.url.split("?", 1)[0] === cleanUrl;
     });
   }
 
@@ -69,6 +137,7 @@
     target.EJS_player = "#game";
     target.EJS_core = "gba";
     target.EJS_controlScheme = "gba";
+    target.EJS_defaultControls = CONTROLS;
     target.EJS_gameUrl = url;
     target.EJS_pathtodata = EMULATOR_DATA_URL;
     target.EJS_color = "#8b5cf6";
@@ -82,8 +151,19 @@
     const params = new URLSearchParams();
     params.set("rom", url);
     params.set("name", name || romNameFromUrl(url));
-    params.set("player", "2");
+    params.set("player", "3");
     return `emulator.html?${params.toString()}`;
+  }
+
+  function publishedRomUrl(demo, manifest) {
+    const clean = demo.url.split("?", 1)[0];
+    const game =
+      manifest &&
+      manifest.games &&
+      manifest.games.find((item) => item.url === clean);
+    return game && /^[a-f0-9]{64}$/.test(game.sha256)
+      ? `${clean}?build=${game.sha256}`
+      : demo.url;
   }
 
   function init(doc, target) {
@@ -100,6 +180,43 @@
     const demoGrid = doc.getElementById("demo-grid");
     const closeButton = doc.getElementById("close-btn");
     let activeFrame = null;
+    let manifest = null;
+    if (target.fetch)
+      target
+        .fetch("rom-manifest.json", { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data) => {
+          manifest = data;
+          const badge = doc.querySelector(".build-badge");
+          if (badge && data)
+            badge.textContent = `Title + 3 scenes · ${data.revision.slice(0, 8)}`;
+        })
+        .catch(function () {});
+
+    ["keydown", "keyup"].forEach(function (type) {
+      target.addEventListener(type, function (event) {
+        const input = KEY_INPUT[event.key.toLowerCase()];
+        if (
+          !activeFrame ||
+          input === undefined ||
+          event.repeat ||
+          /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)
+        )
+          return;
+        event.preventDefault();
+        activeFrame.contentWindow.postMessage(
+          { source: "gba-studio-keyboard", input, pressed: type === "keydown" },
+          target.location.origin,
+        );
+      });
+    });
+    target.addEventListener("blur", function () {
+      if (activeFrame)
+        activeFrame.contentWindow.postMessage(
+          { source: "gba-studio-keyboard", reset: true },
+          target.location.origin,
+        );
+    });
 
     if (!dropZone || !romInput || !loaderUi || !emulatorWrap || !game) {
       return false;
@@ -138,6 +255,7 @@
       frame.setAttribute("allowfullscreen", "");
       frame.src = emulatorUrl(url, name);
       activeFrame = frame;
+      emulatorWrap.scrollIntoView({ block: "start" });
       game.appendChild(frame);
     }
 
@@ -208,9 +326,14 @@
       const description = doc.createElement("span");
       description.textContent = demo.description;
 
-      card.append(tag, title, description);
+      const screenshot = document.createElement("img");
+      screenshot.src = demo.screenshot;
+      screenshot.alt = demo.title + " running in the browser";
+      screenshot.width = 240;
+      screenshot.height = 160;
+      card.append(screenshot, tag, title, description);
       card.addEventListener("click", function () {
-        launch(demo.url, demo.title, demo);
+        launch(publishedRomUrl(demo, manifest), demo.title, demo);
       });
       demoGrid.appendChild(card);
     });
@@ -250,11 +373,15 @@
   }
 
   return {
+    KEY_INPUT,
+    createInputController,
+    CONTROLS,
     DEMOS,
     EMULATOR_DATA_URL,
     configureEmulator,
     demoFromUrl,
     emulatorUrl,
+    publishedRomUrl,
     hasValidGbaHeader,
     init,
     isGbaFileName,

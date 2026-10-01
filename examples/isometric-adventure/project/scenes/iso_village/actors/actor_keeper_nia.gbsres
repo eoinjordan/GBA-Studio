@@ -1,0 +1,80 @@
+{
+  "_resourceType": "actor",
+  "id": "d44c2993-3192-4c45-8f87-127f021385d4",
+  "_index": 0,
+  "symbol": "actor_keeper_nia",
+  "prefabId": "",
+  "name": "Keeper Nia",
+  "x": 5,
+  "y": 4,
+  "isoZ": 0,
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "4abb64b5-33a0-4257-88d1-1802f36f1853",
+  "paletteId": "1706ac37-5ef8-444e-8c63-95179471d952",
+  "direction": "left",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "eec42a10-3391-47fa-83b3-829ba50ce6be",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "0"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "64796a05-a8de-49f1-8725-916dd75c8dae",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Follow the gold east marker.\nWake both ridge beacons."
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "79ad2b58-9d75-4e35-8f66-bdac8c8b1fae",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Dawn has left our valley.\nWill you restore the relay?"
+            }
+          },
+          {
+            "id": "fa5b8cba-9ee0-4a7d-886f-283af26150f0",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "0",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "31ef2484-57d3-4721-87ee-0c6c4d575864",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Wake both Windridge beacons.\nThen find the sanctum core."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "0f502295-19e0-457a-825b-1cdcdaa1de5b",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

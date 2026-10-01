@@ -1,20 +1,14 @@
-# Poachermon: Beige Crimes Unit
+# Poachermon: Case 001
 
-Case 001, “The Snare Affair,” is a complete one-screen conservation mystery built as the GBA Studio feature demo.
+The Snare Affair has an opening title and three playable investigation areas.
 
-## Play loop
+1. Press **START** on the title. Speak to **Captain Rowan** with **A** at the Ranger Outpost, then take the west exit.
+2. On **Snare Trail**, tag both snares and detain Ash. The north exit opens after his arrest.
+3. At **Reedbank**, detain Moss, free the trapped creature and report to Rowan to close the case.
+4. Advance the ending with **A**, then press **START** for a fresh case.
 
-1. Talk to Captain Rowan with **A**.
-2. Tag any two evidence sources: the west snare, east snare, or trail-camera zone near the office path.
-3. Confront Poacher Ash on the west side and Poacher Moss on the east side.
-4. Free the trapped pink creature, then report back to Rowan to close the case.
+Use the D-pad to walk and **A** to interact or advance dialogue. The browser uses arrows, **X** for A and **Enter** for START. Returning to an earlier area preserves evidence and arrests; repeated interactions cannot award them twice.
 
-Hold **B** while talking to Witness Finn for the quiet clue. The final case screen reports the generated field score; **START** reopens the patrol.
+The example and portable template share the same scenes, scripts and assets. Campaign tests check collision reachability, supported events, objective gates, return visits, completion and replay. GitHub Actions builds both ROMs for the browser player.
 
-## GBA feature coverage
-
-The demo exercises scene-start and interaction scripts, custom events, variables and arithmetic, random values, branching, input checks, text interpolation, waits, palette tones, actor positioning/movement/direction, activation, collision toggles, scene triggers, runtime actor conditions, scene switching, background collision, and animated sprites.
-
-`test/examples/poachermon.test.js` keeps the example and distributable template aligned and rejects unsupported script events. GitHub Actions compiles the ROM for CI and publishes it to the browser player.
-
-All bundled art is original redistributable pixel art and contains no third-party ROM assets.
+Art combines local pixel art with redistributed CC0 sources. See `third_party/showcase-art/README.md` in the repository for credits and licenses. No commercial ROM assets are bundled.

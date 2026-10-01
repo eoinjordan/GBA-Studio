@@ -1,0 +1,13 @@
+{
+  "_resourceType": "background",
+  "id": "1740758f-c21f-415d-8cb5-c37a71c8a728",
+  "name": "windridge",
+  "symbol": "bg_windridge",
+  "filename": "windridge.png",
+  "tileColors": "",
+  "width": 30,
+  "height": 20,
+  "imageWidth": 240,
+  "imageHeight": 160,
+  "autoColor": true
+}

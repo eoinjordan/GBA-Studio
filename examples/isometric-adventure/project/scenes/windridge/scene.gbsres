@@ -1,0 +1,68 @@
+{
+  "_resourceType": "scene",
+  "id": "128b69d2-2848-4bc6-8411-6c112f5271d4",
+  "_index": 2,
+  "type": "ISOMETRIC",
+  "name": "2: Windridge Beacons",
+  "symbol": "scene_windridge",
+  "x": 800,
+  "y": 100,
+  "width": 8,
+  "height": 7,
+  "backgroundId": "1740758f-c21f-415d-8cb5-c37a71c8a728",
+  "tilesetId": "",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "1706ac37-5ef8-444e-8c63-95179471d952",
+    "e4aa83d0-8311-4ca3-8554-0d524a4cd527",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06",
+    "12059cce-ee54-4980-8894-138f685a4d06"
+  ],
+  "autoFadeSpeed": 1,
+  "script": [
+    {
+      "id": "97ab528d-68a1-49aa-8b6f-f98a8e72ec4b",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "7"
+      },
+      "children": {
+        "true": [],
+        "false": [
+          {
+            "id": "7772440d-6ef0-43e2-8b0a-5bb1c754f3d4",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "7",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "55218329-ff03-4a8b-82a7-59e321c8e832",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "WINDRIDGE\nStep on both signal markers."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "3451e371-8620-4181-893f-175aed96c99e",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "collisions": "019+006+012+006+012+006+012+006+012+006+019+"
+}

@@ -30,6 +30,7 @@ const VM_OP_ACTOR_SET_COLLISIONS = 0x15;
 const VM_OP_IF_ACTOR_AT_POS = 0x16;
 const VM_OP_IF_ACTOR_RELATIVE = 0x17;
 const VM_OP_LOAD_SCENE_AT = 0x18;
+const VM_OP_AWAIT_INPUT = 0x19;
 
 // GBA key bit masks (mirror gba_system.h).
 const GBA_KEYS: Record<string, number> = {
@@ -46,7 +47,7 @@ const GBA_KEYS: Record<string, number> = {
 };
 
 // GB Studio direction_e order: 0=down, 1=left, 2=right, 3=up.
-const GBA_DIRECTIONS: Record<string, number> = {
+export const GBA_DIRECTIONS: Record<string, number> = {
   down: 0,
   left: 1,
   right: 2,
@@ -118,6 +119,35 @@ function encodeString(s: string): number[] {
   }
   bytes.push(0x00); // NUL terminator
   return bytes;
+}
+
+// Match the runtime's 28-column, two-line textbox. Each page gets its own
+// SHOW_TEXT so instructions beyond the first two lines cannot disappear.
+function dialoguePages(text: string): string[] {
+  const lines: string[] = [];
+  const width = (value: string) => value.replace(/\{\d+\}/g, "-32768").length;
+  for (const paragraph of text.split("\n")) {
+    let line = "";
+    for (const word of paragraph.split(/\s+/).filter(Boolean)) {
+      if (line && width(`${line} ${word}`) > 28) {
+        lines.push(line);
+        line = "";
+      }
+      if (width(word) > 28) {
+        let rest = word;
+        while (rest.length > 28) {
+          lines.push(rest.slice(0, 28));
+          rest = rest.slice(28);
+        }
+        line = rest;
+      } else line += `${line ? " " : ""}${word}`;
+    }
+    lines.push(line);
+  }
+  const pages: string[] = [];
+  for (let index = 0; index < lines.length; index += 2)
+    pages.push(lines.slice(index, index + 2).join("\n"));
+  return pages;
 }
 
 function clampU8(n: number): number {
@@ -411,12 +441,12 @@ function compileEvent(
       return true;
 
     case "EVENT_TEXT": {
-      // args.text may be a string or array of strings (multi-page). We join
-      // with newline — the textbox renderer shows the first two wrapped lines.
-      const raw = Array.isArray(args.text)
-        ? (args.text as string[]).join("\n")
-        : String(args.text ?? "");
-      out.push(VM_OP_SHOW_TEXT, ...encodeString(raw));
+      const texts = Array.isArray(args.text)
+        ? args.text.map(String)
+        : [String(args.text ?? "")];
+      for (const text of texts)
+        for (const page of dialoguePages(text))
+          out.push(VM_OP_SHOW_TEXT, ...encodeString(page));
       return true;
     }
 
@@ -564,6 +594,13 @@ function compileEvent(
         (args.false as GBAScriptEvent[] | undefined) ?? event.children?.false,
         ctx,
       );
+      return true;
+    }
+
+    case "EVENT_AWAIT_INPUT": {
+      const mask = inputMask(args.input);
+      if (!mask) return false;
+      out.push(VM_OP_AWAIT_INPUT, mask & 0xff, (mask >> 8) & 0xff);
       return true;
     }
 

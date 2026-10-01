@@ -1,0 +1,36 @@
+{
+  "_resourceType": "trigger",
+  "id": "1f286d1a-87a5-4d28-8628-1686111d2f8d",
+  "symbol": "trigger_sanctum_return",
+  "name": "trigger sanctum return",
+  "_index": 0,
+  "x": 1,
+  "y": 5,
+  "width": 1,
+  "height": 1,
+  "script": [
+    {
+      "id": "536b0afc-50ee-4054-8845-ff7677d58e05",
+      "command": "EVENT_SWITCH_SCENE",
+      "args": {
+        "sceneId": "128b69d2-2848-4bc6-8411-6c112f5271d4",
+        "x": {
+          "type": "number",
+          "value": 5
+        },
+        "y": {
+          "type": "number",
+          "value": 5
+        },
+        "direction": "up",
+        "fadeSpeed": "1"
+      }
+    },
+    {
+      "id": "adc10cbd-b9e3-41e9-8478-4a8326a7fdaf",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "leaveScript": []
+}

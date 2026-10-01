@@ -1,0 +1,36 @@
+{
+  "_resourceType": "trigger",
+  "id": "be289c3a-203e-4f93-8b2f-a2d7e1064d93",
+  "symbol": "trigger_ridge_return",
+  "name": "trigger ridge return",
+  "_index": 0,
+  "x": 1,
+  "y": 5,
+  "width": 1,
+  "height": 1,
+  "script": [
+    {
+      "id": "3d16cb40-2da7-487c-896a-0a0f2a06bae3",
+      "command": "EVENT_SWITCH_SCENE",
+      "args": {
+        "sceneId": "6447c24e-8073-4878-8c3d-11b86f5f664a",
+        "x": {
+          "type": "number",
+          "value": 5
+        },
+        "y": {
+          "type": "number",
+          "value": 5
+        },
+        "direction": "up",
+        "fadeSpeed": "1"
+      }
+    },
+    {
+      "id": "84b304b8-dfd7-43f0-8bd3-4ab427f256b5",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "leaveScript": []
+}

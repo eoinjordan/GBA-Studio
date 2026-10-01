@@ -2,7 +2,7 @@
   "_resourceType": "project",
   "name": "Poachermon: Beige Crimes Unit",
   "author": "GBA Studio",
-  "notes": "Playable Case 001 demo: collect evidence, report two poachers, rescue a trapped creature, and close the case. Original redistributable sample art; no third-party ROM assets.",
+  "notes": "Poachermon: Case 001: opening title, three playable areas, objective gates, ending and replay.",
   "_version": "4.2.0",
   "_release": "4"
 }

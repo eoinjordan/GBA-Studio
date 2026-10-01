@@ -10,6 +10,7 @@ test("GBA compile emits valid C for constant variable events", async () => {
       startSceneId: "scene1",
       startX: 0,
       startY: 0,
+      startDirection: "up",
       colorCorrection: "default",
       colorMode: "mono",
       defaultFontId: "font1",
@@ -121,4 +122,7 @@ test("GBA compile emits valid C for constant variable events", async () => {
   expect(sceneData).toMatch(/0x04,\s+0x03,\s+0x01/);
   expect(sceneData).toMatch(/0x04,\s+0x04,\s+0x07/);
   expect(sceneData).toMatch(/0x04,\s+0x05,\s+0x00/);
+  expect(sceneData).toMatch(
+    /const gba_game_data_t gba_game_data = \{\s+1,\s+0,\s+0,\s+0,\s+3,/,
+  );
 });

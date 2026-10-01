@@ -1,0 +1,13 @@
+{
+  "_resourceType": "background",
+  "id": "5bb8f95f-1c0d-4e0a-88c2-3d18687e234d",
+  "name": "sunstone title",
+  "symbol": "bg_sunstone_title",
+  "filename": "sunstone_title.png",
+  "tileColors": "",
+  "width": 30,
+  "height": 20,
+  "imageWidth": 240,
+  "imageHeight": 160,
+  "autoColor": true
+}

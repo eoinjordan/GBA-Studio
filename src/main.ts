@@ -11,6 +11,9 @@ import {
 import windowStateKeeper from "electron-window-state";
 import settings from "electron-settings";
 import Path from "path";
+import os from "os";
+import { hardwareCommand, runTool, readHardwareReport } from "lib/handheld/run";
+import type { HandheldAction, HandheldConfig } from "shared/lib/handheld/types";
 import {
   copyFile,
   pathExists,
@@ -48,6 +51,7 @@ import {
   EMULATOR_MUTED_SETTING_KEY,
   LOCALE_SETTING_KEY,
   projectTemplatesRoot,
+  defaultEngineRoot,
   THEME_SETTING_KEY,
 } from "consts";
 import type {
@@ -1535,6 +1539,88 @@ ipcMain.handle(
         buildErr(e.toString());
       }
       throw e;
+    }
+  },
+);
+
+let handheldBusy = false;
+ipcMain.handle("handheld:config", async () => {
+  const sibling = Path.join(os.homedir(), "git", "GBA-FPGA");
+  return (
+    settings.get("handheld") || {
+      python: process.platform === "win32" ? "python" : "python3",
+      llvm: "",
+      fpga: (await pathExists(sibling)) ? sibling : "",
+      gowin: "",
+      port: "",
+      cableIndex: 4,
+      sram: true,
+    }
+  );
+});
+ipcMain.handle(
+  "handheld:run",
+  async (
+    _event,
+    project: ProjectResources,
+    options: BuildOptions,
+    action: HandheldAction,
+    config: HandheldConfig,
+  ) => {
+    if (!projectPath) throw new Error("Open a project first");
+    if (handheldBusy)
+      throw new Error("A handheld operation is already running");
+    const output = Path.join(Path.dirname(projectPath), "build", "tang");
+    const command = hardwareCommand(action, config, output);
+    handheldBusy = true;
+    const log = (message: string) =>
+      sendToProjectWindow("handheld:log", message);
+    try {
+      settings.set("handheld", config);
+      log("Exporting the current project for Tang Nano 20K…\n");
+      const data = Path.join(output, "data");
+      await buildProject(project, {
+        ...options,
+        projectRoot: Path.dirname(projectPath),
+        outputRoot: data,
+        romFilename: "game.gba",
+        tmpPath: getTmp(),
+        buildType: "gba",
+        make: false,
+        debugEnabled: false,
+        progress: log,
+        warnings: log,
+      });
+      // External Python/LLVM cannot read inside app.asar. Copy the bundled engine to a writable directory.
+      const engine = Path.join(output, "engine");
+      await copy(defaultEngineRoot, engine);
+      log("Compiling native game.tang.bin…\n");
+      await runTool(
+        config.python,
+        [
+          Path.join(engine, "platform/tangnano20k/build.py"),
+          "--data",
+          data,
+          "--out",
+          Path.join(output, "firmware"),
+          ...(config.llvm ? ["--llvm", config.llvm] : []),
+        ],
+        log,
+      );
+      if (command.length) {
+        log(
+          action === "flash"
+            ? "Programming FPGA, then loading the game…\n"
+            : "Loading game over USB…\n",
+        );
+        await runTool(config.python, command, log);
+      }
+      return {
+        firmware: Path.join(output, "firmware", "game.tang.bin"),
+        ...(command.length ? { report: readHardwareReport(output) } : {}),
+      };
+    } finally {
+      handheldBusy = false;
     }
   },
 );

@@ -1,0 +1,87 @@
+{
+  "_resourceType": "scene",
+  "id": "74b798d9-1821-407f-829a-52865cff59e9",
+  "_index": 2,
+  "type": "TOPDOWN",
+  "name": "2: Snare Trail",
+  "symbol": "scene_snare_trail",
+  "x": 800,
+  "y": 100,
+  "width": 30,
+  "height": 20,
+  "backgroundId": "20bbe7b8-241c-4d94-8260-cf59717641b1",
+  "tilesetId": "",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [
+    "7fee6b88-f893-493b-82e0-810d6e27a59b",
+    "35543855-752d-4195-836a-ca14bee206d3",
+    "e28289ef-a222-48fa-8c44-af79b5e54e40",
+    "5c769a01-83e5-4647-8254-5ba44907eec9",
+    "73bf49a8-808d-481b-8392-f9c053720845",
+    "9b00eabc-acc9-46e4-8aea-89f44f98e89f",
+    "01edf222-4cde-45ee-8946-98984e07fbe4",
+    "7fee6b88-f893-493b-82e0-810d6e27a59b"
+  ],
+  "autoFadeSpeed": 1,
+  "script": [
+    {
+      "id": "8faa7df8-7414-46b7-8ba2-b04f8761a970",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "16"
+      },
+      "children": {
+        "true": [],
+        "false": [
+          {
+            "id": "23540831-e285-4e39-8963-d9cb97ba3d57",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "16",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "a2b14431-590b-47b9-82ec-ec8a3b0e56b3",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "SNARE TRAIL\nTag both snares. Catch Ash."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "f4aaec7d-257f-44e4-810d-265850b17c70",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "11"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "beb6c358-17b0-4ccc-8cd7-cd26ac376e74",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "4c05184e-420a-4a04-8f97-6389dff0b945"
+            }
+          }
+        ],
+        "false": []
+      }
+    },
+    {
+      "id": "20c53a11-2c50-4b50-8a51-cef89abc53e3",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "collisions": "011f+001c+012+002+01!002+01!002+01!00b+01!002+01!002+01!00!012+001c+012+001c+012+001c+013+001b+012+005+01!0010+01!005+012+001c+012+001c+013+001b+012+001c+012+001c+012+001c+013+001b+012+001c+012+006+01!0012+01!002+012+001c+012+001c+011f+"
+}

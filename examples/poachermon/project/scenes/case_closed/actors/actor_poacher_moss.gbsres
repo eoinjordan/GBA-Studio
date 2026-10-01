@@ -1,0 +1,86 @@
+{
+  "_resourceType": "actor",
+  "id": "8f2fe3ee-a3fe-4726-814e-1339792e4817",
+  "_index": 0,
+  "symbol": "actor_poacher_moss",
+  "prefabId": "",
+  "name": "Poacher Moss",
+  "x": 14,
+  "y": 8,
+  "frame": 0,
+  "animate": true,
+  "spriteSheetId": "2a39d9a0-48f1-42b6-8845-3f15c4c21f4e",
+  "paletteId": "73bf49a8-808d-481b-8392-f9c053720845",
+  "direction": "left",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "script": [
+    {
+      "id": "a8247c3a-03e2-4562-8879-eb76aa4c1c70",
+      "command": "EVENT_IF_TRUE",
+      "args": {
+        "variable": "12"
+      },
+      "children": {
+        "true": [
+          {
+            "id": "680022f5-433c-4d8a-84e1-3d0803b6d31d",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Moss has been detained."
+            }
+          }
+        ],
+        "false": [
+          {
+            "id": "1048aed9-ee27-4507-8463-be453e7a9a4c",
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": "Ash named your trap route.\nYou are under arrest, Moss."
+            }
+          },
+          {
+            "id": "2a96cff2-6f4f-4ae2-8b69-e45de7c6455e",
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "12",
+              "value": {
+                "type": "number",
+                "value": 1
+              }
+            }
+          },
+          {
+            "id": "7f54f1dc-9234-482a-831f-1d5d24f7fabc",
+            "command": "EVENT_INC_VALUE",
+            "args": {
+              "variable": "2"
+            }
+          },
+          {
+            "id": "4348290d-4f8f-4513-8c1d-cb405c4a6be5",
+            "command": "EVENT_ACTOR_DEACTIVATE",
+            "args": {
+              "actorId": "$self$"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "db49790a-139c-41c5-8d72-cc3e62e898c5",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": []
+}

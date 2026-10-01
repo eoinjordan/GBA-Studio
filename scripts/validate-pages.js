@@ -22,9 +22,13 @@ const emulatorHtml = fs.readFileSync(
   requireFile("player/emulator.html"),
   "utf8",
 );
+const manifest = JSON.parse(
+  fs.readFileSync(requireFile("player/rom-manifest.json"), "utf8"),
+);
 requireFile("styles.css");
 requireFile("player/player.js");
 requireFile("player/gba-studio-mark.svg");
+requireFile("player/handheld-logo.png");
 
 if (!landing.includes('href="player/"'))
   fail("landing page does not link to player");
@@ -35,7 +39,7 @@ if (
 ) {
   fail("landing page does not link to the interactive Studio preview");
 }
-if (!playerHtml.includes('src="player.js"'))
+if (!playerHtml.includes('src="player.js?player=3"'))
   fail("player script is not loaded");
 if (!emulatorHtml.includes("window.EJS_startOnLoaded = false"))
   fail("browser emulator must wait for an explicit user start");
@@ -57,10 +61,21 @@ if (
 }
 
 for (const demo of player.DEMOS) {
-  const relativePath = path.posix.join("player", demo.url);
+  requireFile(path.posix.join("player", demo.screenshot));
+  const relativePath = path.posix.join("player", demo.url.split("?", 1)[0]);
   const rom = fs.readFileSync(requireFile(relativePath));
   if (!player.hasValidGbaHeader(rom))
     fail(`${relativePath} has an invalid GBA header`);
+  const crypto = require("crypto");
+  const entry = manifest.games.find(
+    (game) => game.url === demo.url.split("?", 1)[0],
+  );
+  if (
+    !entry ||
+    entry.bytes !== rom.length ||
+    entry.sha256 !== crypto.createHash("sha256").update(rom).digest("hex")
+  )
+    fail(`${relativePath} does not match its published manifest`);
   process.stdout.write(`[pages] valid ${relativePath} (${rom.length} bytes)\n`);
 }
 

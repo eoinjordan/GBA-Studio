@@ -1,0 +1,269 @@
+{
+  "_resourceType": "scene",
+  "id": "bd336eef-fd67-4d7a-8462-e285544733b1",
+  "_index": 0,
+  "type": "LOGO",
+  "name": "Poachermon: Case 001",
+  "symbol": "scene_title",
+  "x": 100,
+  "y": 100,
+  "width": 30,
+  "height": 20,
+  "backgroundId": "28111379-f7f8-4c2f-80db-2252cd7bf759",
+  "tilesetId": "",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [
+    "7fee6b88-f893-493b-82e0-810d6e27a59b",
+    "35543855-752d-4195-836a-ca14bee206d3",
+    "e28289ef-a222-48fa-8c44-af79b5e54e40",
+    "5c769a01-83e5-4647-8254-5ba44907eec9",
+    "73bf49a8-808d-481b-8392-f9c053720845",
+    "9b00eabc-acc9-46e4-8aea-89f44f98e89f",
+    "01edf222-4cde-45ee-8946-98984e07fbe4",
+    "7fee6b88-f893-493b-82e0-810d6e27a59b"
+  ],
+  "autoFadeSpeed": 1,
+  "script": [
+    {
+      "id": "8273e2f0-c221-40b6-8528-f3110b14e213",
+      "command": "EVENT_ACTOR_DEACTIVATE",
+      "args": {
+        "actorId": "player"
+      }
+    },
+    {
+      "id": "b1dc3e4b-75ea-4b82-87fd-3d5083cc1827",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "0",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "d9b3141f-cb59-4eef-8112-a4909a0b12fe",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "1",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "7bbc1007-e95e-4430-8a52-02d4cfed15c0",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "2",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "9647b2f0-5ad4-4090-8513-2915884a2483",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "3",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "561afa1a-a83e-42c5-8bd8-e914e5fc98cb",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "4",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "e745f98a-28d2-4d92-866f-fc3eb87ef84e",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "5",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "5f932894-5b46-43f8-8d6a-785e6c13329d",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "6",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "2cf44f67-bb63-4399-80ca-02527b3e47aa",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "7",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "74ba18ef-aedb-4a09-8b7d-c7281138375e",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "8",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "3e5fa1f9-d7d6-456b-839c-ca8759c7ce8f",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "9",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "7afc004d-9b14-46d5-819b-a3938dd5f91d",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "10",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "ca8372d7-50f9-431b-8ca8-a9d601cb0607",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "11",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "14dbdc8a-efd9-42e6-85e9-641c57c9755b",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "12",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "41872ab6-3ee9-4f81-8d14-7240a79f167b",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "13",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "a7eebadb-8382-46cd-87e9-4c0238d1d2b6",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "14",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "3f39a928-9411-463a-8819-c5b7de308f11",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "15",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "76a7461d-249e-4e03-8df8-d3899030e484",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "16",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "ace78232-7d4b-406b-8418-d354a939b719",
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "17",
+        "value": {
+          "type": "number",
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "9e3efaf4-d0f2-401b-894a-e5950e1e95cd",
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "start"
+        ]
+      }
+    },
+    {
+      "id": "d783f08c-220c-43ea-8bcc-c4327679c003",
+      "command": "EVENT_SWITCH_SCENE",
+      "args": {
+        "sceneId": "7671f207-60dd-4ac5-8d9d-578b2cc5f93c",
+        "x": {
+          "type": "number",
+          "value": 15
+        },
+        "y": {
+          "type": "number",
+          "value": 18
+        },
+        "direction": "up",
+        "fadeSpeed": "1"
+      }
+    },
+    {
+      "id": "0124690c-2bdb-401d-8915-6bcebebc92f0",
+      "command": "EVENT_END",
+      "args": {}
+    }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "collisions": "011f+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+012+001c+011f+"
+}

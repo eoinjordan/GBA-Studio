@@ -52,6 +52,11 @@ import type {
 import type { ThemeInterface } from "ui/theme/ThemeInterface";
 import type { TemplatePlugin } from "lib/templates/templateManager";
 import { EngineSchema } from "lib/project/loadEngineSchema";
+import type {
+  HandheldAction,
+  HandheldConfig,
+  HandheldResult,
+} from "shared/lib/handheld/types";
 
 interface L10NLookup {
   [key: string]: string | boolean | undefined;
@@ -113,6 +118,20 @@ const createWatchSubscribeAPI = <T>(channel: string) => {
 };
 
 const APISetup = {
+  handheld: {
+    config: (): Promise<HandheldConfig> =>
+      ipcRenderer.invoke("handheld:config"),
+    run: (
+      project: ProjectResources,
+      options: BuildOptions,
+      action: HandheldAction,
+      config: HandheldConfig,
+    ): Promise<HandheldResult> =>
+      ipcRenderer.invoke("handheld:run", project, options, action, config),
+    log: createSubscribeAPI<(event: IpcRendererEvent, message: string) => void>(
+      "handheld:log",
+    ),
+  },
   platform: process.platform,
   test: () => console.log("Hello World"),
   app: {

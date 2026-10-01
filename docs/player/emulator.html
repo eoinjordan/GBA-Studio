@@ -17,8 +17,8 @@
       }
 
       body {
-        display: grid;
-        place-items: stretch;
+        display: flex;
+        flex-direction: column;
         color: #f5f3ff;
         font:
           14px system-ui,
@@ -27,6 +27,31 @@
 
       #shell {
         position: relative;
+        flex: 1;
+        min-height: 0;
+      }
+
+      #game-controls {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px;
+        background: #101323;
+      }
+
+      #game-controls button {
+        min-width: 40px;
+        min-height: 36px;
+        border: 1px solid #8068b8;
+        border-radius: 6px;
+        color: #f5f3ff;
+        background: #29203f;
+        touch-action: none;
+        cursor: pointer;
+      }
+
+      #game-controls button:focus-visible {
+        outline: 2px solid #d9f99d;
       }
 
       .boot-status {
@@ -75,6 +100,33 @@
         Loading emulator controls…
       </button>
     </div>
+    <div id="game-controls" aria-label="Game buttons">
+      <button type="button" data-input="4" aria-label="Move up" disabled>
+        ↑
+      </button>
+      <button type="button" data-input="5" aria-label="Move down" disabled>
+        ↓
+      </button>
+      <button type="button" data-input="6" aria-label="Move left" disabled>
+        ←
+      </button>
+      <button type="button" data-input="7" aria-label="Move right" disabled>
+        →
+      </button>
+      <button
+        type="button"
+        data-input="8"
+        aria-label="A: interact or advance"
+        disabled
+      >
+        A
+      </button>
+      <button type="button" data-input="0" aria-label="B" disabled>B</button>
+      <button type="button" data-input="3" aria-label="Start" disabled>
+        Start
+      </button>
+    </div>
+    <script src="player.js?player=3"></script>
     <script>
       (function () {
         const params = new URLSearchParams(window.location.search);
@@ -101,6 +153,7 @@
         window.EJS_player = "#game";
         window.EJS_core = "gba";
         window.EJS_controlScheme = "gba";
+        window.EJS_defaultControls = window.GBAStudioPlayer.CONTROLS;
         window.EJS_gameUrl = rom;
         window.EJS_gameName = name;
         window.EJS_pathtodata = "https://cdn.emulatorjs.org/4.2.3/data/";
@@ -121,8 +174,88 @@
         };
         window.EJS_onGameStart = function () {
           bootStatus.hidden = true;
+          document
+            .querySelectorAll("#game-controls button")
+            .forEach(function (button) {
+              button.disabled = false;
+            });
+          const canvas = document.querySelector("#game canvas");
+          if (canvas) {
+            canvas.tabIndex = 0;
+            canvas.setAttribute("aria-label", name + " game screen");
+            canvas.focus();
+          }
           report("started", "Game running");
         };
+
+        const input = window.GBAStudioPlayer.createInputController(
+          function (button, value) {
+            const emulator = window.EJS_emulator;
+            if (emulator && emulator.gameManager)
+              emulator.gameManager.simulateInput(0, button, value);
+          },
+        );
+        ["keydown", "keyup"].forEach(function (type) {
+          window.addEventListener(
+            type,
+            function (event) {
+              const button =
+                window.GBAStudioPlayer.KEY_INPUT[event.key.toLowerCase()];
+              if (
+                button === undefined ||
+                /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)
+              )
+                return;
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              if (!event.repeat)
+                input[type === "keydown" ? "press" : "release"](button);
+            },
+            true,
+          );
+        });
+        window.addEventListener("message", function (event) {
+          if (
+            event.source !== window.parent ||
+            event.origin !== window.location.origin ||
+            !event.data ||
+            event.data.source !== "gba-studio-keyboard"
+          )
+            return;
+          if (event.data.reset) input.reset();
+          else if (Number.isInteger(event.data.input))
+            input[event.data.pressed ? "press" : "release"](event.data.input);
+        });
+        window.addEventListener("blur", input.reset);
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) input.reset();
+        });
+        document
+          .querySelectorAll("#game-controls button")
+          .forEach(function (button) {
+            const code = Number(button.dataset.input);
+            let pointerTap = false;
+            button.addEventListener("pointerdown", function (event) {
+              pointerTap = true;
+              button.setPointerCapture(event.pointerId);
+              input.press(code);
+            });
+            ["pointerup", "pointercancel", "lostpointercapture"].forEach(
+              function (event) {
+                button.addEventListener(event, function () {
+                  input.release(code);
+                });
+              },
+            );
+            button.addEventListener("click", function () {
+              if (pointerTap) {
+                pointerTap = false;
+                return;
+              }
+              input.press(code);
+              input.release(code);
+            });
+          });
 
         bootStatus.addEventListener("click", function () {
           const startButton = document.querySelector(".ejs_start_button");
